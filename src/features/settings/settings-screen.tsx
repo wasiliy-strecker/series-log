@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import {
   Body,
+  Button,
   BusyOverlay,
   Card,
   Field,
@@ -248,6 +249,15 @@ export function SettingsScreen() {
             Empfänger. Backups sind passwortgeschützt. Ohne Passwort können sie
             nicht wiederhergestellt werden.
           </Body>
+          <View style={{ marginTop: 14 }}>
+            <Button
+              secondary
+              icon="open_in_new"
+              title="Datenschutzerklärung öffnen"
+              disabled={vm.busy}
+              onPress={() => void vm.openPrivacy()}
+            />
+          </View>
         </Card>
         <View style={{ marginTop: 6 }}>
           <Heading>Über SerienLog</Heading>

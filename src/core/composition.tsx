@@ -19,6 +19,10 @@ import { PdfService } from './pdf/pdf-service';
 import { SeriesService } from '../features/entries/entry-service';
 import { BackupCodec, BackupService } from './backup/backup-service';
 import { ExpoMedia, type MediaPort } from './media/media-service';
+import {
+  DeviceExternalLinks,
+  type ExternalLinks,
+} from './links/external-links';
 import { seriesNative, type SeriesNative } from './native/series-native';
 import type { Environment } from './ports';
 
@@ -26,6 +30,7 @@ export type Services = {
   series: SeriesService;
   backup: BackupService;
   media: MediaPort;
+  links: ExternalLinks;
   native: SeriesNative;
   viewer: PdfViewerService;
 };
@@ -112,6 +117,7 @@ async function createServices(): Promise<Services> {
     series,
     backup: new BackupService(series, new BackupCodec(env, androidPasswordKey)),
     media,
+    links: new DeviceExternalLinks(),
     native: seriesNative,
     viewer: new PdfViewerService(series, seriesNative),
   };

@@ -24,8 +24,9 @@ oder Store-Build.
 
 ## Kurze manuelle Abnahme auf einem Gerät
 
-Diese Schritte sind dokumentiert, noch nicht auf einem Smartphone ausgeführt.
-Es wurde keine umfangreiche visuelle Testreihe gestartet.
+Die vollständige manuelle Abnahme steht noch aus. Schritt 10 wurde auf einem
+verbundenen Android-Smartphone geprüft. Es wurde keine umfangreiche visuelle
+Testreihe gestartet.
 
 1. Serie mit Titel und Genre anlegen. Gesamtfolgenzahl offen lassen.
 2. Staffel 1, Folge 3 ohne Foto speichern. Drei Folgen ohne Prozentwert prüfen.
@@ -40,6 +41,8 @@ Es wurde keine umfangreiche visuelle Testreihe gestartet.
 8. Serienprotokoll öffnen, drucken oder teilen. Verschlüsseltes Backup speichern
    und importieren. Fotos, Folgenstände und Erinnerungseinstellungen prüfen.
 9. Große Systemschrift, Tastatur, Zurücknavigation und Querformat kurz prüfen.
+10. In den Einstellungen „Datenschutzerklärung öffnen“ antippen. Die Seite
+    `github.com/wasiliy-strecker/series-log/blob/main/PRIVACY.md` muss öffnen.
 
 Die native Testsuite ersetzt keine reale Prüfung von Kamera, Dateiauswahl,
 Hersteller-Energiesparregeln, Benachrichtigungszustellung oder PDF-Druckdiensten.

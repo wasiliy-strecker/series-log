@@ -54,6 +54,37 @@ zukünftige neue Stände benötigen eine Bestätigung. Der Verlauf zählt gespei
 Stände, nicht einzelne Seh-Sitzungen. Serienangaben, die vorhandenen Ständen
 widersprechen, werden nicht gespeichert.
 
+## Erinnerungen zum Weiterschauen
+
+Das Formular und die Statusanzeigen folgen MaschinenLog und dessen
+ZählerstandLog-Vorlage. Erinnerungen bleiben optional und lokal. Es gibt
+stündliche, tägliche, wöchentliche, monatliche und jährliche Termine. Beim
+stündlichen Intervall lassen sich Startdatum und Startzeit getrennt wählen.
+Der nächste Termin wird vor dem Speichern angezeigt.
+
+Neue Erinnerungen verwenden den aktuellen Tag bis maximal 28, den aktuellen
+Monat, 09:00 Uhr und für stündliche Termine die nächste volle Stunde.
+Gespeicherte Tage 29 bis 31 bleiben gültig. Intervall, Tag und Uhrzeit bleiben
+beim Aus- und Einschalten im selben Formular erhalten.
+
+„Normale Erinnerung“ kann verzögert erscheinen und berücksichtigt „Nicht
+stören“. „Pünktlich mit Ton“ öffnet bei fehlender Freigabe „Alarme &
+Erinnerungen“. Blockierte Benachrichtigungen, gesperrte Erinnerungsarten und
+„Nicht stören“ erhalten eigene Hinweise mit passenden Android-Einstellungen.
+Nach Rückkehr liest die App den Zustand erneut. Die vorhandenen Kanal-IDs und
+damit die Einstellungen für diese Kategorien bleiben erhalten.
+
+„Erinnerung jetzt testen“ zeigt Serientitel, Genre und den letzten Folgenstand.
+Antippen öffnet die gespeicherte Serie. Bei einer noch nicht gespeicherten Serie
+öffnet die Testmeldung die App. Sie verschwindet nach einer Minute. Erfolg,
+Blockierung und technische Fehler werden getrennt gemeldet. Die
+Erfolgsrückmeldung bleibt acht Sekunden sichtbar.
+
+Übersicht und Seriendetails zeigen ausstehende, blockierte oder fehlgeschlagene
+Termine. Eine nicht bestätigte Planung lässt sich auch ohne Feldänderung mit
+„Erinnerung erneut speichern“ reparieren. Gespeicherte Seriendaten und
+Planungsprobleme werden getrennt gemeldet.
+
 ## Architektur
 
 `src/app` enthält schlanke Expo-Router-Routen. `src/features` enthält Screens,

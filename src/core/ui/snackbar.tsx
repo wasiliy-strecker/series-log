@@ -11,7 +11,6 @@ import { useTheme } from './theme';
 
 // Match Fahrzeugakte's fixed Material snackbar and Flutter's default timing.
 const transitionMs = 250;
-const displayMs = 4000;
 const timing = {
   duration: transitionMs,
   easing: Easing.bezier(0.4, 0, 0.2, 1),
@@ -37,17 +36,19 @@ export function Snackbar({
   id,
   message,
   onDismiss,
+  durationMs = 4000,
 }: {
   id: number;
   message: string;
   onDismiss(id: number): void;
+  durationMs?: number;
 }) {
   const c = useTheme();
   const safe = useSafeAreaInsets();
   useEffect(() => {
-    const timer = setTimeout(() => onDismiss(id), transitionMs + displayMs);
+    const timer = setTimeout(() => onDismiss(id), transitionMs + durationMs);
     return () => clearTimeout(timer);
-  }, [id, onDismiss]);
+  }, [id, onDismiss, durationMs]);
   return (
     <Animated.View
       entering={enter}

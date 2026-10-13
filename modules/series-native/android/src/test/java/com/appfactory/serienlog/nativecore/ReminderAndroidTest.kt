@@ -54,6 +54,17 @@ class ReminderAndroidTest {
         id, "Test", "other", "Test", null, null, "daily", 1, null, 9, 0,
         if (punctual) "punctualWithSound" else "normal")
 
+    @Test fun contextualTestOpensTheSelectedSeriesAndShowsTheLastEpisode() {
+        assertEquals("posted", ReminderNotifier.showTest(context, "series-a", "Dark", "series", "Drama", "Staffel 2 · Folge 3", null, false))
+        val notification = shadowOf(notifications).allNotifications.single()
+        assertEquals("Letzter Folgenstand: Staffel 2 · Folge 3", notification.extras.getCharSequence("android.text").toString())
+        assertTrue(notification.extras.getCharSequence("android.bigText").toString().contains("Tippen öffnet die Serie"))
+        assertEquals("series-a", shadowOf(notification.contentIntent).savedIntent.data?.lastPathSegment)
+        if (Build.VERSION.SDK_INT >= 26) {
+            assertEquals("Normale Erinnerung", notifications.getNotificationChannel(notification.channelId).name.toString())
+        }
+    }
+
     @Test fun careWithoutHeightAppearsInRealAndTestNotifications() {
         val care = reminder().copy(label = "Testserie", latestValue = "Staffel 1 · Folge 3", latestUnit = "")
         ReminderNotifier.showRecord(context, care)
@@ -63,7 +74,7 @@ class ReminderAndroidTest {
         notifications.cancelAll()
         assertEquals("posted", ReminderNotifier.showTest(context, "test", "Testserie", "other", "Drama", "Staffel 2 · Folge 1", "", false))
         notification = shadowOf(notifications).allNotifications.single()
-        assertEquals("Letzter Eintrag: Staffel 2 · Folge 1", notification.extras.getCharSequence("android.text").toString())
+        assertEquals("Letzter Folgenstand: Staffel 2 · Folge 1", notification.extras.getCharSequence("android.text").toString())
     }
 
     @Test fun acceptedScheduleReportsItsActualAlarmAndCancellationRemovesIt() {
@@ -165,11 +176,13 @@ class ReminderAndroidTest {
         assertFalse(ReminderScheduler.cancel(context, saved.recordId))
         assertEquals("cancelFailed", ReminderScheduler.status(context, saved.recordId)["planningState"])
         assertNull(ReminderStore.find(context, saved.recordId))
+        assertTrue(ReminderStore.statusIds(context).contains(saved.recordId))
         SeriesReminderReceiver().onReceive(context, Intent().putExtra("record_id", saved.recordId))
         assertTrue(shadowOf(notifications).allNotifications.isEmpty())
         FailingCancellation.fail = false
-        assertTrue(ReminderScheduler.cancel(context, saved.recordId))
+        ReminderScheduler.rescheduleAll(context)
         assertEquals("none", ReminderScheduler.status(context, saved.recordId)["planningState"])
+        assertFalse(ReminderStore.statusIds(context).contains(saved.recordId))
     }
 
     @Implements(AlarmManager::class)

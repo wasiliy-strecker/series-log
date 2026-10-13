@@ -2,21 +2,24 @@
 
 ## Ausgeführt
 
-`npm run check`: Formatierung, ESLint, TypeScript und 13 gezielte Tests für
+`npm run check`: Formatierung, ESLint, TypeScript und 17 gezielte Tests für
 Folgenberechnung, optionale Gesamtzahlen, Staffelwechsel, Rücksprünge,
 SQLite-Persistenz, Suche, Paginierung, Korrekturen, Dateireferenzen, PDF-Erzeugung
-und verschlüsselte Backups. Die Backup-Prüfung nutzt echte JPEG-/PDF-Dateien
-und verifiziert die Verschlüsselung zusätzlich mit Node/OpenSSL.
+und verschlüsselte Backups sowie Erinnerungsdefaults, Zeitumstellung und
+Statusfälle. Die Backup-Prüfung nutzt echte JPEG-/PDF-Dateien und verifiziert
+die Verschlüsselung zusätzlich mit Node/OpenSSL.
 
-`npm run check:native`: 38 vorhandene, auf SerienLog angepasste JVM-Tests für
+`npm run check:native`: 44 JVM-Tests für
 Erinnerungen, Zeitzonen, Android-Berechtigungen, Dateizugriff und
 Passwortableitung bestanden. Android-Lint für das eigene Modul bestanden.
 Die bereits in der Vorlage dokumentierten Lint-Abstürze zweier Expo-/Worklets-
 Abhängigkeiten werden im übernommenen Skript gezielt ausgeschlossen.
 
 `expo prebuild`: Eigene Android-Kennungen, Expo-Modul, Icon, Startfarben und
-getrennte Dev-/Store-Varianten erzeugt. Kein Store-Debug. Kein APK oder AAB für
-den Store erstellt. Keine Installation, kein Upload und kein Push.
+getrennte Dev-/Store-Varianten erzeugt. Kein Store-Debug und kein Store-Build.
+
+`npm run build:preview`: Eigenständige Dev-Testversion mit eingebettetem
+JavaScript und aktualisierter nativer Erinnerungslogik erfolgreich gebaut.
 
 `npx expo export --platform android --output-dir build/bundle-check`: Android-
 JavaScript-Bündel mit Metro und Hermes erfolgreich erzeugt. Das ist kein APK-
@@ -43,6 +46,11 @@ Testreihe gestartet.
 9. Große Systemschrift, Tastatur, Zurücknavigation und Querformat kurz prüfen.
 10. In den Einstellungen „Datenschutzerklärung öffnen“ antippen. Die Seite
     `github.com/wasiliy-strecker/series-log/blob/main/PRIVACY.md` muss öffnen.
+11. Eine Erinnerung aktivieren, Intervall und Tag ändern, aus- und wieder
+    einschalten. Die Auswahl muss erhalten bleiben. „Erinnerung jetzt testen“
+    soll Serientitel und letzten Folgenstand zeigen und zur Serie führen.
+    Blockierte App oder Kategorie, „Nicht stören“ und fehlende Alarmfreigabe
+    sollen unterschiedliche Hinweise und passende Einstellungsziele zeigen.
 
 Die native Testsuite ersetzt keine reale Prüfung von Kamera, Dateiauswahl,
 Hersteller-Energiesparregeln, Benachrichtigungszustellung oder PDF-Druckdiensten.

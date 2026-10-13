@@ -1,6 +1,5 @@
 import { positionText } from '../../core/domain/progress';
 import { useCallback, useState } from 'react';
-import { AppState } from 'react-native';
 import { useFocusEffect, router } from 'expo-router';
 import { useIsFocused } from 'expo-router/react-navigation';
 import { useStartupHold } from '../../core/startup/startup';
@@ -12,7 +11,7 @@ import type {
   SavedReport,
 } from '../../core/domain/models';
 import { PAGE_SIZE } from '../../core/domain/models';
-import type { ReminderStatus } from '../../core/native/series-native';
+import { useReminderStatus } from './use-reminder-status';
 import { errorText } from '../../core/ui/components';
 import { useTask } from '../../core/ui/use-task';
 import { useFeedback } from '../../core/ui/feedback';
@@ -23,31 +22,6 @@ import {
   type HistoryItem,
   type RecordSort,
 } from './presentation-model';
-export function useReminderStatus() {
-  const { native } = useServices();
-  const [status, setStatus] = useState<ReminderStatus>();
-  useFocusEffect(
-    useCallback(() => {
-      let active = true;
-      const load = () =>
-        native
-          .reminderStatus()
-          .then((v) => {
-            if (active) setStatus(v);
-          })
-          .catch(() => {});
-      void load();
-      const l = AppState.addEventListener('change', (s) => {
-        if (s === 'active') void load();
-      });
-      return () => {
-        active = false;
-        l.remove();
-      };
-    }, [native]),
-  );
-  return status;
-}
 export function useRecords() {
   const { series, revision } = useServices();
   const [items, setItems] = useState<DashboardItem[]>([]),

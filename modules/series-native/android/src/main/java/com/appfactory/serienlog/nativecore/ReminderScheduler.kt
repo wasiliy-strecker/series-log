@@ -97,6 +97,8 @@ internal object ReminderScheduler {
     )
 
     fun rescheduleAll(context: Context, clockChanged: Boolean = false) {
+        ReminderStore.statusIds(context).filter { ReminderStore.planningState(context, it) == "cancelFailed" }
+            .forEach { cancel(context, it) }
         ReminderStore.all(context).forEach { reminder ->
             if (clockChanged) {
                 scheduleNext(context, reminder)
@@ -226,9 +228,9 @@ internal object ReminderNotifier {
         val latestReading = if (
             !reminder.latestValue.isNullOrBlank()
         ) {
-            "Letzter Eintrag: ${reminder.latestValue} ${reminder.latestUnit.orEmpty()}".trim()
+            "Letzter Folgenstand: ${reminder.latestValue}"
         } else {
-            "Noch kein Eintrag"
+            "Noch kein Folgenstand"
         }
         val summary = "${reminder.categoryLabel} · $latestReading"
         val notification = NotificationCompat.Builder(context, channelId)
@@ -313,9 +315,9 @@ internal object ReminderNotifier {
         val availability = availability(context, punctual)
         if (availability != ReminderAvailability.AVAILABLE) return availability.wireValue
         val latestReading = if (!latestValue.isNullOrBlank()) {
-            "Letzter Eintrag: $latestValue ${latestUnit.orEmpty()}".trim()
+            "Letzter Folgenstand: $latestValue"
         } else {
-            "Noch kein Eintrag"
+            "Noch kein Folgenstand"
         }
         val target = if (recordId.isNullOrBlank()) "die App" else "die Serie"
         val notification = NotificationCompat.Builder(
@@ -412,10 +414,10 @@ internal object ReminderNotifier {
         val manager = context.getSystemService(NotificationManager::class.java)
         val normal = NotificationChannel(
             normalChannelId,
-            "SerienLog-Erinnerungen",
+            "Normale Erinnerung",
             NotificationManager.IMPORTANCE_HIGH,
         ).apply {
-            description = "Optionale Erinnerungen für regelmäßige Einträge."
+            description = "Optionale Erinnerungen zum Weiterschauen."
             enableVibration(true)
             setSound(
                 RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION),
@@ -429,10 +431,10 @@ internal object ReminderNotifier {
             ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val alarm = NotificationChannel(
             alarmChannelId,
-            "Pünktliche SerienLog-Erinnerungen",
+            "Pünktlich mit Ton",
             NotificationManager.IMPORTANCE_HIGH,
         ).apply {
-            description = "Pünktliche SerienLog-Erinnerungen mit Alarmton."
+            description = "Pünktliche Erinnerungen zum Weiterschauen mit Alarmton."
             enableVibration(true)
             setSound(
                 alarmSound,

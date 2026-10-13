@@ -48,6 +48,8 @@ export function useEntryDetail(id: string) {
         !(await feedback.confirm(
           'Eintrag löschen?',
           'Der Eintrag und seine Einzelprotokolle werden gelöscht. Gespeicherte Gesamtprotokolle bleiben erhalten.',
+          'Löschen',
+          true,
         ))
       )
         return;

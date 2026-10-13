@@ -13,10 +13,12 @@ import { errorText } from '../../core/ui/components';
 import { useFeedback } from '../../core/ui/feedback';
 import { useLeaveGuard } from '../../core/ui/use-leave-guard';
 import { capturePhase } from '../records/presentation-model';
+import { positionText } from '../../core/domain/progress';
 import { useFormErrors } from '../../core/ui/use-form-errors';
 import {
   entryFieldOrder,
   entrySaveFieldErrors,
+  needsLowerPositionConfirmation,
   validateEntryForm,
 } from './entry-form-validation';
 export function useEntryEditor(recordId: string, entryId?: string) {
@@ -175,6 +177,7 @@ export function useEntryEditor(recordId: string, entryId?: string) {
           !(await feedback.confirm(
             'Staffel abschließen?',
             `Staffel ${season} mit ${episode} Folgen als vollständig gesehen bestätigen und zu Staffel ${season + 1} wechseln? Die nächste Staffel beginnt bei Folge 0. Gespeichert wird erst mit „Bestätigen & speichern“.`,
+            'Zur nächsten Staffel',
           ))
         )
           return;
@@ -274,18 +277,20 @@ export function useEntryEditor(recordId: string, entryId?: string) {
           !(await feedback.confirm(
             'Staffelwechsel bestätigen?',
             `Du speicherst einen Stand in Staffel ${position.season}. Der Gesamtfortschritt setzt voraus, dass frühere Staffeln vollständig gesehen sind. Bei unbekannten Staffellängen bleibt er offen.`,
+            'Weiter zum Speichern',
           ))
         )
           return;
         if (
           !entryId &&
           latest &&
-          (position.season < latest.season ||
-            (position.season === latest.season &&
-              position.episode < latest.episode)) &&
+          needsLowerPositionConfirmation(position, d.form.occurredAt, latest) &&
           !(await feedback.confirm(
-            'Niedrigeren Folgenstand speichern?',
-            'Dieser Stand liegt vor deinem letzten Folgenstand. Der Verlauf bleibt erhalten. Für die Übersicht zählt der zeitlich neueste Eintrag.',
+            'Niedrigeren Stand speichern?',
+            `Bisheriger Stand: ${positionText(latest)}. Neuer Stand: ${positionText(position)}. Die Übersicht zeigt den zeitlich neuesten Folgenstand und kann danach weniger gesehene Folgen anzeigen. Möchtest du diesen Stand trotzdem speichern?`,
+            'Trotzdem speichern',
+            false,
+            'Eingabe prüfen',
           ))
         )
           return;
@@ -294,6 +299,7 @@ export function useEntryEditor(recordId: string, entryId?: string) {
           !(await feedback.confirm(
             'Zeitpunkt liegt in der Zukunft',
             'Diesen Folgenstand mit dem zukünftigen Zeitpunkt speichern?',
+            'Trotzdem speichern',
           ))
         )
           return;

@@ -1,4 +1,8 @@
-import type { EntryForm, SeriesRecord } from '../../core/domain/models';
+import type {
+  EntryForm,
+  EpisodeEntry,
+  SeriesRecord,
+} from '../../core/domain/models';
 import {
   validateProgress,
   wholeNumber,
@@ -7,6 +11,21 @@ import {
 import type { FormErrors } from '../../core/ui/use-form-errors';
 
 export const entryFieldOrder = ['season', 'episode', 'occurredAt', 'note'];
+
+export function needsLowerPositionConfirmation(
+  position: Position,
+  occurredAt: string,
+  latest?: EpisodeEntry,
+): boolean {
+  if (!latest) return false;
+  const lower =
+    position.season < latest.season ||
+    (position.season === latest.season && position.episode < latest.episode);
+  return (
+    lower &&
+    new Date(occurredAt).getTime() >= new Date(latest.occurredAt).getTime()
+  );
+}
 
 export function validateEntryForm(
   form: EntryForm,

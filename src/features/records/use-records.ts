@@ -280,6 +280,8 @@ export function useReports(
         await feedback.confirm(
           'Serienprotokoll löschen?',
           'Die gespeicherte PDF wird entfernt. Bereits exportierte Kopien bleiben erhalten.',
+          'Löschen',
+          true,
         )
       )
         await task.run(async () => {

@@ -392,6 +392,8 @@ export function RecordDetailScreen() {
               .confirm(
                 'Serie löschen?',
                 'Die Serie, ihre Folgenstände und gespeicherten Protokolle werden gelöscht. Exportierte Dateien bleiben erhalten.',
+                'Löschen',
+                true,
               )
               .then((ok) => {
                 if (ok) void vm.remove();

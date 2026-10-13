@@ -56,7 +56,7 @@ type Feedback = {
   confirm(
     title: string,
     message: string,
-    accept?: string,
+    accept: string,
     danger?: boolean,
     cancelLabel?: string,
   ): Promise<boolean>;
@@ -117,8 +117,8 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
     async (
       title: string,
       message: string,
-      accept = 'Löschen',
-      danger = true,
+      accept: string,
+      danger = false,
       cancelLabel = 'Abbrechen',
     ) =>
       (await choose({

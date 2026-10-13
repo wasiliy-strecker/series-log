@@ -7,6 +7,7 @@ import {
 } from '../src/features/records/record-form-validation';
 import {
   entrySaveFieldErrors,
+  needsLowerPositionConfirmation,
   validateEntryForm,
 } from '../src/features/entries/entry-form-validation';
 
@@ -74,4 +75,39 @@ it('maps progress errors found during save back to the affected field', () => {
       ),
     ),
   ).toHaveProperty('episode');
+});
+
+it('warns about a lower latest stand but allows older history entries without a warning', () => {
+  const latest = {
+    id: '11111111-1111-4111-8111-111111111111',
+    recordId: '22222222-2222-4222-8222-222222222222',
+    season: 1,
+    episode: 6,
+    occurredAt: '2026-10-13T20:00:00.000Z',
+    note: '',
+    attachments: [],
+    createdAt: '2026-10-13T20:00:00.000Z',
+    updatedAt: '2026-10-13T20:00:00.000Z',
+  };
+  expect(
+    needsLowerPositionConfirmation(
+      { season: 1, episode: 4 },
+      '2026-10-13T20:10:00.000Z',
+      latest,
+    ),
+  ).toBe(true);
+  expect(
+    needsLowerPositionConfirmation(
+      { season: 1, episode: 4 },
+      '2026-10-12T20:00:00.000Z',
+      latest,
+    ),
+  ).toBe(false);
+  expect(
+    needsLowerPositionConfirmation(
+      { season: 1, episode: 7 },
+      '2026-10-13T20:10:00.000Z',
+      latest,
+    ),
+  ).toBe(false);
 });

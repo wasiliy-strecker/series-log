@@ -666,6 +666,7 @@ export function DateField({
   time = false,
   optional = false,
   disabled = false,
+  error,
 }: {
   label: string;
   value: string;
@@ -673,6 +674,7 @@ export function DateField({
   time?: boolean;
   optional?: boolean;
   disabled?: boolean;
+  error?: string;
 }) {
   const c = useTheme(),
     picker = useMaterialDateTime();
@@ -701,75 +703,82 @@ export function DateField({
       );
   }
   return (
-    <View
-      style={{
-        borderWidth: 1,
-        borderColor: c.muted,
-        borderRadius: 14,
-        backgroundColor: c.input,
-        flexDirection: 'row',
-        alignItems: 'center',
-        minHeight: 56,
-      }}
-    >
-      {picker.dialog}
-      <Text
+    <View style={{ gap: 4 }}>
+      <View
         style={{
-          position: 'absolute',
-          top: -10,
-          left: 12,
-          paddingHorizontal: 4,
-          backgroundColor: c.background,
-          color: c.muted,
-          fontFamily: 'Roboto',
-          fontSize: 12,
-          lineHeight: 18,
+          borderWidth: 1,
+          borderColor: error ? c.danger : c.muted,
+          borderRadius: 14,
+          backgroundColor: c.input,
+          flexDirection: 'row',
+          alignItems: 'center',
+          minHeight: 56,
         }}
       >
-        {label}
-      </Text>
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={label}
-        disabled={disabled}
-        onPress={() => void pick()}
-        style={{ flex: 1, padding: 16 }}
-      >
+        {picker.dialog}
         <Text
           style={{
+            position: 'absolute',
+            top: -10,
+            left: 12,
+            paddingHorizontal: 4,
+            backgroundColor: c.background,
+            color: error ? c.danger : c.muted,
             fontFamily: 'Roboto',
-            fontSize: 16,
-            color: value ? c.ink : c.muted,
+            fontSize: 12,
+            lineHeight: 18,
           }}
         >
-          {value
-            ? time
-              ? date.toLocaleString('de-DE', {
-                  dateStyle: 'short',
-                  timeStyle: 'short',
-                })
-              : date.toLocaleDateString('de-DE', {
-                  day: '2-digit',
-                  month: '2-digit',
-                  year: 'numeric',
-                })
-            : 'Datum auswählen'}
+          {label}
         </Text>
-      </Pressable>
-      {!!value && optional && (
-        <IconButton
-          icon="close"
-          label="Datum entfernen"
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={label}
           disabled={disabled}
-          onPress={() => onChange('')}
+          onPress={() => void pick()}
+          style={{ flex: 1, padding: 16 }}
+        >
+          <Text
+            style={{
+              fontFamily: 'Roboto',
+              fontSize: 16,
+              color: value ? c.ink : c.muted,
+            }}
+          >
+            {value
+              ? time
+                ? date.toLocaleString('de-DE', {
+                    dateStyle: 'short',
+                    timeStyle: 'short',
+                  })
+                : date.toLocaleDateString('de-DE', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                  })
+              : 'Datum auswählen'}
+          </Text>
+        </Pressable>
+        {!!value && optional && (
+          <IconButton
+            icon="close"
+            label="Datum entfernen"
+            disabled={disabled}
+            onPress={() => onChange('')}
+          />
+        )}
+        <IconButton
+          icon="calendar_today"
+          label="Datum auswählen"
+          disabled={disabled}
+          onPress={() => void pick()}
         />
+      </View>
+      {!!error && (
+        <Body style={{ fontSize: 12, color: c.danger, paddingHorizontal: 16 }}>
+          {error}
+        </Body>
       )}
-      <IconButton
-        icon="calendar_today"
-        label="Datum auswählen"
-        disabled={disabled}
-        onPress={() => void pick()}
-      />
     </View>
   );
 }

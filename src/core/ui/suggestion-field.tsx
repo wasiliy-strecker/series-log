@@ -14,6 +14,7 @@ export function SuggestionField({
   placeholder,
   helper,
   helperStyle,
+  error,
   value,
   suggestions,
   onChange,
@@ -25,6 +26,7 @@ export function SuggestionField({
   placeholder?: string;
   helper: string;
   helperStyle?: StyleProp<TextStyle>;
+  error?: string;
   value: string;
   suggestions: string[];
   onChange(value: string): void;
@@ -52,6 +54,7 @@ export function SuggestionField({
       <View onLayout={(e) => setFieldHeight(e.nativeEvent.layout.height)}>
         <Field
           label={label}
+          error={error}
           value={value}
           onChangeText={(text) => {
             setEditedSinceFocus(true);

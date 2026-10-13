@@ -1,4 +1,3 @@
-import { wholeNumber } from '../../core/domain/progress';
 import { useEffect, useState } from 'react';
 import { router } from 'expo-router';
 import { PermissionsAndroid, Platform } from 'react-native';
@@ -15,6 +14,12 @@ import {
   reminderSchedule,
   reminderSaveWarning,
 } from './reminder-model';
+import { useFormErrors } from '../../core/ui/use-form-errors';
+import {
+  recordFieldOrder,
+  recordSaveFieldErrors,
+  validateRecordForm,
+} from './record-form-validation';
 export function useRecordEditor(id?: string) {
   const { series, refresh, native } = useServices();
   const reminderState = useReminderStatusSnapshot();
@@ -44,6 +49,7 @@ export function useRecordEditor(id?: string) {
   );
   const task = useTask();
   const { setError } = task;
+  const formErrors = useFormErrors();
   useEffect(() => {
     let active = true;
     series.repository
@@ -92,10 +98,13 @@ export function useRecordEditor(id?: string) {
     key: K,
     value: SeriesRecord[K],
   ) {
+    formErrors.clear(key);
     setRecord((current) => current && { ...current, [key]: value });
   }
   return {
     record,
+    fieldErrors: formErrors.fieldErrors,
+    errorTarget: formErrors.errorTarget,
     dirty,
     reminderStatus: reminderState.status,
     refreshReminderStatus: reminderState.refresh,
@@ -103,19 +112,35 @@ export function useRecordEditor(id?: string) {
     change,
     categorySuggestions: suggestions,
     totalInput,
-    setTotalInput,
+    setTotalInput: (value: string) => {
+      formErrors.clear('totalEpisodes');
+      setTotalInput(value);
+    },
     seasonInputs,
-    changeSeason: (index: number, value: string) =>
+    changeSeason: (index: number, value: string) => {
+      formErrors.clear(`season-${index}`);
       setSeasonInputs((items) =>
         items.map((item, i) => (i === index ? value : item)),
-      ),
+      );
+    },
     addSeason: () =>
       setSeasonInputs((items) => (items.length < 200 ? [...items, ''] : items)),
-    removeSeason: () => setSeasonInputs((items) => items.slice(0, -1)),
+    removeSeason: () => {
+      formErrors.clear(`season-${seasonInputs.length - 1}`);
+      setSeasonInputs((items) => items.slice(0, -1));
+    },
     ...task,
-    save: () =>
-      task.run(async () => {
-        if (!record) return;
+    save: () => {
+      if (!record) return Promise.resolve(undefined);
+      const validation = validateRecordForm(record, totalInput, seasonInputs);
+      if (!validation.value) {
+        setError('');
+        formErrors.show(validation.errors, recordFieldOrder);
+        return Promise.resolve(undefined);
+      }
+      const value = validation.value;
+      formErrors.clear();
+      return task.run(async () => {
         if (
           record.reminder &&
           Platform.OS === 'android' &&
@@ -124,15 +149,15 @@ export function useRecordEditor(id?: string) {
           await PermissionsAndroid.request(
             PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
           );
-        const warnings = await series.saveRecord({
-          ...record,
-          totalEpisodes: totalInput.trim()
-            ? wholeNumber(totalInput, 'Gesamtfolgenzahl', 1)
-            : null,
-          seasons: seasonInputs.map((value, i) =>
-            value.trim() ? wholeNumber(value, `Staffel ${i + 1}`, 1) : null,
-          ),
-        });
+        let warnings;
+        try {
+          warnings = await series.saveRecord(value);
+        } catch (error) {
+          const errors = recordSaveFieldErrors(error);
+          if (!errors) throw error;
+          formErrors.show(errors, recordFieldOrder);
+          return;
+        }
         refresh();
         let reminderWarning: string | null;
         try {
@@ -177,6 +202,7 @@ export function useRecordEditor(id?: string) {
               ? 'Änderungen an der Serie gespeichert.'
               : 'Serie gespeichert. Als Nächstes kannst du den ersten Folgenstand erfassen.'),
         );
-      }),
+      });
+    },
   };
 }

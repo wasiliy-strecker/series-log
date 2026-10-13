@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { View } from 'react-native';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import {
@@ -12,9 +13,11 @@ import {
 import { SuggestionField } from '../../core/ui/suggestion-field';
 import { useRecordEditor } from './use-record-editor';
 import { ReminderEditor } from './reminder-editor';
+import { FormErrorScroll } from '../../core/ui/form-error-scroll';
 export function RecordEditorScreen() {
   const { id } = useLocalSearchParams<{ id?: string }>();
   const vm = useRecordEditor(id);
+  const anchors = useRef<Record<string, View | null>>({});
   const r = vm.record;
   if (!r)
     return (
@@ -59,27 +62,44 @@ export function RecordEditorScreen() {
         </>
       }
     >
+      <FormErrorScroll target={vm.errorTarget} anchors={anchors} />
       <Stack.Screen
         options={{ title: id ? 'Serie bearbeiten' : 'Serie anlegen' }}
       />
       <View style={{ gap: 16 }}>
         <Notice error text={vm.error} />
-        <SuggestionField
-          label="Genre *"
-          placeholder="z. B. Drama oder Comedy"
-          helper="Vorschlag auswählen oder eigenes Genre eingeben."
-          value={r.category}
-          suggestions={vm.categorySuggestions}
-          disabled={vm.busy}
-          showAllOnFocus
-          onChange={(v) => vm.change('category', v)}
-        />
-        <Field
-          label="Serientitel *"
-          value={r.name}
-          onChangeText={(v) => vm.change('name', v)}
-          editable={!vm.busy}
-        />
+        <View
+          ref={(view) => {
+            anchors.current.category = view;
+          }}
+          collapsable={false}
+        >
+          <SuggestionField
+            label="Genre *"
+            error={vm.fieldErrors.category}
+            placeholder="z. B. Drama oder Comedy"
+            helper="Vorschlag auswählen oder eigenes Genre eingeben."
+            value={r.category}
+            suggestions={vm.categorySuggestions}
+            disabled={vm.busy}
+            showAllOnFocus
+            onChange={(v) => vm.change('category', v)}
+          />
+        </View>
+        <View
+          ref={(view) => {
+            anchors.current.name = view;
+          }}
+          collapsable={false}
+        >
+          <Field
+            label="Serientitel *"
+            error={vm.fieldErrors.name}
+            value={r.name}
+            onChangeText={(v) => vm.change('name', v)}
+            editable={!vm.busy}
+          />
+        </View>
         <Card>
           <Body strong>Folgen & Staffeln</Body>
           <Body muted>
@@ -87,22 +107,38 @@ export function RecordEditorScreen() {
             Prozentfortschritt braucht SerienLog die Gesamtzahl und die Längen
             der vorherigen Staffeln.
           </Body>
-          <Field
-            label="Gesamtfolgenzahl (optional)"
-            keyboardType="number-pad"
-            value={vm.totalInput}
-            onChangeText={vm.setTotalInput}
-            editable={!vm.busy}
-          />
-          {vm.seasonInputs.map((value, index) => (
+          <View
+            ref={(view) => {
+              anchors.current.totalEpisodes = view;
+            }}
+            collapsable={false}
+          >
             <Field
-              key={index}
-              label={`Folgen in Staffel ${index + 1} (optional)`}
+              label="Gesamtfolgenzahl (optional)"
+              error={vm.fieldErrors.totalEpisodes}
               keyboardType="number-pad"
-              value={value}
-              onChangeText={(v) => vm.changeSeason(index, v)}
+              value={vm.totalInput}
+              onChangeText={vm.setTotalInput}
               editable={!vm.busy}
             />
+          </View>
+          {vm.seasonInputs.map((value, index) => (
+            <View
+              key={index}
+              ref={(view) => {
+                anchors.current[`season-${index}`] = view;
+              }}
+              collapsable={false}
+            >
+              <Field
+                label={`Folgen in Staffel ${index + 1} (optional)`}
+                error={vm.fieldErrors[`season-${index}`]}
+                keyboardType="number-pad"
+                value={value}
+                onChangeText={(v) => vm.changeSeason(index, v)}
+                editable={!vm.busy}
+              />
+            </View>
           ))}
           <Button
             secondary
@@ -134,13 +170,21 @@ export function RecordEditorScreen() {
           status={vm.reminderStatus}
           refreshStatus={vm.refreshReminderStatus}
         />
-        <Field
-          label="Notiz (optional)"
-          multiline
-          value={r.note}
-          onChangeText={(v) => vm.change('note', v)}
-          editable={!vm.busy}
-        />
+        <View
+          ref={(view) => {
+            anchors.current.note = view;
+          }}
+          collapsable={false}
+        >
+          <Field
+            label="Notiz (optional)"
+            error={vm.fieldErrors.note}
+            multiline
+            value={r.note}
+            onChangeText={(v) => vm.change('note', v)}
+            editable={!vm.busy}
+          />
+        </View>
       </View>
     </Page>
   );

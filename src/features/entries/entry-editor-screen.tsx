@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { View } from 'react-native';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import {
@@ -13,6 +14,7 @@ import {
 import { PhotoEditor, type AttachmentActions } from '../media/attachments';
 import { useEntryEditor } from './use-entry-editor';
 import { entrySummary } from '../records/presentation-model';
+import { FormErrorScroll } from '../../core/ui/form-error-scroll';
 
 export function EntryEditorScreen() {
   const { recordId, entryId } = useLocalSearchParams<{
@@ -20,6 +22,7 @@ export function EntryEditorScreen() {
     entryId?: string;
   }>();
   const vm = useEntryEditor(recordId, entryId);
+  const anchors = useRef<Record<string, View | null>>({});
   const draft = vm.draft;
   if (!draft)
     return (
@@ -42,6 +45,7 @@ export function EntryEditorScreen() {
   };
   return (
     <Page>
+      <FormErrorScroll target={vm.errorTarget} anchors={anchors} />
       <Stack.Screen
         options={{
           title: entryId ? 'Folgenstand bearbeiten' : 'Folgenstand erfassen',
@@ -89,20 +93,36 @@ export function EntryEditorScreen() {
             {vm.latest && !entryId && (
               <Body muted>Zuletzt: {entrySummary(vm.latest)}</Body>
             )}
-            <Field
-              label="Staffel *"
-              keyboardType="number-pad"
-              value={form.season}
-              onChangeText={(v) => vm.change('season', v)}
-              editable={!vm.busy}
-            />
-            <Field
-              label="Zuletzt gesehene Folge *"
-              keyboardType="number-pad"
-              value={form.episode}
-              onChangeText={(v) => vm.change('episode', v)}
-              editable={!vm.busy}
-            />
+            <View
+              ref={(view) => {
+                anchors.current.season = view;
+              }}
+              collapsable={false}
+            >
+              <Field
+                label="Staffel *"
+                error={vm.fieldErrors.season}
+                keyboardType="number-pad"
+                value={form.season}
+                onChangeText={(v) => vm.change('season', v)}
+                editable={!vm.busy}
+              />
+            </View>
+            <View
+              ref={(view) => {
+                anchors.current.episode = view;
+              }}
+              collapsable={false}
+            >
+              <Field
+                label="Zuletzt gesehene Folge *"
+                error={vm.fieldErrors.episode}
+                keyboardType="number-pad"
+                value={form.episode}
+                onChangeText={(v) => vm.change('episode', v)}
+                editable={!vm.busy}
+              />
+            </View>
             <Body muted>
               Folge 0 bedeutet, dass du diese Staffel noch nicht begonnen hast.
               Die Eingabe zählt vollständig gesehene Folgen ab Staffelbeginn.
@@ -126,21 +146,37 @@ export function EntryEditorScreen() {
           <PhotoEditor photos={form.attachments} actions={actions} />
           <Card>
             <Body strong>Datum und Uhrzeit</Body>
-            <DateField
-              label="Gesehen am"
-              time
-              value={form.occurredAt}
-              onChange={(v) => vm.change('occurredAt', v)}
-              disabled={vm.busy}
-            />
+            <View
+              ref={(view) => {
+                anchors.current.occurredAt = view;
+              }}
+              collapsable={false}
+            >
+              <DateField
+                label="Gesehen am"
+                error={vm.fieldErrors.occurredAt}
+                time
+                value={form.occurredAt}
+                onChange={(v) => vm.change('occurredAt', v)}
+                disabled={vm.busy}
+              />
+            </View>
           </Card>
-          <Field
-            label="Notiz (optional)"
-            multiline
-            value={form.note}
-            onChangeText={(v) => vm.change('note', v)}
-            editable={!vm.busy}
-          />
+          <View
+            ref={(view) => {
+              anchors.current.note = view;
+            }}
+            collapsable={false}
+          >
+            <Field
+              label="Notiz (optional)"
+              error={vm.fieldErrors.note}
+              multiline
+              value={form.note}
+              onChangeText={(v) => vm.change('note', v)}
+              editable={!vm.busy}
+            />
+          </View>
           <Body muted>
             Prüfe Staffel, Folge und Zeitpunkt vor dem Speichern.
           </Body>

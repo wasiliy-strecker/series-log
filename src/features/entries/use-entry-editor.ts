@@ -1,4 +1,3 @@
-import { wholeNumber, validateProgress } from '../../core/domain/progress';
 import { useEffect, useRef, useState } from 'react';
 import { router } from 'expo-router';
 import { useServices } from '../../core/composition';
@@ -14,6 +13,12 @@ import { errorText } from '../../core/ui/components';
 import { useFeedback } from '../../core/ui/feedback';
 import { useLeaveGuard } from '../../core/ui/use-leave-guard';
 import { capturePhase } from '../records/presentation-model';
+import { useFormErrors } from '../../core/ui/use-form-errors';
+import {
+  entryFieldOrder,
+  entrySaveFieldErrors,
+  validateEntryForm,
+} from './entry-form-validation';
 export function useEntryEditor(recordId: string, entryId?: string) {
   const { series, media, refresh } = useServices();
   const feedback = useFeedback();
@@ -26,6 +31,7 @@ export function useEntryEditor(recordId: string, entryId?: string) {
     committed = useRef(false);
   const task = useTask();
   const { setError } = task;
+  const formErrors = useFormErrors();
   useEffect(() => {
     let active = true;
     (async () => {
@@ -96,6 +102,7 @@ export function useEntryEditor(recordId: string, entryId?: string) {
   }
   function change<K extends keyof EntryForm>(key: K, value: EntryForm[K]) {
     if (!current.current) return;
+    formErrors.clear(key);
     void apply({
       ...current.current,
       ...(key === 'season' ? { completedSeason: undefined } : {}),
@@ -114,26 +121,56 @@ export function useEntryEditor(recordId: string, entryId?: string) {
     draft,
     record,
     latest,
+    fieldErrors: formErrors.fieldErrors,
+    errorTarget: formErrors.errorTarget,
     dirty,
     phase: draft ? capturePhase(draft) : 'choose',
     change,
     setAttachments,
     ...task,
-    nextSeason: () =>
-      task.run(async () => {
+    nextSeason: () => {
+      const d = current.current;
+      if (!d || !record) return Promise.resolve(undefined);
+      const validation = validateEntryForm(d.form, record);
+      if (!validation.position) {
+        setError('');
+        formErrors.show(validation.errors, entryFieldOrder);
+        return Promise.resolve(undefined);
+      }
+      const position = validation.position;
+      formErrors.clear();
+      return task.run(async () => {
         const d = current.current;
         if (!d || !record) return;
-        const season = wholeNumber(d.form.season, 'Staffel', 1, 199);
-        const episode = wholeNumber(
-          d.form.episode,
-          'Zuletzt gesehene Folge',
-          1,
-        );
-        const length = record.seasons[season - 1];
-        if (length != null && episode !== length)
-          throw new Error(
-            `Für den Wechsel muss Staffel ${season} abgeschlossen sein. Trage zuerst die letzte Folge ${length} ein.`,
+        const season = position.season;
+        const episode = position.episode;
+        if (season >= 200) {
+          formErrors.show(
+            { season: 'Staffel 200 ist die letzte mögliche Staffel.' },
+            entryFieldOrder,
           );
+          return;
+        }
+        if (episode < 1) {
+          formErrors.show(
+            {
+              episode:
+                'Zum Abschließen muss mindestens eine Folge gesehen sein.',
+            },
+            entryFieldOrder,
+          );
+          return;
+        }
+        const length = record.seasons[season - 1];
+        if (length != null && episode !== length) {
+          formErrors.show(
+            {
+              episode: `Für den Wechsel muss Staffel ${season} abgeschlossen sein. Trage zuerst die letzte Folge ${length} ein.`,
+            },
+            entryFieldOrder,
+          );
+          return;
+        }
         if (
           !(await feedback.confirm(
             'Staffel abschließen?',
@@ -146,7 +183,8 @@ export function useEntryEditor(recordId: string, entryId?: string) {
           completedSeason: { season, episodes: episode },
           form: { ...d.form, season: String(season + 1), episode: '0' },
         });
-      }),
+      });
+    },
     chooseManual: () =>
       task.run(async () => {
         if (!current.current) return;
@@ -218,15 +256,18 @@ export function useEntryEditor(recordId: string, entryId?: string) {
       items[index + delta] = item;
       setAttachments(items);
     },
-    save: () =>
-      task.run(async () => {
-        if (!current.current) return;
-        const d = current.current;
-        const position = {
-          season: wholeNumber(d.form.season, 'Staffel', 1, 200),
-          episode: wholeNumber(d.form.episode, 'Folge'),
-        };
-        if (record && !d.completedSeason) validateProgress(record, [position]);
+    save: () => {
+      const d = current.current;
+      if (!d) return Promise.resolve(undefined);
+      const validation = validateEntryForm(d.form, record, !!d.completedSeason);
+      if (!validation.position) {
+        setError('');
+        formErrors.show(validation.errors, entryFieldOrder);
+        return Promise.resolve(undefined);
+      }
+      const position = validation.position;
+      formErrors.clear();
+      return task.run(async () => {
         if (
           !d.completedSeason &&
           position.season > (latest?.season ?? 1) &&
@@ -257,7 +298,15 @@ export function useEntryEditor(recordId: string, entryId?: string) {
         )
           return;
         await series.persistDraft(d);
-        const result = await series.saveEntry(current.current);
+        let result;
+        try {
+          result = await series.saveEntry(d);
+        } catch (error) {
+          const errors = entrySaveFieldErrors(error);
+          if (!errors) throw error;
+          formErrors.show(errors, entryFieldOrder);
+          return;
+        }
         committed.current = true;
         refresh();
         leave(() => {
@@ -276,6 +325,7 @@ export function useEntryEditor(recordId: string, entryId?: string) {
           result.warnings.join('\n') ||
             (entryId ? 'Änderungen gespeichert.' : 'Folgenstand gespeichert.'),
         );
-      }),
+      });
+    },
   };
 }

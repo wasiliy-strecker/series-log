@@ -112,11 +112,10 @@ export function RecordEditorScreen() {
           />
         </View>
         <Card>
-          <Body strong>Folgen & Staffeln</Body>
+          <Body strong>Folgenzahlen (optional)</Body>
           <Body muted>
-            Die Zahlen sind optional und können später ergänzt werden. Für
-            Prozentfortschritt braucht SerienLog die Gesamtzahl und die Längen
-            der vorherigen Staffeln.
+            Hier kannst du die Gesamtfolgenzahl und die Folgenzahl jeder Staffel
+            eintragen. Wenn du die Zahlen nicht kennst, lass die Felder leer.
           </Body>
           <View
             ref={(view) => {
@@ -154,21 +153,22 @@ export function RecordEditorScreen() {
           <Button
             secondary
             icon="add"
-            title="Staffel ergänzen"
+            title={`Folgenzahl für Staffel ${vm.seasonInputs.length + 1} eintragen`}
             disabled={vm.busy || vm.seasonInputs.length >= 200}
             onPress={vm.addSeason}
           />
           {!!vm.seasonInputs.length && (
             <Button
               secondary
-              title="Letzte Staffel aus Angaben entfernen"
+              title={`Angabe zu Staffel ${vm.seasonInputs.length} entfernen`}
               disabled={vm.busy}
               onPress={vm.removeSeason}
             />
           )}
           <Body muted>
-            Eine leere Folgenzahl bleibt unbekannt. Die Gesamtzahl umfasst die
-            Folgen aller Staffeln, die du verfolgen möchtest.
+            Die Gesamtzahl umfasst alle Staffeln. Beispiel: Staffel 1 hat 8
+            Folgen. Bei Staffel 2, Folge 3 hast du dann insgesamt 11 Folgen
+            gesehen.
           </Body>
         </Card>
         <ReminderEditor

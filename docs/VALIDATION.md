@@ -75,6 +75,11 @@ umfangreiche visuelle Testreihe gestartet.
     dürfen die Vorschau nicht entfernen. Ein Bild ändern oder den zugehörigen
     Stand löschen und die aktualisierte Vorschau beziehungsweise den Rückgriff
     auf das ältere Bild prüfen. Serien ohne Bild bleiben ohne leere Bildfläche.
+16. In den Serienangaben „Folgenzahl für Staffel 1 eintragen“ antippen. Das
+    optionale Feld für Staffel 1 muss erscheinen und der Button Staffel 2
+    nennen. Weitere Angaben ergänzen und die letzte Angabe wieder entfernen.
+    Der Erklärungstext muss zeigen, wozu diese Zahlen benötigt werden. Leere
+    Felder müssen weiterhin als unbekannte Folgenzahl speicherbar sein.
 
 Die native Testsuite ersetzt keine reale Prüfung von Kamera, Dateiauswahl,
 Hersteller-Energiesparregeln, Benachrichtigungszustellung oder PDF-Druckdiensten.

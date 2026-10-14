@@ -2,7 +2,7 @@
 
 ## Ausgeführt
 
-`npm run check`: Formatierung, ESLint, TypeScript und 17 gezielte Tests für
+`npm run check`: Formatierung, ESLint, TypeScript und 21 gezielte Tests für
 Folgenberechnung, optionale Gesamtzahlen, Staffelwechsel, Rücksprünge,
 SQLite-Persistenz, Suche, Paginierung, Korrekturen, Dateireferenzen, PDF-Erzeugung
 und verschlüsselte Backups sowie Erinnerungsdefaults, Zeitumstellung und
@@ -27,9 +27,10 @@ oder Store-Build.
 
 ## Kurze manuelle Abnahme auf einem Gerät
 
-Die vollständige manuelle Abnahme steht noch aus. Schritt 10 wurde auf einem
-verbundenen Android-Smartphone geprüft. Es wurde keine umfangreiche visuelle
-Testreihe gestartet.
+Die vollständige manuelle Abnahme steht noch aus. Schritt 10 sowie Öffnen,
+Weiterblättern, Randpfeile und Android-Zurück der Beispielgalerie aus Schritt 13
+wurden auf einem verbundenen Android-Smartphone geprüft. Es wurde keine
+umfangreiche visuelle Testreihe gestartet.
 
 1. Serie mit Titel und Genre anlegen. Gesamtfolgenzahl offen lassen.
 2. Staffel 1, Folge 3 ohne Foto speichern. Drei Folgen ohne Prozentwert prüfen.
@@ -55,6 +56,12 @@ Testreihe gestartet.
     Erinnerungen“ öffnen antippen. Die Android-Einstellung für SerienLog muss
     erscheinen. Danach zu SerienLog zurückkehren und prüfen, dass die gewählte
     Erinnerungsart erhalten blieb.
+13. Einen neuen Folgenstand beginnen. Die Foto-Hinweise zur Aufnahme und lokalen
+    Speicherung lesen und „Beispiele ansehen“ öffnen. Vier Beispiele durch
+    Wischen und mit den Pfeilen ansehen. Am Anfang und Ende muss der jeweilige
+    Pfeil deaktiviert sein. Galerie mit Schließen, Android-Zurück und nach unten
+    Ziehen schließen. Die Beispiele dürfen keine Fotos oder Folgenstände
+    übernehmen. Große Schrift und Querformat müssen durch Scrollen nutzbar bleiben.
 
 Die native Testsuite ersetzt keine reale Prüfung von Kamera, Dateiauswahl,
 Hersteller-Energiesparregeln, Benachrichtigungszustellung oder PDF-Druckdiensten.

@@ -10,6 +10,7 @@ weiße Schrift und rote Akzente geben SerienLog ein eigenes Erscheinungsbild.
 - Serien mit Titel, Genre und optionaler Notiz anlegen und bearbeiten
 - Staffel und zuletzt vollständig gesehene Folge mit Datum und Uhrzeit speichern
 - Optional Fotos aus Kamera oder Galerie und eine Notiz ergänzen
+- Foto-Hinweise und vier Beispielfotos vor dem Erfassen eines Folgenstands ansehen
 - Aktuellen Stand und Fortschritt in der Serienübersicht sehen
 - Zehn aktuelle Folgenstände und vollständigen, durchsuchbaren Verlauf ansehen
 - Folgenstände korrigieren oder löschen. Bearbeitungen aktualisieren den Eintrag

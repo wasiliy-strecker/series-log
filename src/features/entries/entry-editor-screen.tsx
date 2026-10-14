@@ -15,6 +15,8 @@ import { PhotoEditor, type AttachmentActions } from '../media/attachments';
 import { useEntryEditor } from './use-entry-editor';
 import { entrySummary } from '../records/presentation-model';
 import { FormErrorScroll } from '../../core/ui/form-error-scroll';
+import { CaptureGuidance } from './capture-guidance';
+import { PhotoExamplesButton } from './photo-examples-button';
 
 export function EntryEditorScreen() {
   const { recordId, entryId } = useLocalSearchParams<{
@@ -56,16 +58,10 @@ export function EntryEditorScreen() {
       <Body strong>{vm.record?.name}</Body>
       {vm.phase === 'choose' ? (
         <>
-          <Card>
-            <Body strong style={{ fontSize: 22 }}>
-              Wo bist du stehen geblieben?
-            </Body>
-            <Body>
-              Speichere deine Staffel und die zuletzt vollständig gesehene
-              Folge. Ein Bild und eine Notiz sind optional.
-            </Body>
-            {vm.latest && <Body muted>Zuletzt: {entrySummary(vm.latest)}</Body>}
-          </Card>
+          <CaptureGuidance
+            latest={vm.latest ? entrySummary(vm.latest) : undefined}
+          />
+          <PhotoExamplesButton disabled={vm.busy} />
           <Button
             icon="edit_note_outlined"
             title="Ohne Foto erfassen"

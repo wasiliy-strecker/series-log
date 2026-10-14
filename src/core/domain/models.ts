@@ -84,6 +84,11 @@ export const snapshotSchema = z
 export type SeriesRecord = z.infer<typeof recordSchema>;
 export type EpisodeEntry = z.infer<typeof entrySchema>;
 export type Attachment = z.infer<typeof attachmentSchema>;
+export type SeriesPhoto = {
+  attachment: Attachment;
+  entryId: string;
+  occurredAt: string;
+};
 export type SavedReport = z.infer<typeof reportSchema>;
 export type Snapshot = z.infer<typeof snapshotSchema>;
 export type Reminder = z.infer<typeof reminderSchema>;

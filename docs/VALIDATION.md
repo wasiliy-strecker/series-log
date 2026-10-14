@@ -2,7 +2,7 @@
 
 ## Ausgeführt
 
-`npm run check`: Formatierung, ESLint, TypeScript und 23 gezielte Tests für
+`npm run check`: Formatierung, ESLint, TypeScript und 24 gezielte Tests für
 Folgenberechnung, optionale Gesamtzahlen, Staffelwechsel, Rücksprünge,
 SQLite-Persistenz, Suche, Paginierung, Korrekturen, Dateireferenzen, PDF-Erzeugung
 und verschlüsselte Backups sowie Erinnerungsdefaults, Zeitumstellung und
@@ -69,6 +69,12 @@ umfangreiche visuelle Testreihe gestartet.
     erhöhen oder leer lassen, speichern und zum angefangenen Folgenstand
     zurückkehren. Die neue Grenze muss sofort gelten. Eine unbekannte Gesamtzahl
     darf keinen Prozentwert erzeugen.
+15. Einen Folgenstand mit Bild speichern. Das Bild muss im Dashboard und oben
+    in der Serie erscheinen. Im Dashboard öffnet Antippen die Serie. In den
+    Details öffnet Antippen das Original mit Zoom. Neuere Stände ohne Bild
+    dürfen die Vorschau nicht entfernen. Ein Bild ändern oder den zugehörigen
+    Stand löschen und die aktualisierte Vorschau beziehungsweise den Rückgriff
+    auf das ältere Bild prüfen. Serien ohne Bild bleiben ohne leere Bildfläche.
 
 Die native Testsuite ersetzt keine reale Prüfung von Kamera, Dateiauswahl,
 Hersteller-Energiesparregeln, Benachrichtigungszustellung oder PDF-Druckdiensten.

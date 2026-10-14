@@ -21,6 +21,7 @@ import { useRecords, useRecordDetail } from './use-records';
 import { ReminderScheduleStatus } from './reminder-status';
 import { HistoryTile } from './history-tile';
 import { Reports } from './reports';
+import { SeriesCover } from './series-cover';
 import {
   dateTime,
   entrySummary,
@@ -176,9 +177,10 @@ export function RecordsScreen() {
               <Body>Keine passenden Serien gefunden.</Body>
             </Card>
           )}
-          {vm.items.map(({ record, latest, lastEdited }) => (
+          {vm.items.map(({ record, latest, lastEdited, photo }) => (
             <Card
               key={record.id}
+              style={{ padding: 0, gap: 0 }}
               onPress={() =>
                 router.push({
                   pathname: '/record/[id]',
@@ -186,8 +188,14 @@ export function RecordsScreen() {
                 })
               }
             >
+              <SeriesCover photo={photo} title={record.name} />
               <View
-                style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}
+                style={{
+                  padding: 16,
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  gap: 14,
+                }}
               >
                 <View
                   style={{
@@ -327,6 +335,7 @@ export function RecordDetailScreen() {
       }
     >
       <Stack.Screen options={{ title: r.name }} />
+      <SeriesCover photo={vm.photo} title={r.name} expandable />
       <Card onPress={edit} style={{ margin: 4, padding: 17, gap: 0 }}>
         <View style={{ flexDirection: 'row', gap: 12, alignItems: 'center' }}>
           <View

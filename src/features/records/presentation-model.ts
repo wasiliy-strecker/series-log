@@ -3,6 +3,7 @@ import type {
   SeriesRecord,
   Reminder,
   EntryDraft,
+  SeriesPhoto,
 } from '../../core/domain/models';
 import { categories } from '../../core/domain/models';
 import { episodeDelta, positionText } from '../../core/domain/progress';
@@ -43,6 +44,7 @@ export type DashboardItem = {
   record: SeriesRecord;
   latest: EpisodeEntry | null;
   lastEdited: string;
+  photo: SeriesPhoto | null;
 };
 export type RecordSort = 'lastEdited' | 'name' | 'category';
 export const sortLabels: Record<RecordSort, string> = {

@@ -4,6 +4,7 @@ import type {
   SavedReport,
   Snapshot,
   EntryDraft,
+  SeriesPhoto,
 } from './domain/models';
 
 export interface SqlConnection {
@@ -16,8 +17,14 @@ export interface Repository {
   records(): Promise<SeriesRecord[]>;
   entry(id: string): Promise<EpisodeEntry | null>;
   dashboard(): Promise<
-    { record: SeriesRecord; latest: EpisodeEntry | null; lastEdited: string }[]
+    {
+      record: SeriesRecord;
+      latest: EpisodeEntry | null;
+      lastEdited: string;
+      photo: SeriesPhoto | null;
+    }[]
   >;
+  latestPhoto(recordId: string): Promise<SeriesPhoto | null>;
   entries(
     recordId: string,
     search?: string,

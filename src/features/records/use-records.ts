@@ -9,6 +9,7 @@ import type {
   SeriesRecord,
   EpisodeEntry,
   SavedReport,
+  SeriesPhoto,
 } from '../../core/domain/models';
 import { PAGE_SIZE } from '../../core/domain/models';
 import { useReminderStatus } from './use-reminder-status';
@@ -84,6 +85,7 @@ export function useRecordDetail(id: string, history = false) {
   const { setError } = task;
   const status = useReminderStatus();
   const [hasAttachments, setHasAttachments] = useState(false);
+  const [photo, setPhoto] = useState<SeriesPhoto | null>(null);
   useFocusEffect(
     useCallback(() => {
       let active = true;
@@ -95,8 +97,9 @@ export function useRecordDetail(id: string, history = false) {
           history ? search : '',
           history ? offset : 0,
         ),
+        history ? Promise.resolve(null) : series.repository.latestPhoto(id),
       ])
-        .then(async ([records, page]) => {
+        .then(async ([records, page, latestPhoto]) => {
           const found = records.find((r) => r.id === id);
           const comparisons = await Promise.all(
             page.rows.map(async (e) => {
@@ -112,6 +115,7 @@ export function useRecordDetail(id: string, history = false) {
           setEntries(page.rows);
           setTotal(page.total);
           setHasAttachments(page.hasAttachments);
+          setPhoto(latestPhoto);
           setComparisons(Object.fromEntries(comparisons));
           setError('');
           if (offset && offset >= page.total)
@@ -137,6 +141,7 @@ export function useRecordDetail(id: string, history = false) {
     record,
     entries,
     hasAttachments,
+    photo,
     historyItems: entries.map((entry): HistoryItem => {
       const photos = entry.attachments.filter((a) => a.kind === 'photo');
       return {

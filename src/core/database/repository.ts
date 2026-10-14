@@ -5,12 +5,20 @@ import {
   type SavedReport,
   type Snapshot,
   type EntryDraft,
+  type SeriesPhoto,
   PAGE_SIZE,
   recordSchema,
   entrySchema,
   reportSchema,
   validateSnapshot,
 } from '../domain/models';
+
+function latestPhotoQuery(recordId: '?' | 'r.id') {
+  return `SELECT json_object('attachment',json(a.value),'entryId',e.id,'occurredAt',e.occurred_at) body
+    FROM entries e,json_each(e.body,'$.attachments') a
+    WHERE e.record_id=${recordId} AND json_extract(a.value,'$.kind')='photo'
+    ORDER BY e.occurred_at DESC,e.id DESC,CAST(a.key AS INTEGER) ASC LIMIT 1`;
+}
 
 export const schemaV1 = `
 CREATE TABLE records (id TEXT PRIMARY KEY, body TEXT NOT NULL CHECK(json_valid(body)));
@@ -91,16 +99,28 @@ export class SqlRepository implements Repository {
         body: string;
         latest: string | null;
         lastEdited: string;
+        photo: string | null;
       }>(`
         SELECT r.body,
           (SELECT e.body FROM entries e WHERE e.record_id=r.id ORDER BY e.occurred_at DESC,e.id DESC LIMIT 1) latest,
+          (${latestPhotoQuery('r.id')}) photo,
           max(json_extract(r.body,'$.updatedAt'),coalesce((SELECT max(json_extract(e.body,'$.updatedAt')) FROM entries e WHERE e.record_id=r.id),json_extract(r.body,'$.updatedAt'))) lastEdited
         FROM records r ORDER BY lastEdited DESC,r.id ASC`);
       return rows.map((row) => ({
         record: JSON.parse(row.body) as SeriesRecord,
         latest: row.latest ? (JSON.parse(row.latest) as EpisodeEntry) : null,
         lastEdited: row.lastEdited,
+        photo: row.photo ? (JSON.parse(row.photo) as SeriesPhoto) : null,
       }));
+    });
+  }
+  latestPhoto(recordId: string) {
+    return this.queue.run(async () => {
+      const rows = await this.db.all<{ body: string }>(
+        latestPhotoQuery('?'),
+        recordId,
+      );
+      return rows[0] ? (JSON.parse(rows[0].body) as SeriesPhoto) : null;
     });
   }
   entries(recordId: string, search = '', offset = 0, limit = PAGE_SIZE) {

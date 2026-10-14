@@ -12,6 +12,7 @@ weiße Schrift und rote Akzente geben SerienLog ein eigenes Erscheinungsbild.
 - Optional Fotos aus Kamera oder Galerie und eine Notiz ergänzen
 - Foto-Hinweise und vier Beispielfotos vor dem Erfassen eines Folgenstands ansehen
 - Aktuellen Stand und Fortschritt in der Serienübersicht sehen
+- Letztes Serienbild auf dem Dashboard und in den Seriendetails sehen und dort vergrößern
 - Zehn aktuelle Folgenstände und vollständigen, durchsuchbaren Verlauf ansehen
 - Folgenstände korrigieren oder löschen. Bearbeitungen aktualisieren den Eintrag
 - Persönliche lokale Erinnerungen mit den vorhandenen Android-Einstellungen
@@ -61,6 +62,13 @@ Grenze. „Folgenzahlen anpassen“ öffnet direkt die Serienangaben und kehrt n
 dem Speichern zum angefangenen Folgenstand zurück. Die Eingaben bleiben erhalten.
 Die Gesamtzahl wird nie automatisch erhöht und kann bei unbekannter Länge
 offen bleiben.
+
+Als Serienbild erscheint das erste Foto des zeitlich neuesten gespeicherten
+Folgenstands mit Foto. Neuere Stände ohne Foto verdrängen es nicht. Auch Bilder
+aus älteren Einträgen außerhalb der ersten Verlaufsseite werden berücksichtigt.
+Entwürfe dienen nicht als Vorschaubild. Nach Bildänderungen oder Löschungen
+aktualisiert sich die Vorschau und greift gegebenenfalls auf ein älteres Bild
+zurück. In den Seriendetails lässt sich das Original durch Antippen öffnen.
 
 ## Erinnerungen zum Weiterschauen
 

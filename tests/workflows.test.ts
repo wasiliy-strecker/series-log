@@ -97,6 +97,81 @@ it('preserves a conflicting draft while episode limits are corrected and then sa
   expect(await f.repo.drafts()).toHaveLength(0);
 });
 
+it('selects the same latest saved series photo for the dashboard and details across edits and deletions', async () => {
+  const f = await setup();
+  const r = record();
+  const other = record();
+  await f.series.saveRecord(r);
+  await f.series.saveRecord(other);
+  const photos = await Promise.all(
+    [1, 2, 3, 4, 5].map((value) =>
+      f.series.importAttachment(
+        new Uint8Array([value]),
+        'photo',
+        `Beispiel-${value}.jpg`,
+      ),
+    ),
+  );
+  const pdf = await PDFDocument.create();
+  pdf.addPage();
+  const document = await f.series.importAttachment(
+    await pdf.save(),
+    'pdf',
+    'Beispiel.pdf',
+  );
+  const firstDraft = await f.series.draft(r.id);
+  firstDraft.form.episode = '1';
+  firstDraft.form.occurredAt = '2026-09-01T20:00:00.000Z';
+  firstDraft.form.attachments = [photos[0]!];
+  const first = (await f.series.saveEntry(firstDraft)).entry;
+  const secondDraft = await f.series.draft(r.id);
+  secondDraft.form.episode = '2';
+  secondDraft.form.occurredAt = '2026-09-02T20:00:00.000Z';
+  secondDraft.form.attachments = [document, photos[1]!, photos[2]!];
+  const second = (await f.series.saveEntry(secondDraft)).entry;
+  for (let episode = 3; episode <= 14; episode++) {
+    const draft = await f.series.draft(r.id);
+    draft.form.episode = String(episode);
+    draft.form.occurredAt = `2026-09-${String(episode).padStart(2, '0')}T20:00:00.000Z`;
+    await f.series.saveEntry(draft);
+  }
+  const pending = await f.series.draft(r.id);
+  pending.form.attachments = [photos[3]!];
+  await f.series.persistDraft(pending);
+  const otherDraft = await f.series.draft(other.id);
+  otherDraft.form.episode = '1';
+  otherDraft.form.attachments = [photos[4]!];
+  await f.series.saveEntry(otherDraft);
+
+  async function expectCover(attachment: (typeof photos)[number] | null) {
+    const dashboard = (await f.repo.dashboard()).find(
+      (item) => item.record.id === r.id,
+    )!;
+    expect(dashboard.latest?.episode).toBe(14);
+    expect(dashboard.photo).toEqual(await f.repo.latestPhoto(r.id));
+    expect(dashboard.photo?.attachment ?? null).toEqual(attachment);
+  }
+  expect((await f.repo.entries(r.id)).rows).not.toContainEqual(second);
+  await expectCover(photos[1]!);
+  expect(await f.repo.latestPhoto(r.id)).toMatchObject({
+    entryId: second.id,
+    occurredAt: second.occurredAt,
+  });
+  const editOld = await f.series.draft(r.id, first);
+  editOld.form.note = 'Älteren Eintrag später bearbeiten';
+  await f.series.saveEntry(editOld);
+  await expectCover(photos[1]!);
+  const editPhoto = await f.series.draft(r.id, second);
+  editPhoto.form.attachments = [document, photos[2]!, photos[1]!];
+  await f.series.saveEntry(editPhoto);
+  await expectCover(photos[2]!);
+  await f.series.delete('entry', second.id);
+  await expectCover(photos[0]!);
+  await f.series.delete('entry', first.id);
+  await expectCover(null);
+  expect((await f.repo.latestPhoto(other.id))?.attachment).toEqual(photos[4]);
+});
+
 it('rejects invalid edits, renders a PDF, and deletes only associated entries and reports', async () => {
   const f = await setup(),
     r = record({ seasons: [8] }),

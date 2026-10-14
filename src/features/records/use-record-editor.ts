@@ -43,10 +43,7 @@ export function useRecordEditor(id?: string, returnToEntry = false) {
   const [initialReady, setReady] = useState(!id);
   const [suggestions, setSuggestions] = useState(() => categorySuggestions([]));
   const [totalInput, setTotalInput] = useState('');
-  const [seasonInputs, setSeasonInputs] = useState<string[]>([]);
-  const [initialNumbers, setInitialNumbers] = useState(
-    JSON.stringify(['', []]),
-  );
+  const [initialTotal, setInitialTotal] = useState('');
   const task = useTask();
   const { setError } = task;
   const formErrors = useFormErrors();
@@ -64,10 +61,8 @@ export function useRecordEditor(id?: string, returnToEntry = false) {
           setInitial(JSON.stringify(found));
           setReady(true);
           const total = found.totalEpisodes?.toString() ?? '';
-          const seasons = found.seasons.map((n) => n?.toString() ?? '');
           setTotalInput(total);
-          setSeasonInputs(seasons);
-          setInitialNumbers(JSON.stringify([total, seasons]));
+          setInitialTotal(total);
         }
       })
       .catch((e) => {
@@ -79,8 +74,7 @@ export function useRecordEditor(id?: string, returnToEntry = false) {
   }, [series, id, setError]);
   const dirty =
     initialReady &&
-    (JSON.stringify(record) !== initial ||
-      JSON.stringify([totalInput, seasonInputs]) !== initialNumbers);
+    (JSON.stringify(record) !== initial || totalInput !== initialTotal);
   const reminderNeedsRepair =
     !!id &&
     reminderState.loaded &&
@@ -116,23 +110,10 @@ export function useRecordEditor(id?: string, returnToEntry = false) {
       formErrors.clear('totalEpisodes');
       setTotalInput(value);
     },
-    seasonInputs,
-    changeSeason: (index: number, value: string) => {
-      formErrors.clear(`season-${index}`);
-      setSeasonInputs((items) =>
-        items.map((item, i) => (i === index ? value : item)),
-      );
-    },
-    addSeason: () =>
-      setSeasonInputs((items) => (items.length < 200 ? [...items, ''] : items)),
-    removeSeason: () => {
-      formErrors.clear(`season-${seasonInputs.length - 1}`);
-      setSeasonInputs((items) => items.slice(0, -1));
-    },
     ...task,
     save: () => {
       if (!record) return Promise.resolve(undefined);
-      const validation = validateRecordForm(record, totalInput, seasonInputs);
+      const validation = validateRecordForm(record, totalInput);
       if (!validation.value) {
         setError('');
         formErrors.show(validation.errors, recordFieldOrder);

@@ -23,21 +23,35 @@ function entry(overrides: Partial<EntryForm> = {}): EntryForm {
 }
 
 it('places missing series fields and invalid episode counts on their inputs', () => {
-  const missing = validateRecordForm(
-    record({ name: '', category: ' ' }),
-    '',
-    [],
-  );
+  const missing = validateRecordForm(record({ name: '', category: ' ' }), '');
   expect(missing.value).toBeNull();
   expect(missing.errors).toMatchObject({
     category: 'Bitte ein Genre eingeben.',
     name: 'Bitte einen Serientitel eingeben.',
   });
 
-  const invalid = validateRecordForm(record(), '5', ['8', 'x']);
-  expect(invalid.errors['season-1']).toContain('ganze Zahl');
-  const total = validateRecordForm(record(), '5', ['8']);
+  const invalid = validateRecordForm(record(), 'x');
+  expect(invalid.errors.totalEpisodes).toContain('ganze Zahl');
+  const total = validateRecordForm(record({ seasons: [8] }), '5');
   expect(total.errors.totalEpisodes).toContain('Gesamtfolgenzahl');
+});
+
+it('keeps stored season lengths when saving the simplified series form', () => {
+  const original = record({ seasons: [8, null, 10], totalEpisodes: 26 });
+  const updated = validateRecordForm(
+    { ...original, name: 'Neuer Titel' },
+    '30',
+  );
+  expect(updated.value).toMatchObject({
+    name: 'Neuer Titel',
+    totalEpisodes: 30,
+    seasons: [8, null, 10],
+  });
+  expect(validateRecordForm(original, '').value).toMatchObject({
+    totalEpisodes: null,
+    seasons: [8, null, 10],
+  });
+  expect(original.seasons).toEqual([8, null, 10]);
 });
 
 it('places missing episode and date values and progress conflicts on their inputs', () => {
@@ -67,7 +81,12 @@ it('maps progress errors found during save back to the affected field', () => {
         'Staffel 2 hat 6 Folgen. Ein gespeicherter Folgenstand darf diese Zahl nicht überschreiten.',
       ),
     ),
-  ).toHaveProperty('season-1');
+  ).toBeNull();
+  expect(
+    recordSaveFieldErrors(
+      new Error('Der Folgenstand überschreitet die Gesamtfolgenzahl.'),
+    ),
+  ).toHaveProperty('totalEpisodes');
   expect(
     entrySaveFieldErrors(
       new Error(

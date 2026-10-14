@@ -2,7 +2,7 @@
 
 ## Ausgeführt
 
-`npm run check`: Formatierung, ESLint, TypeScript und 24 gezielte Tests für
+`npm run check`: Formatierung, ESLint, TypeScript und 25 gezielte Tests für
 Folgenberechnung, optionale Gesamtzahlen, Staffelwechsel, Rücksprünge,
 SQLite-Persistenz, Suche, Paginierung, Korrekturen, Dateireferenzen, PDF-Erzeugung
 und verschlüsselte Backups sowie Erinnerungsdefaults, Zeitumstellung und
@@ -34,7 +34,7 @@ umfangreiche visuelle Testreihe gestartet.
 
 1. Serie mit Titel und Genre anlegen. Gesamtfolgenzahl offen lassen.
 2. Staffel 1, Folge 3 ohne Foto speichern. Drei Folgen ohne Prozentwert prüfen.
-3. Staffel 1 mit acht Folgen und Gesamtzahl 18 ergänzen. Fortschritt prüfen.
+3. Gesamtfolgenzahl 18 in den Serienangaben einstellen. Fortschritt prüfen.
 4. Neuen Stand mit Folge 8 beginnen. „Nächste Staffel“ bestätigen und Folge 3
    in Staffel 2 speichern. Elf gesehene Folgen und 61 Prozent prüfen.
 5. Foto aus Galerie und Kamera hinzufügen, vergrößern, ersetzen und entfernen.
@@ -64,7 +64,7 @@ umfangreiche visuelle Testreihe gestartet.
     übernehmen. Große Schrift und Querformat müssen durch Scrollen nutzbar bleiben.
 14. Eine Serie mit insgesamt 26 Folgen öffnen und Folge 59 eintragen. Speichern
     muss den Konflikt mit beiden Zahlen direkt am Folgenfeld erklären. Über
-    „Folgenzahlen anpassen“ zu den Serienangaben wechseln. Ohne Änderungen
+    „Gesamtfolgenzahl ändern“ zu den Serienangaben wechseln. Ohne Änderungen
     zurückkehren und die erhaltene Eingabe prüfen. Dann die Gesamtzahl bewusst
     erhöhen oder leer lassen, speichern und zum angefangenen Folgenstand
     zurückkehren. Die neue Grenze muss sofort gelten. Eine unbekannte Gesamtzahl
@@ -75,11 +75,11 @@ umfangreiche visuelle Testreihe gestartet.
     dürfen die Vorschau nicht entfernen. Ein Bild ändern oder den zugehörigen
     Stand löschen und die aktualisierte Vorschau beziehungsweise den Rückgriff
     auf das ältere Bild prüfen. Serien ohne Bild bleiben ohne leere Bildfläche.
-16. In den Serienangaben „Folgenzahl für Staffel 1 eintragen“ antippen. Das
-    optionale Feld für Staffel 1 muss erscheinen und der Button Staffel 2
-    nennen. Weitere Angaben ergänzen und die letzte Angabe wieder entfernen.
-    Der Erklärungstext muss zeigen, wozu diese Zahlen benötigt werden. Leere
-    Felder müssen weiterhin als unbekannte Folgenzahl speicherbar sein.
+16. Serie anlegen und bearbeiten. Es darf keine separate Liste für Staffeln und
+    keine Aktion zum Hinzufügen einer Staffel geben. Die optionale Gesamtzahl
+    muss leer bleiben können. Bei einer älteren Serie mit gespeicherten
+    Staffellängen nur Titel oder Genre bearbeiten. Der bisherige Fortschritt
+    muss nach dem Speichern erhalten bleiben.
 
 Die native Testsuite ersetzt keine reale Prüfung von Kamera, Dateiauswahl,
 Hersteller-Energiesparregeln, Benachrichtigungszustellung oder PDF-Druckdiensten.

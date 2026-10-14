@@ -45,7 +45,7 @@ export function progress(record: SeriesRecord, position: Position | null) {
       : null;
   const text =
     watched === null
-      ? 'Gesamtfortschritt offen · Folgenzahlen früherer Staffeln ergänzen'
+      ? 'Gesamtfortschritt noch unbekannt'
       : record.totalEpisodes !== null
         ? `${watched} von ${record.totalEpisodes} Folgen gesehen`
         : `${watched} ${watched === 1 ? 'Folge' : 'Folgen'} gesehen · Gesamtzahl offen`;
@@ -85,7 +85,7 @@ export function validateProgress(
     const length = record.seasons[position.season - 1];
     if (length !== undefined && length !== null && position.episode > length)
       throw new Error(
-        `Staffel ${position.season} hat ${length} Folgen. Eingegeben ist Folge ${position.episode}. Prüfe Staffel und Folge oder passe die hinterlegten Folgenzahlen an.`,
+        `Staffel ${position.season} hat ${length} Folgen. Eingegeben ist Folge ${position.episode}. Bitte die gewählte Staffel und zuletzt gesehene Folge prüfen.`,
       );
     let minimumWatched = position.episode;
     let hasUnknownSeasons = false;
@@ -96,7 +96,7 @@ export function validateProgress(
       } else minimumWatched += record.seasons[season - 1]!;
     if (record.totalEpisodes !== null && minimumWatched > record.totalEpisodes)
       throw new Error(
-        `Der Folgenstand überschreitet die hinterlegte Gesamtfolgenzahl von ${record.totalEpisodes} Folgen. Dein Stand entspricht ${hasUnknownSeasons ? 'mindestens ' : ''}${minimumWatched} gesehenen Folgen. Prüfe Staffel und Folge oder passe die hinterlegten Folgenzahlen an.`,
+        `Der Folgenstand überschreitet die hinterlegte Gesamtfolgenzahl von ${record.totalEpisodes} Folgen. Dein Stand entspricht ${hasUnknownSeasons ? 'mindestens ' : ''}${minimumWatched} gesehenen Folgen. Prüfe Staffel und Folge oder passe die Gesamtfolgenzahl an.`,
       );
   }
 }

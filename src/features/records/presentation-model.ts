@@ -23,7 +23,7 @@ export function historyComparison(
   if (!previous) return null;
   const delta = episodeDelta(record, entry, previous);
   if (delta === null)
-    return 'Staffelwechsel · Folgenzahl der vorherigen Staffel offen';
+    return 'Staffelwechsel · Zuwachs an gesehenen Folgen noch unbekannt';
   if (delta < 0)
     return `${Math.abs(delta)} Folgen zurück · niedrigerer Folgenstand`;
   if (delta === 0) return 'Unveränderter Folgenstand';

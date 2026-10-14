@@ -132,11 +132,11 @@ export function EntryEditorScreen() {
             <Button
               textOnly
               icon="edit_note_outlined"
-              title="Folgenzahlen anpassen"
+              title="Gesamtfolgenzahl ändern"
               disabled={vm.busy}
               onPress={() => {
                 Keyboard.dismiss();
-                void vm.editEpisodeCounts();
+                void vm.editTotalEpisodes();
               }}
             />
             <Body muted>

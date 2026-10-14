@@ -149,7 +149,7 @@ export function useEntryEditor(recordId: string, entryId?: string) {
     change,
     setAttachments,
     ...task,
-    editEpisodeCounts: () =>
+    editTotalEpisodes: () =>
       task.run(async () => {
         if (!current.current) return;
         await series.persistDraft(current.current);

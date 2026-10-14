@@ -5,7 +5,6 @@ import {
   Body,
   Button,
   Busy,
-  Card,
   Field,
   Notice,
   Page,
@@ -111,66 +110,26 @@ export function RecordEditorScreen() {
             editable={!vm.busy}
           />
         </View>
-        <Card>
-          <Body strong>Folgenzahlen (optional)</Body>
-          <Body muted>
-            Hier kannst du die Gesamtfolgenzahl und die Folgenzahl jeder Staffel
-            eintragen. Wenn du die Zahlen nicht kennst, lass die Felder leer.
-          </Body>
-          <View
-            ref={(view) => {
-              anchors.current.totalEpisodes = view;
-            }}
-            collapsable={false}
-          >
-            <Field
-              label="Gesamtfolgenzahl (optional)"
-              error={vm.fieldErrors.totalEpisodes}
-              keyboardType="number-pad"
-              value={vm.totalInput}
-              onChangeText={vm.setTotalInput}
-              editable={!vm.busy}
-            />
-          </View>
-          {vm.seasonInputs.map((value, index) => (
-            <View
-              key={index}
-              ref={(view) => {
-                anchors.current[`season-${index}`] = view;
-              }}
-              collapsable={false}
-            >
-              <Field
-                label={`Folgen in Staffel ${index + 1} (optional)`}
-                error={vm.fieldErrors[`season-${index}`]}
-                keyboardType="number-pad"
-                value={value}
-                onChangeText={(v) => vm.changeSeason(index, v)}
-                editable={!vm.busy}
-              />
-            </View>
-          ))}
-          <Button
-            secondary
-            icon="add"
-            title={`Folgenzahl für Staffel ${vm.seasonInputs.length + 1} eintragen`}
-            disabled={vm.busy || vm.seasonInputs.length >= 200}
-            onPress={vm.addSeason}
+        <View
+          ref={(view) => {
+            anchors.current.totalEpisodes = view;
+          }}
+          collapsable={false}
+          style={{ gap: 8 }}
+        >
+          <Field
+            label="Gesamtfolgenzahl (optional)"
+            error={vm.fieldErrors.totalEpisodes}
+            keyboardType="number-pad"
+            value={vm.totalInput}
+            onChangeText={vm.setTotalInput}
+            editable={!vm.busy}
           />
-          {!!vm.seasonInputs.length && (
-            <Button
-              secondary
-              title={`Angabe zu Staffel ${vm.seasonInputs.length} entfernen`}
-              disabled={vm.busy}
-              onPress={vm.removeSeason}
-            />
-          )}
           <Body muted>
-            Die Gesamtzahl umfasst alle Staffeln. Beispiel: Staffel 1 hat 8
-            Folgen. Bei Staffel 2, Folge 3 hast du dann insgesamt 11 Folgen
-            gesehen.
+            Alle Folgen der Serie zusammen. Lass das Feld leer, wenn du die
+            Gesamtzahl nicht kennst.
           </Body>
-        </Card>
+        </View>
         <ReminderEditor
           reminder={r.reminder}
           busy={vm.busy}

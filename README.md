@@ -29,8 +29,13 @@ die du verfolgen möchtest. Bei laufenden Serien kannst du sie später erhöhen
 oder offen lassen. Bekannte Staffelzahlen werden nicht automatisch als fertige
 Gesamtzahl ausgegeben, da weitere Staffeln erscheinen können.
 
-Pro Staffel kann eine Folgenzahl hinterlegt werden. Leere Felder bedeuten
-unbekannt. Ein Stand in Staffel 2, Folge 3 bedeutet, dass Staffel 1 vollständig
+Die Serienangaben haben keine separate Staffelverwaltung. Dort werden Titel,
+Genre und eine optionale Gesamtfolgenzahl erfasst. Beim Folgenstand werden
+Staffel und zuletzt gesehene Folge eingetragen. Die Länge einer abgeschlossenen
+Staffel merkt sich die App nach Bestätigung von „Nächste Staffel“.
+Bereits gespeicherte Staffellängen bleiben bei Änderungen an der Serie erhalten.
+
+Ein Stand in Staffel 2, Folge 3 bedeutet, dass Staffel 1 vollständig
 und die ersten drei Folgen von Staffel 2 gesehen wurden. Wenn Staffel 1 acht
 Folgen hat, zeigt die App elf gesehene Folgen. Bei insgesamt 18 Folgen sind das
 61 Prozent. Folge 0 bedeutet, dass die betreffende Staffel noch nicht begonnen
@@ -47,7 +52,7 @@ Ohne Gesamtzahl wird kein Prozentwert gezeigt. Ohne die Längen früherer Staffe
 bleibt auch die kumulierte Folgenzahl offen. Staffel und Folge sind immer sichtbar.
 Innerhalb derselben Staffel kann die Differenz zum vorigen Stand trotzdem
 angezeigt werden. Staffelübergreifende Differenzen brauchen die dazwischenliegenden
-Staffellängen. Nachträglich ergänzte Staffellängen aktualisieren die Berechnung.
+Staffellängen. Bestätigte Staffelabschlüsse aktualisieren die Berechnung.
 Bereits erzeugte PDFs behalten ihren Inhalt.
 
 Der zeitlich neueste Folgenstand bestimmt die Übersicht, auch nach Korrektur oder
@@ -58,7 +63,7 @@ widersprechen, werden nicht gespeichert.
 
 Beim Erfassen sind die hinterlegten Folgenzahlen sichtbar. Widerspricht ein
 Stand diesen Angaben, nennt die Fehlermeldung die eingetragene Zahl und die
-Grenze. „Folgenzahlen anpassen“ öffnet direkt die Serienangaben und kehrt nach
+Grenze. „Gesamtfolgenzahl ändern“ öffnet direkt die Serienangaben und kehrt nach
 dem Speichern zum angefangenen Folgenstand zurück. Die Eingaben bleiben erhalten.
 Die Gesamtzahl wird nie automatisch erhöht und kann bei unbekannter Länge
 offen bleiben.

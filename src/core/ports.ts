@@ -31,18 +31,12 @@ export interface Repository {
     offset?: number,
     limit?: number,
   ): Promise<{ rows: EpisodeEntry[]; total: number; hasAttachments: boolean }>;
-  previousEntry(entry: EpisodeEntry): Promise<EpisodeEntry | null>;
   reports(recordId: string): Promise<SavedReport[]>;
   drafts(): Promise<EntryDraft[]>;
   saveDraft(draft: EntryDraft): Promise<void>;
   removeDraft(id: string): Promise<void>;
   saveRecord(record: SeriesRecord): Promise<void>;
   saveEntry(entry: EpisodeEntry, draftId: string): Promise<void>;
-  saveProgress(
-    entry: EpisodeEntry,
-    draftId: string,
-    record?: SeriesRecord,
-  ): Promise<void>;
   saveReport(report: SavedReport): Promise<void>;
   saveReports(reports: SavedReport[]): Promise<void>;
   deleteRecord(id: string): Promise<void>;

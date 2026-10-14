@@ -1,5 +1,10 @@
 import { afterEach, expect, it } from 'vitest';
-import { createDecipheriv, pbkdf2Sync } from 'node:crypto';
+import {
+  createCipheriv,
+  createDecipheriv,
+  pbkdf2Sync,
+  randomBytes,
+} from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { fixture, record } from './support';
 import { digest } from '../src/core/files/integrity';
@@ -14,12 +19,10 @@ afterEach(async () => {
 });
 const password = 'Test26';
 
-it('round trips episodes, reminders, a real photo and PDF with independent AES-GCM verification', async () => {
+it('imports legacy archives, episodes, reminders, a real photo and PDF with independent AES-GCM verification', async () => {
   const f = await setup(),
     target = await setup();
   const r = record({
-    totalEpisodes: 18,
-    seasons: [8, 10],
     reminder: {
       interval: 'weekly',
       day: 5,
@@ -59,8 +62,31 @@ it('round trips episodes, reminders, a real photo and PDF with independent AES-G
   expect(
     Buffer.from(bytes).includes(Buffer.from('Synthetische Seriennotiz')),
   ).toBe(false);
+  // Build an encrypted archive with the old series fields and the same media.
+  const length = plain.readUInt32BE(0);
+  const metadata = JSON.parse(plain.subarray(4, 4 + length).toString('utf8'));
+  expect(metadata.data.records[0]).not.toHaveProperty('totalEpisodes');
+  metadata.data.records[0].totalEpisodes = 18;
+  metadata.data.records[0].seasons = [8, 10];
+  const manifest = Buffer.from(JSON.stringify(metadata));
+  const prefix = Buffer.alloc(4);
+  prefix.writeUInt32BE(manifest.length);
+  const header = Buffer.from(bytes.slice(0, 40));
+  randomBytes(12).copy(header, 28);
+  const legacyCipher = createCipheriv('aes-256-gcm', key, header.subarray(28));
+  legacyCipher.setAAD(header);
+  const encrypted = Buffer.concat([
+    legacyCipher.update(
+      Buffer.concat([prefix, manifest, plain.subarray(4 + length)]),
+    ),
+    legacyCipher.final(),
+    legacyCipher.getAuthTag(),
+  ]);
   key.fill(0);
-  const decoded = await target.backup.codec.decode(bytes, password);
+  const decoded = await target.backup.codec.decode(
+    Buffer.concat([header, encrypted]),
+    password,
+  );
   await target.backup.restore(decoded);
   const restored = await target.repo.snapshot();
   expect(restored.records).toEqual((await f.repo.snapshot()).records);
@@ -104,10 +130,10 @@ it('rejects wrong passwords, corrupt files, foreign identity and invalid series 
   await expect(f.backup.create('12345')).rejects.toThrow('6 bis 1024');
   await expect(
     f.backup.codec.encode(
-      { ...before, records: [{ ...r, totalEpisodes: 4, seasons: [8] }] },
+      { ...before, records: [{ ...r, name: '' }] },
       new Map(),
       password,
     ),
-  ).rejects.toThrow('Gesamtfolgenzahl');
+  ).rejects.toThrow('Serientitel');
   expect(await f.repo.snapshot()).toEqual(before);
 });

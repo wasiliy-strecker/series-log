@@ -1,4 +1,4 @@
-import { positionText } from '../../core/domain/progress';
+import { positionText } from '../../core/domain/episode-position';
 import { useCallback, useState } from 'react';
 import { useFocusEffect, router } from 'expo-router';
 import { useIsFocused } from 'expo-router/react-navigation';
@@ -18,7 +18,6 @@ import { useTask } from '../../core/ui/use-task';
 import { useFeedback } from '../../core/ui/feedback';
 import {
   visibleRecords,
-  historyComparison,
   type DashboardItem,
   type HistoryItem,
   type RecordSort,
@@ -76,7 +75,6 @@ export function useRecordDetail(id: string, history = false) {
   const { series, native, revision, refresh } = useServices();
   const [record, setRecord] = useState<SeriesRecord>(),
     [entries, setEntries] = useState<EpisodeEntry[]>([]),
-    [comparisons, setComparisons] = useState<Record<string, string | null>>({}),
     [total, setTotal] = useState(0),
     [offset, setOffset] = useState(0),
     [search, setSearch] = useState(''),
@@ -99,24 +97,13 @@ export function useRecordDetail(id: string, history = false) {
         ),
         history ? Promise.resolve(null) : series.repository.latestPhoto(id),
       ])
-        .then(async ([records, page, latestPhoto]) => {
-          const found = records.find((r) => r.id === id);
-          const comparisons = await Promise.all(
-            page.rows.map(async (e) => {
-              const p = await series.repository.previousEntry(e);
-              return [
-                e.id,
-                found ? historyComparison(found, e, p) : null,
-              ] as const;
-            }),
-          );
+        .then(([records, page, latestPhoto]) => {
           if (!active) return;
           setRecord(records.find((r) => r.id === id));
           setEntries(page.rows);
           setTotal(page.total);
           setHasAttachments(page.hasAttachments);
           setPhoto(latestPhoto);
-          setComparisons(Object.fromEntries(comparisons));
           setError('');
           if (offset && offset >= page.total)
             setOffset(
@@ -149,7 +136,6 @@ export function useRecordDetail(id: string, history = false) {
         photoUri: photos[0] ? series.vault.uri(photos[0].file) : undefined,
         photoCount: photos.length,
         positionLabel: positionText(entry),
-        comparison: comparisons[entry.id] ?? null,
       };
     }),
     total,
@@ -250,7 +236,7 @@ export function useReports(
             value: 'compact',
             label: 'Kompakt ohne Anhänge',
             description:
-              'Einträge, Dienstleister, Kosten, Notizen und Dokumentenliste – ohne Anhänge.',
+              'Staffel, Folge, Datum und Notizen ohne eingebettete Fotos.',
             icon: 'description_outlined',
           },
           {

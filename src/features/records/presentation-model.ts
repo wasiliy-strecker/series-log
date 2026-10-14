@@ -6,29 +6,14 @@ import type {
   SeriesPhoto,
 } from '../../core/domain/models';
 import { categories } from '../../core/domain/models';
-import { episodeDelta, positionText } from '../../core/domain/progress';
+import { positionText } from '../../core/domain/episode-position';
 
 export type HistoryItem = {
   entry: EpisodeEntry;
   photoUri?: string;
   photoCount: number;
   positionLabel: string;
-  comparison: string | null;
 };
-export function historyComparison(
-  record: SeriesRecord,
-  entry: EpisodeEntry,
-  previous: EpisodeEntry | null,
-): string | null {
-  if (!previous) return null;
-  const delta = episodeDelta(record, entry, previous);
-  if (delta === null)
-    return 'Staffelwechsel · Zuwachs an gesehenen Folgen noch unbekannt';
-  if (delta < 0)
-    return `${Math.abs(delta)} Folgen zurück · niedrigerer Folgenstand`;
-  if (delta === 0) return 'Unveränderter Folgenstand';
-  return `+${delta} ${delta === 1 ? 'Folge' : 'Folgen'} seit dem vorigen Stand`;
-}
 export function categorySuggestions(records: SeriesRecord[]): string[] {
   const unique = new Map<string, string>();
   for (const category of [

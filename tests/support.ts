@@ -110,8 +110,6 @@ export function record(overrides: Partial<SeriesRecord> = {}): SeriesRecord {
     id: env.id(),
     name: 'Testserie',
     category: 'Drama',
-    totalEpisodes: null,
-    seasons: [],
     note: '',
     reminder: null,
     createdAt: env.now(),

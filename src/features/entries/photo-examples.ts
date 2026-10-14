@@ -22,7 +22,7 @@ export const photoExamples: PhotoExample[] = [
       require('../../../assets/photo-examples/03_phone_staffel_3_folge_8.png'),
   },
   {
-    label: 'Staffel abgeschlossen · Staffel 1 · Folge 10',
+    label: 'Folgenübersicht · Staffel 1 · Folge 10',
     source: () =>
       require('../../../assets/photo-examples/04_episode_list_staffel_1_folge_10.png'),
   },

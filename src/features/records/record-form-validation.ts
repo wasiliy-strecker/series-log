@@ -1,13 +1,12 @@
 import type { SeriesRecord } from '../../core/domain/models';
-import { validateProgress, wholeNumber } from '../../core/domain/progress';
 import type { FormErrors } from '../../core/ui/use-form-errors';
 
-export const recordFieldOrder = ['category', 'name', 'totalEpisodes', 'note'];
+export const recordFieldOrder = ['category', 'name', 'note'];
 
-export function validateRecordForm(
-  record: SeriesRecord,
-  totalInput: string,
-): { value: SeriesRecord | null; errors: FormErrors } {
+export function validateRecordForm(record: SeriesRecord): {
+  value: SeriesRecord | null;
+  errors: FormErrors;
+} {
   const errors: FormErrors = {};
   if (!record.category.trim()) errors.category = 'Bitte ein Genre eingeben.';
   if (!record.name.trim()) errors.name = 'Bitte einen Serientitel eingeben.';
@@ -17,33 +16,5 @@ export function validateRecordForm(
     errors.name = 'Der Serientitel darf höchstens 500 Zeichen enthalten.';
   if (record.note.length > 20000)
     errors.note = 'Die Notiz darf höchstens 20.000 Zeichen enthalten.';
-
-  let totalEpisodes: number | null = null;
-  if (totalInput.trim()) {
-    try {
-      totalEpisodes = wholeNumber(totalInput, 'Gesamtfolgenzahl', 1);
-    } catch {
-      errors.totalEpisodes =
-        'Bitte eine ganze Zahl zwischen 1 und 1.000.000 eingeben.';
-    }
-  }
-  if (Object.keys(errors).length) return { value: null, errors };
-
-  const value = { ...record, totalEpisodes };
-  try {
-    validateProgress(value, []);
-  } catch (error) {
-    errors.totalEpisodes = (error as Error).message;
-  }
-  return { value: Object.keys(errors).length ? null : value, errors };
-}
-
-export function recordSaveFieldErrors(error: unknown): FormErrors | null {
-  if (!(error instanceof Error)) return null;
-  if (
-    error.message.includes('Gesamtfolgenzahl') ||
-    error.message.startsWith('Der Folgenstand überschreitet')
-  )
-    return { totalEpisodes: error.message };
-  return null;
+  return { value: Object.keys(errors).length ? null : record, errors };
 }

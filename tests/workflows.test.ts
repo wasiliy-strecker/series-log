@@ -15,7 +15,7 @@ afterEach(async () => {
 
 it('persists series, drafts and paginated searchable history across a database reopen', async () => {
   const f = await setup(),
-    r = record({ seasons: [20], totalEpisodes: 20 });
+    r = record();
   await f.series.saveRecord(r);
   for (let episode = 1; episode <= 12; episode++) {
     const d = await f.series.draft(r.id);
@@ -47,54 +47,79 @@ it('persists series, drafts and paginated searchable history across a database r
   }
 });
 
-it('saves a confirmed season transition atomically and rolls back on SQL failure', async () => {
+it('saves an episode stand and removes its draft atomically, rolling back on SQL failure', async () => {
   const f = await setup(),
     r = record();
   await f.series.saveRecord(r);
+  const savedRecord = (await f.repo.records())[0]!;
   const d = await f.series.draft(r.id);
   d.form.season = '2';
-  d.form.episode = '0';
-  d.completedSeason = { season: 1, episodes: 8 };
+  d.form.episode = '3';
   await f.series.persistDraft(d);
   f.raw.exec(
     "CREATE TRIGGER fail_entry BEFORE INSERT ON entries BEGIN SELECT RAISE(ABORT,'synthetic'); END;",
   );
   await expect(f.series.saveEntry(d)).rejects.toThrow();
-  expect((await f.repo.records())[0]?.seasons).toEqual([]);
+  expect((await f.repo.entries(r.id)).total).toBe(0);
   expect(await f.repo.drafts()).toHaveLength(1);
   f.raw.exec('DROP TRIGGER fail_entry');
   await f.series.saveEntry(d);
-  expect((await f.repo.records())[0]?.seasons).toEqual([8]);
+  expect((await f.repo.records())[0]).toEqual(savedRecord);
   expect((await f.repo.dashboard())[0]?.latest).toMatchObject({
     season: 2,
-    episode: 0,
+    episode: 3,
   });
   expect(await f.repo.drafts()).toHaveLength(0);
 });
 
-it('preserves a conflicting draft while episode limits are corrected and then saves that draft', async () => {
+it('saves arbitrary episode stands and lower seasons independently of legacy counts', async () => {
   const f = await setup();
-  const r = record({ totalEpisodes: 26 });
-  await f.series.saveRecord(r);
-  const draft = await f.series.draft(r.id);
-  draft.form.episode = '59';
-  draft.form.note = 'Angefangenen Folgenstand behalten';
-  await f.series.persistDraft(draft);
-  await expect(f.series.saveEntry(draft)).rejects.toThrow('26 Folgen');
-  expect((await f.repo.entries(r.id)).total).toBe(0);
-  expect((await f.repo.drafts())[0]?.form).toEqual(draft.form);
-
-  await f.series.saveRecord({ ...r, totalEpisodes: 80 });
+  const r = record();
+  await f.db.run(
+    'INSERT INTO records VALUES (?,?)',
+    r.id,
+    JSON.stringify({ ...r, totalEpisodes: 2, seasons: [1, 1] }),
+  );
+  expect((await f.repo.records())[0]).toEqual(r);
+  expect((await f.repo.dashboard())[0]?.record).toEqual(r);
+  const first = await f.series.draft(r.id);
+  first.form.season = '3';
+  first.form.episode = '3';
+  first.form.occurredAt = '2026-10-13T20:00:00.000Z';
+  await f.series.saveEntry(first);
+  const next = await f.series.draft(r.id);
+  next.form.season = '2';
+  next.form.episode = '2';
+  next.form.occurredAt = '2026-10-13T21:00:00.000Z';
+  await f.series.persistDraft(next);
   const restored = (await f.repo.drafts())[0]!;
-  expect(restored.form).toEqual(draft.form);
-  const result = await f.series.saveEntry(restored);
-  expect(result.entry).toMatchObject({
-    season: 1,
-    episode: 59,
-    note: draft.form.note,
+  await f.series.saveEntry(restored);
+  expect((await f.repo.dashboard())[0]?.latest).toMatchObject({
+    season: 2,
+    episode: 2,
   });
-  expect((await f.repo.records())[0]?.totalEpisodes).toBe(80);
+  expect(
+    (await f.repo.entries(r.id)).rows.map((entry) => [
+      entry.season,
+      entry.episode,
+    ]),
+  ).toEqual([
+    [2, 2],
+    [3, 3],
+  ]);
   expect(await f.repo.drafts()).toHaveLength(0);
+  const last = await f.series.draft(r.id);
+  last.form.episode = '59';
+  const saved = await f.series.saveEntry(last);
+  expect(saved.entry).toMatchObject({ season: 2, episode: 59 });
+  const invalid = await f.series.draft(r.id);
+  invalid.form.season = '';
+  invalid.form.episode = '1';
+  await expect(f.series.saveEntry(invalid)).rejects.toThrow('Staffel:');
+  invalid.form.season = '1';
+  invalid.form.episode = '0';
+  await expect(f.series.saveEntry(invalid)).rejects.toThrow('Folge:');
+  expect((await f.repo.entries(r.id)).total).toBe(3);
 });
 
 it('selects the same latest saved series photo for the dashboard and details across edits and deletions', async () => {
@@ -172,18 +197,16 @@ it('selects the same latest saved series photo for the dashboard and details acr
   expect((await f.repo.latestPhoto(other.id))?.attachment).toEqual(photos[4]);
 });
 
-it('rejects invalid edits, renders a PDF, and deletes only associated entries and reports', async () => {
+it('edits independent stands, renders a PDF, and deletes only associated entries and reports', async () => {
   const f = await setup(),
-    r = record({ seasons: [8] }),
+    r = record(),
     other = record();
   await f.series.saveRecord(r);
   await f.series.saveRecord(other);
   const d = await f.series.draft(r.id);
   d.form.episode = '7';
   const { entry } = await f.series.saveEntry(d);
-  await expect(f.series.saveRecord({ ...r, seasons: [6] })).rejects.toThrow(
-    'Staffel 1',
-  );
+  await f.series.saveRecord({ ...r, name: 'Neuer Titel' });
   const edit = await f.series.draft(r.id, entry);
   edit.form.episode = '6';
   edit.form.note = 'Korrektur';

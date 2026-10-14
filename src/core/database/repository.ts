@@ -79,11 +79,13 @@ export class SqlRepository implements Repository {
     });
   }
   records() {
-    return this.queue.run(() =>
-      this.bodies<SeriesRecord>(
-        'records',
-        "ORDER BY json_extract(body, '$.name') COLLATE NOCASE",
-      ),
+    return this.queue.run(async () =>
+      (
+        await this.bodies<SeriesRecord>(
+          'records',
+          "ORDER BY json_extract(body, '$.name') COLLATE NOCASE",
+        )
+      ).map((record) => recordSchema.parse(record)),
     );
   }
   entry(id: string) {
@@ -107,7 +109,7 @@ export class SqlRepository implements Repository {
           max(json_extract(r.body,'$.updatedAt'),coalesce((SELECT max(json_extract(e.body,'$.updatedAt')) FROM entries e WHERE e.record_id=r.id),json_extract(r.body,'$.updatedAt'))) lastEdited
         FROM records r ORDER BY lastEdited DESC,r.id ASC`);
       return rows.map((row) => ({
-        record: JSON.parse(row.body) as SeriesRecord,
+        record: recordSchema.parse(JSON.parse(row.body)),
         latest: row.latest ? (JSON.parse(row.latest) as EpisodeEntry) : null,
         lastEdited: row.lastEdited,
         photo: row.photo ? (JSON.parse(row.photo) as SeriesPhoto) : null,
@@ -155,16 +157,6 @@ export class SqlRepository implements Repository {
         [recordId],
       ),
     );
-  }
-  previousEntry(entry: EpisodeEntry) {
-    return this.queue.run(async () => {
-      const rows = await this.bodies<EpisodeEntry>(
-        'entries',
-        'WHERE record_id=? AND (occurred_at<? OR (occurred_at=? AND id<?)) ORDER BY occurred_at DESC,id DESC LIMIT 1',
-        [entry.recordId, entry.occurredAt, entry.occurredAt, entry.id],
-      );
-      return rows[0] ?? null;
-    });
   }
   drafts() {
     return this.queue.run(() => this.bodies<EntryDraft>('drafts'));
@@ -225,11 +217,7 @@ export class SqlRepository implements Repository {
     );
   }
   saveEntry(entry: EpisodeEntry, draftId: string) {
-    return this.saveProgress(entry, draftId);
-  }
-  saveProgress(entry: EpisodeEntry, draftId: string, record?: SeriesRecord) {
     return this.write(async () => {
-      if (record) await this.putRecord(record);
       await this.putEntry(entry);
       await this.db.run('DELETE FROM drafts WHERE id=?', draftId);
     });

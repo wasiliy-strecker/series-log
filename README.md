@@ -11,7 +11,7 @@ weiße Schrift und rote Akzente geben SerienLog ein eigenes Erscheinungsbild.
 - Staffel und zuletzt vollständig gesehene Folge mit Datum und Uhrzeit speichern
 - Optional Fotos aus Kamera oder Galerie und eine Notiz ergänzen
 - Foto-Hinweise und vier Beispielfotos vor dem Erfassen eines Folgenstands ansehen
-- Aktuellen Stand und Fortschritt in der Serienübersicht sehen
+- Letzte gespeicherte Staffel und Folge in der Serienübersicht sehen
 - Letztes Serienbild auf dem Dashboard und in den Seriendetails sehen und dort vergrößern
 - Zehn aktuelle Folgenstände und vollständigen, durchsuchbaren Verlauf ansehen
 - Folgenstände korrigieren oder löschen. Bearbeitungen aktualisieren den Eintrag
@@ -22,51 +22,29 @@ weiße Schrift und rote Akzente geben SerienLog ein eigenes Erscheinungsbild.
 
 Kein Konto, kein Server, keine Streaming-Anbindung, keine eigene Telemetrie.
 
-## Bestätigte Folgenlogik
+## Einfacher Folgenstand
 
-Die Gesamtfolgenzahl ist optional. Sie bezeichnet die Folgen aller Staffeln,
-die du verfolgen möchtest. Bei laufenden Serien kannst du sie später erhöhen
-oder offen lassen. Bekannte Staffelzahlen werden nicht automatisch als fertige
-Gesamtzahl ausgegeben, da weitere Staffeln erscheinen können.
+Beim Anlegen einer Serie werden Titel, Genre, optionale Notiz und Erinnerung
+erfasst. Es gibt keine Gesamtfolgenzahl und keine Verwaltung von Staffellängen.
 
-Die Serienangaben haben keine separate Staffelverwaltung. Dort werden Titel,
-Genre und eine optionale Gesamtfolgenzahl erfasst. Beim Folgenstand werden
-Staffel und zuletzt gesehene Folge eingetragen. Die Länge einer abgeschlossenen
-Staffel merkt sich die App nach Bestätigung von „Nächste Staffel“.
-Bereits gespeicherte Staffellängen bleiben bei Änderungen an der Serie erhalten.
+Jeder Folgenstand enthält die Pflichtfelder Staffel und Folge. Beide müssen
+positive ganze Zahlen sein. Datum und Uhrzeit werden vorbelegt und können
+geändert werden. Ein Foto und eine Notiz bleiben optional. Speichern übernimmt
+den Eintrag direkt ohne Staffelwechsel- oder Rücksprungbestätigung. Staffel und
+Folge werden unabhängig von früheren Einträgen geprüft.
 
-Ein Stand in Staffel 2, Folge 3 bedeutet, dass Staffel 1 vollständig
-und die ersten drei Folgen von Staffel 2 gesehen wurden. Wenn Staffel 1 acht
-Folgen hat, zeigt die App elf gesehene Folgen. Bei insgesamt 18 Folgen sind das
-61 Prozent. Folge 0 bedeutet, dass die betreffende Staffel noch nicht begonnen
-wurde. Ausgelassene Folgen und wiederholtes Anschauen werden nicht einzeln gezählt.
+Du kannst zuerst Staffel 3, Folge 3 und später Staffel 2, Folge 2 speichern.
+Die App bewertet diese Reihenfolge nicht. Sie berechnet weder gesehene
+Gesamtfolgen noch Prozentwerte, Fortschrittsbalken oder Differenzen im Verlauf.
+Der zeitlich neueste Eintrag bestimmt die Übersicht. Ein rückdatierter Eintrag
+bleibt im Verlauf. Korrigieren und Löschen aktualisieren die Übersicht.
 
-„Nächste Staffel“ verlangt die letzte gesehene Folge der aktuellen Staffel.
-Eine bekannte Staffellänge muss dazu passen. Nach deiner Bestätigung merkt der
-Entwurf den Staffelabschluss vor und wechselt auf Folge 0 der nächsten Staffel.
-Erst „Bestätigen & speichern“ übernimmt die Staffellänge und den neuen Stand
-in einer gemeinsamen Datenbanktransaktion. Auch manuelle Sprünge in spätere
-Staffeln erklären und bestätigen die Annahme abgeschlossener früherer Staffeln.
-
-Ohne Gesamtzahl wird kein Prozentwert gezeigt. Ohne die Längen früherer Staffeln
-bleibt auch die kumulierte Folgenzahl offen. Staffel und Folge sind immer sichtbar.
-Innerhalb derselben Staffel kann die Differenz zum vorigen Stand trotzdem
-angezeigt werden. Staffelübergreifende Differenzen brauchen die dazwischenliegenden
-Staffellängen. Bestätigte Staffelabschlüsse aktualisieren die Berechnung.
-Bereits erzeugte PDFs behalten ihren Inhalt.
-
-Der zeitlich neueste Folgenstand bestimmt die Übersicht, auch nach Korrektur oder
-Löschung. Ein rückdatierter Eintrag ersetzt keinen neueren Stand. Niedrigere und
-zukünftige neue Stände benötigen eine Bestätigung. Der Verlauf zählt gespeicherte
-Stände, nicht einzelne Seh-Sitzungen. Serienangaben, die vorhandenen Ständen
-widersprechen, werden nicht gespeichert.
-
-Beim Erfassen sind die hinterlegten Folgenzahlen sichtbar. Widerspricht ein
-Stand diesen Angaben, nennt die Fehlermeldung die eingetragene Zahl und die
-Grenze. „Gesamtfolgenzahl ändern“ öffnet direkt die Serienangaben und kehrt nach
-dem Speichern zum angefangenen Folgenstand zurück. Die Eingaben bleiben erhalten.
-Die Gesamtzahl wird nie automatisch erhöht und kann bei unbekannter Länge
-offen bleiben.
+Ältere Serien und Backups bleiben lesbar. Ihre ehemaligen Gesamtzahlen und
+Staffellängen werden beim Einlesen ignoriert. Bestehende Folgenstände, Fotos,
+Notizen und Erinnerungen bleiben erhalten. Auch früher gespeicherte Folge-0-
+Einträge bleiben lesbar. Neue oder bearbeitete Stände brauchen eine Folge ab 1.
+Bereits erzeugte PDFs behalten ihren Inhalt. Neue PDFs zeigen die gespeicherten
+Folgenstände ohne Fortschrittsberechnung oder Differenzspalte.
 
 Als Serienbild erscheint das erste Foto des zeitlich neuesten gespeicherten
 Folgenstands mit Foto. Neuere Stände ohne Foto verdrängen es nicht. Auch Bilder

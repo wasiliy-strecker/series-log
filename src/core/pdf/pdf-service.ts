@@ -1,4 +1,4 @@
-import { episodeDelta, positionText } from '../domain/progress';
+import { positionText } from '../domain/episode-position';
 import { PDFDocument, type PDFImage } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
 import { type EpisodeEntry, type SeriesRecord } from '../domain/models';
@@ -76,25 +76,10 @@ function dateTime(iso: string, withOffset = false) {
 function summary(entry: EpisodeEntry) {
   return positionText(entry);
 }
-function difference(
-  record: SeriesRecord,
-  entry: EpisodeEntry,
-  previous?: EpisodeEntry,
-) {
-  if (!previous) return '–';
-  const delta = episodeDelta(record, entry, previous);
-  return delta === null
-    ? 'Staffellänge offen'
-    : `${delta > 0 ? '+' : ''}${delta} Folgen`;
-}
 function recordSection(layout: ReportLayout, record: SeriesRecord) {
   const rows = [
     ['Serie', record.name],
     ['Genre', record.category],
-    ['Gesamtfolgen', record.totalEpisodes?.toString() ?? 'Offen'],
-    ...record.seasons.flatMap((length, i) =>
-      length === null ? [] : [[`Staffel ${i + 1}`, `${length} Folgen`]],
-    ),
   ];
   layout.ensure(80);
   layout.text('Aktuelle Serienangaben', { bold: true });
@@ -303,7 +288,6 @@ export class PdfService {
             String(ordered.length - i),
             dateTime(entry.occurredAt, true),
             summary(entry),
-            difference(record, entry, ordered[i + 1]),
           ]),
         );
       else layout!.text('Noch keine Einträge vorhanden.');

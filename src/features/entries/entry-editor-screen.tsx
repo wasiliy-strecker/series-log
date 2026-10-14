@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { Keyboard, View } from 'react-native';
+import { View } from 'react-native';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import {
   Body,
@@ -34,8 +34,6 @@ export function EntryEditorScreen() {
       </Page>
     );
   const form = draft.form;
-  const season = Number(form.season);
-  const seasonEpisodes = vm.record?.seasons[season - 1];
   const actions: AttachmentActions = {
     busy: vm.busy,
     pick: (source, id) => {
@@ -121,43 +119,6 @@ export function EntryEditorScreen() {
                 editable={!vm.busy}
               />
             </View>
-            <Body muted>
-              {vm.record?.totalEpisodes == null
-                ? 'Gesamtfolgenzahl: offen.'
-                : `Für die Serie hinterlegt: ${vm.record.totalEpisodes} Folgen insgesamt.`}
-              {seasonEpisodes != null
-                ? ` Staffel ${season}: ${seasonEpisodes} Folgen.`
-                : ''}
-            </Body>
-            <Button
-              textOnly
-              icon="edit_note_outlined"
-              title="Gesamtfolgenzahl ändern"
-              disabled={vm.busy}
-              onPress={() => {
-                Keyboard.dismiss();
-                void vm.editTotalEpisodes();
-              }}
-            />
-            <Body muted>
-              Folge 0 bedeutet, dass du diese Staffel noch nicht begonnen hast.
-              Die Eingabe zählt vollständig gesehene Folgen ab Staffelbeginn.
-            </Body>
-            {!draft.completedSeason && (
-              <Button
-                secondary
-                title="Nächste Staffel"
-                icon="chevron_right"
-                disabled={vm.busy}
-                onPress={() => void vm.nextSeason()}
-              />
-            )}
-            {draft.completedSeason && (
-              <Body strong>
-                Staffel {draft.completedSeason.season} wird mit{' '}
-                {draft.completedSeason.episodes} Folgen abgeschlossen.
-              </Body>
-            )}
           </Card>
           <PhotoEditor photos={form.attachments} actions={actions} />
           <Card>
@@ -203,7 +164,7 @@ export function EntryEditorScreen() {
                 ? 'Wird gespeichert …'
                 : entryId
                   ? 'Änderungen speichern'
-                  : 'Bestätigen & speichern'
+                  : 'Folgenstand speichern'
             }
             disabled={vm.busy}
             onPress={() => void vm.save()}

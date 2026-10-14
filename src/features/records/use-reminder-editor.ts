@@ -7,7 +7,7 @@ import type {
 } from '../../core/native/series-native';
 import { useServices } from '../../core/composition';
 import { useFeedback } from '../../core/ui/feedback';
-import { positionText } from '../../core/domain/progress';
+import { positionText } from '../../core/domain/episode-position';
 import {
   defaultReminder,
   reminderSettingsFailure,

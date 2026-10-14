@@ -268,10 +268,10 @@ export class ReportLayout {
   }
 
   historyTable(rows: string[][]) {
-    const flex = (this.width - 30) / 4;
+    const flex = (this.width - 30) / 2;
     this.table(
-      [['Nr.', 'Zeitpunkt', 'Eintrag', 'Differenz'], ...rows],
-      [30, flex * 1.35, flex, flex * 1.65],
+      [['Nr.', 'Zeitpunkt', 'Folgenstand'], ...rows],
+      [30, flex, flex],
       true,
     );
   }

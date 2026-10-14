@@ -18,8 +18,8 @@ export function CaptureGuidance({ latest }: { latest?: string }) {
         Standortmetadaten werden nicht übernommen.
       </Body>
       <Body>
-        Staffel und Folge trägst du anschließend selbst ein und bestätigst sie
-        vor dem Speichern. Ein Foto und eine Notiz sind optional.
+        Staffel und Folge trägst du anschließend selbst ein. Beide Angaben sind
+        Pflichtfelder. Ein Foto und eine Notiz sind optional.
       </Body>
       {latest && <Body muted>Zuletzt: {latest}</Body>}
     </Card>

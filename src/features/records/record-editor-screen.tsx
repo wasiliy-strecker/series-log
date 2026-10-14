@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import { useRef } from 'react';
 import { View } from 'react-native';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import {
@@ -14,17 +14,11 @@ import { useRecordEditor } from './use-record-editor';
 import { ReminderEditor } from './reminder-editor';
 import { FormErrorScroll } from '../../core/ui/form-error-scroll';
 export function RecordEditorScreen() {
-  const { id, returnTo } = useLocalSearchParams<{
+  const { id } = useLocalSearchParams<{
     id?: string;
-    returnTo?: string;
   }>();
-  const returnToEntry = returnTo === 'entry';
-  const vm = useRecordEditor(id, returnToEntry);
+  const vm = useRecordEditor(id);
   const anchors = useRef<Record<string, View | null>>({});
-  const initialTarget = useMemo(
-    () => (returnToEntry ? { field: 'totalEpisodes', attempt: 0 } : null),
-    [returnToEntry],
-  );
   const r = vm.record;
   if (!r)
     return (
@@ -69,10 +63,7 @@ export function RecordEditorScreen() {
         </>
       }
     >
-      <FormErrorScroll
-        target={vm.errorTarget ?? initialTarget}
-        anchors={anchors}
-      />
+      <FormErrorScroll target={vm.errorTarget} anchors={anchors} />
       <Stack.Screen
         options={{ title: id ? 'Serie bearbeiten' : 'Serie anlegen' }}
       />
@@ -109,26 +100,6 @@ export function RecordEditorScreen() {
             onChangeText={(v) => vm.change('name', v)}
             editable={!vm.busy}
           />
-        </View>
-        <View
-          ref={(view) => {
-            anchors.current.totalEpisodes = view;
-          }}
-          collapsable={false}
-          style={{ gap: 8 }}
-        >
-          <Field
-            label="Gesamtfolgenzahl (optional)"
-            error={vm.fieldErrors.totalEpisodes}
-            keyboardType="number-pad"
-            value={vm.totalInput}
-            onChangeText={vm.setTotalInput}
-            editable={!vm.busy}
-          />
-          <Body muted>
-            Alle Folgen der Serie zusammen. Lass das Feld leer, wenn du die
-            Gesamtzahl nicht kennst.
-          </Body>
         </View>
         <ReminderEditor
           reminder={r.reminder}

@@ -13,16 +13,14 @@ import { errorText } from '../../core/ui/components';
 import { useFeedback } from '../../core/ui/feedback';
 import { useLeaveGuard } from '../../core/ui/use-leave-guard';
 import { capturePhase } from '../records/presentation-model';
-import { positionText } from '../../core/domain/progress';
 import { useFormErrors } from '../../core/ui/use-form-errors';
 import {
   entryFieldOrder,
   entrySaveFieldErrors,
-  needsLowerPositionConfirmation,
   validateEntryForm,
 } from './entry-form-validation';
 export function useEntryEditor(recordId: string, entryId?: string) {
-  const { series, media, revision, refresh } = useServices();
+  const { series, media, refresh } = useServices();
   const feedback = useFeedback();
   const [draft, setDraft] = useState<EntryDraft>(),
     [record, setRecord] = useState<SeriesRecord>(),
@@ -86,25 +84,6 @@ export function useEntryEditor(recordId: string, entryId?: string) {
         void series.discard(d).catch(() => {});
     };
   }, [series, recordId, entryId, setError]);
-  useEffect(() => {
-    if (!current.current) return;
-    let active = true;
-    series.repository
-      .records()
-      .then((records) => {
-        if (!active) return;
-        const updated = records.find((r) => r.id === recordId);
-        if (!updated) throw new Error('Die Serie wurde nicht gefunden.');
-        // Refresh edited series limits without replacing the in-progress entry.
-        setRecord(updated);
-      })
-      .catch((error) => {
-        if (active) setError(errorText(error));
-      });
-    return () => {
-      active = false;
-    };
-  }, [series, recordId, revision, setError]);
   const dirty = !!draft && JSON.stringify(draft.form) !== initialForm;
   const leave = useLeaveGuard({
     dirty,
@@ -126,7 +105,6 @@ export function useEntryEditor(recordId: string, entryId?: string) {
     formErrors.clear(key);
     void apply({
       ...current.current,
-      ...(key === 'season' ? { completedSeason: undefined } : {}),
       form: { ...current.current.form, [key]: value },
     }).catch((e) =>
       setError(`Entwurf konnte nicht gesichert werden: ${errorText(e)}`),
@@ -149,74 +127,6 @@ export function useEntryEditor(recordId: string, entryId?: string) {
     change,
     setAttachments,
     ...task,
-    editTotalEpisodes: () =>
-      task.run(async () => {
-        if (!current.current) return;
-        await series.persistDraft(current.current);
-        formErrors.clear('episode');
-        router.push({
-          pathname: '/record/edit',
-          params: { id: recordId, returnTo: 'entry' },
-        });
-      }),
-    nextSeason: () => {
-      const d = current.current;
-      if (!d || !record) return Promise.resolve(undefined);
-      const validation = validateEntryForm(d.form, record);
-      if (!validation.position) {
-        setError('');
-        formErrors.show(validation.errors, entryFieldOrder);
-        return Promise.resolve(undefined);
-      }
-      const position = validation.position;
-      formErrors.clear();
-      return task.run(async () => {
-        const d = current.current;
-        if (!d || !record) return;
-        const season = position.season;
-        const episode = position.episode;
-        if (season >= 200) {
-          formErrors.show(
-            { season: 'Staffel 200 ist die letzte mögliche Staffel.' },
-            entryFieldOrder,
-          );
-          return;
-        }
-        if (episode < 1) {
-          formErrors.show(
-            {
-              episode:
-                'Zum Abschließen muss mindestens eine Folge gesehen sein.',
-            },
-            entryFieldOrder,
-          );
-          return;
-        }
-        const length = record.seasons[season - 1];
-        if (length != null && episode !== length) {
-          formErrors.show(
-            {
-              episode: `Für den Wechsel muss Staffel ${season} abgeschlossen sein. Trage zuerst die letzte Folge ${length} ein.`,
-            },
-            entryFieldOrder,
-          );
-          return;
-        }
-        if (
-          !(await feedback.confirm(
-            'Staffel abschließen?',
-            `Staffel ${season} mit ${episode} Folgen als vollständig gesehen bestätigen und zu Staffel ${season + 1} wechseln? Die nächste Staffel beginnt bei Folge 0. Gespeichert wird erst mit „Bestätigen & speichern“.`,
-            'Zur nächsten Staffel',
-          ))
-        )
-          return;
-        await apply({
-          ...d,
-          completedSeason: { season, episodes: episode },
-          form: { ...d.form, season: String(season + 1), episode: '0' },
-        });
-      });
-    },
     chooseManual: () =>
       task.run(async () => {
         if (!current.current) return;
@@ -291,47 +201,14 @@ export function useEntryEditor(recordId: string, entryId?: string) {
     save: () => {
       const d = current.current;
       if (!d) return Promise.resolve(undefined);
-      const validation = validateEntryForm(d.form, record, !!d.completedSeason);
+      const validation = validateEntryForm(d.form);
       if (!validation.position) {
         setError('');
         formErrors.show(validation.errors, entryFieldOrder);
         return Promise.resolve(undefined);
       }
-      const position = validation.position;
       formErrors.clear();
       return task.run(async () => {
-        if (
-          !d.completedSeason &&
-          position.season > (latest?.season ?? 1) &&
-          !(await feedback.confirm(
-            'Staffelwechsel bestätigen?',
-            `Du wechselst zu Staffel ${position.season}. Bestätige, dass du die vorherigen Staffeln vollständig gesehen hast. Ohne bekannte Folgenzahlen bleibt der Gesamtfortschritt unbekannt.`,
-            'Bestätigen & speichern',
-          ))
-        )
-          return;
-        if (
-          !entryId &&
-          latest &&
-          needsLowerPositionConfirmation(position, d.form.occurredAt, latest) &&
-          !(await feedback.confirm(
-            'Niedrigeren Stand speichern?',
-            `Bisheriger Stand: ${positionText(latest)}. Neuer Stand: ${positionText(position)}. Die Übersicht zeigt den zeitlich neuesten Folgenstand und kann danach weniger gesehene Folgen anzeigen. Möchtest du diesen Stand trotzdem speichern?`,
-            'Trotzdem speichern',
-            false,
-            'Eingabe prüfen',
-          ))
-        )
-          return;
-        if (
-          new Date(d.form.occurredAt).getTime() > Date.now() + 60000 &&
-          !(await feedback.confirm(
-            'Zeitpunkt liegt in der Zukunft',
-            'Diesen Folgenstand mit dem zukünftigen Zeitpunkt speichern?',
-            'Trotzdem speichern',
-          ))
-        )
-          return;
         await series.persistDraft(d);
         let result;
         try {

@@ -8,13 +8,15 @@ Runtime-Abhängigkeiten zu Nachbar-Apps einführen.
 ## Architektur und Fachlogik
 
 Schlanke Expo-Router-Routen in `src/app`, View-Model-Hooks in den Features.
-Geschäftsregeln in Services und `src/core/domain/progress.ts`.
+Geschäftsregeln in Services und `src/core/domain/episode-position.ts`.
 Gerätezugriffe über Ports, persistente Formularentwürfe und SQLite-Transaktionen.
 Erst Datenbankänderungen abschließen, dann nicht mehr referenzierte Dateien löschen.
-Staffelabschluss und Folgenstand atomar speichern.
+Folgenstand und Entfernen seines Entwurfs atomar speichern.
 
-Die Folgenlogik ist in README.md dokumentiert und vom Nutzer bestätigt.
-Keine erfundenen Gesamtzahlen oder Prozentwerte. Ganze Staffel-/Folgenzahlen.
+Der einfache Folgenstand ist in README.md dokumentiert und vom Nutzer beauftragt.
+Staffel und Folge sind unabhängige Pflichtfelder mit positiven ganzen Zahlen.
+Keine Gesamtzahlen, Staffelverwaltung, Fortschrittsberechnung oder Bestätigungen
+für Staffelwechsel und Rücksprünge. Ältere Datensätze und Backups erhalten.
 Dunkles Design mit roten Akzenten, heller Schrift und eigenem SerienLog-Symbol.
 
 ## Entwicklung und Prüfung

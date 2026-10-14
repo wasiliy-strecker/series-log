@@ -1,92 +1,65 @@
-# Prüfung der ersten SerienLog-Version
+# Prüfung von SerienLog
 
-## Ausgeführt
+## Automatische Prüfung
 
-`npm run check`: Formatierung, ESLint, TypeScript und 25 gezielte Tests für
-Folgenberechnung, optionale Gesamtzahlen, Staffelwechsel, Rücksprünge,
-SQLite-Persistenz, Suche, Paginierung, Korrekturen, Dateireferenzen, PDF-Erzeugung
-und verschlüsselte Backups sowie Erinnerungsdefaults, Zeitumstellung und
-Statusfälle. Die Backup-Prüfung nutzt echte JPEG-/PDF-Dateien und verifiziert
-die Verschlüsselung zusätzlich mit Node/OpenSSL.
+`npm run check` prüft Formatierung, ESLint, TypeScript und die kleine Testsuite.
+Sie deckt Pflichtfelder, unabhängige Staffel-/Folgenangaben, rückwärts erfasste
+Stände, SQLite-Persistenz, Entwürfe, Suche, Paginierung, Fotos, PDF-Erzeugung,
+verschlüsselte Backups und Erinnerungen ab. Ein gezielter Test speichert zuerst
+Staffel 3, Folge 3 und danach Staffel 2, Folge 2. Ehemalige Gesamtzahlen dürfen
+keinen dieser Stände blockieren. Ein verschlüsseltes Archiv mit den alten
+Serienfeldern, echtem Foto und PDF wird mit Node/OpenSSL erzeugt und importiert.
 
-`npm run check:native`: 44 JVM-Tests für
-Erinnerungen, Zeitzonen, Android-Berechtigungen, Dateizugriff und
-Passwortableitung bestanden. Android-Lint für das eigene Modul bestanden.
-Die bereits in der Vorlage dokumentierten Lint-Abstürze zweier Expo-/Worklets-
-Abhängigkeiten werden im übernommenen Skript gezielt ausgeschlossen.
-
-`expo prebuild`: Eigene Android-Kennungen, Expo-Modul, Icon, Startfarben und
-getrennte Dev-/Store-Varianten erzeugt. Kein Store-Debug und kein Store-Build.
-
-`npm run build:preview`: Eigenständige Dev-Testversion mit eingebettetem
-JavaScript und aktualisierter nativer Erinnerungslogik erfolgreich gebaut.
-
-`npx expo export --platform android --output-dir build/bundle-check`: Android-
-JavaScript-Bündel mit Metro und Hermes erfolgreich erzeugt. Das ist kein APK-
-oder Store-Build.
+Die bestehende native Prüfung `npm run check:native` umfasst 44 JVM-Tests und
+Android-Lint für das eigene Modul. Sie wurde für die vorherige Änderung der
+nativen Erinnerungslogik ausgeführt. Der aktuelle Umbau ändert kein natives Modul.
 
 ## Kurze manuelle Abnahme auf einem Gerät
 
-Die vollständige manuelle Abnahme steht noch aus. Schritt 10 sowie Öffnen,
-Weiterblättern, Randpfeile und Android-Zurück der Beispielgalerie aus Schritt 13
-wurden auf einem verbundenen Android-Smartphone geprüft. Es wurde keine
-umfangreiche visuelle Testreihe gestartet.
+Keine aufwendige visuelle Testreihe. Für den einfachen Folgenstand reichen die
+ersten drei Schritte. Die übrigen Schritte dokumentieren bestehende Funktionen.
 
-1. Serie mit Titel und Genre anlegen. Gesamtfolgenzahl offen lassen.
-2. Staffel 1, Folge 3 ohne Foto speichern. Drei Folgen ohne Prozentwert prüfen.
-3. Gesamtfolgenzahl 18 in den Serienangaben einstellen. Fortschritt prüfen.
-4. Neuen Stand mit Folge 8 beginnen. „Nächste Staffel“ bestätigen und Folge 3
-   in Staffel 2 speichern. Elf gesehene Folgen und 61 Prozent prüfen.
-5. Foto aus Galerie und Kamera hinzufügen, vergrößern, ersetzen und entfernen.
-   Eingabe abbrechen und Entwurfs-/Verwerfendialog prüfen.
-6. Stand bearbeiten, rückdatieren und löschen. Übersicht und Verlauf prüfen.
-7. Erinnerung einschalten, Freigaben prüfen und Test-Erinnerung antippen.
-   Zustellung bei Hintergrundbetrieb und nach Geräte-Neustart separat prüfen.
-8. Serienprotokoll öffnen, drucken oder teilen. Verschlüsseltes Backup speichern
-   und importieren. Fotos, Folgenstände und Erinnerungseinstellungen prüfen.
-9. Große Systemschrift, Tastatur, Zurücknavigation und Querformat kurz prüfen.
-10. In den Einstellungen „Datenschutzerklärung öffnen“ antippen. Die Seite
-    `github.com/wasiliy-strecker/series-log/blob/main/PRIVACY.md` muss öffnen.
-11. Eine Erinnerung aktivieren, Intervall und Tag ändern, aus- und wieder
-    einschalten. Die Auswahl muss erhalten bleiben. „Erinnerung jetzt testen“
-    soll Serientitel und letzten Folgenstand zeigen und zur Serie führen.
-    Blockierte App oder Kategorie, „Nicht stören“ und fehlende Alarmfreigabe
-    sollen unterschiedliche Hinweise und passende Einstellungsziele zeigen.
-12. Bei aktiver normaler Erinnerung auf Android 12 oder neuer „Alarme &
-    Erinnerungen“ öffnen antippen. Die Android-Einstellung für SerienLog muss
-    erscheinen. Danach zu SerienLog zurückkehren und prüfen, dass die gewählte
-    Erinnerungsart erhalten blieb.
-13. Einen neuen Folgenstand beginnen. Die Foto-Hinweise zur Aufnahme und lokalen
-    Speicherung lesen und „Beispiele ansehen“ öffnen. Vier Beispiele durch
-    Wischen und mit den Pfeilen ansehen. Am Anfang und Ende muss der jeweilige
-    Pfeil deaktiviert sein. Galerie mit Schließen, Android-Zurück und nach unten
-    Ziehen schließen. Die Beispiele dürfen keine Fotos oder Folgenstände
-    übernehmen. Große Schrift und Querformat müssen durch Scrollen nutzbar bleiben.
-14. Eine Serie mit insgesamt 26 Folgen öffnen und Folge 59 eintragen. Speichern
-    muss den Konflikt mit beiden Zahlen direkt am Folgenfeld erklären. Über
-    „Gesamtfolgenzahl ändern“ zu den Serienangaben wechseln. Ohne Änderungen
-    zurückkehren und die erhaltene Eingabe prüfen. Dann die Gesamtzahl bewusst
-    erhöhen oder leer lassen, speichern und zum angefangenen Folgenstand
-    zurückkehren. Die neue Grenze muss sofort gelten. Eine unbekannte Gesamtzahl
-    darf keinen Prozentwert erzeugen.
-15. Einen Folgenstand mit Bild speichern. Das Bild muss im Dashboard und oben
-    in der Serie erscheinen. Im Dashboard öffnet Antippen die Serie. In den
-    Details öffnet Antippen das Original mit Zoom. Neuere Stände ohne Bild
-    dürfen die Vorschau nicht entfernen. Ein Bild ändern oder den zugehörigen
-    Stand löschen und die aktualisierte Vorschau beziehungsweise den Rückgriff
-    auf das ältere Bild prüfen. Serien ohne Bild bleiben ohne leere Bildfläche.
-16. Serie anlegen und bearbeiten. Es darf keine separate Liste für Staffeln und
-    keine Aktion zum Hinzufügen einer Staffel geben. Die optionale Gesamtzahl
-    muss leer bleiben können. Bei einer älteren Serie mit gespeicherten
-    Staffellängen nur Titel oder Genre bearbeiten. Der bisherige Fortschritt
-    muss nach dem Speichern erhalten bleiben.
-17. In einem neuen Folgenstand eine spätere Staffel eintragen und speichern.
-    Im Dialog „Staffelwechsel bestätigen?“ muss die rote Hauptaktion in voller
-    Breite über dem umrandeten Abbrechen-Button stehen. Beide Buttons müssen
-    auch bei großer Systemschrift und langen Beschriftungen untereinander
-    bleiben. Abbrechen oder Android-Zurück darf nichts speichern und muss die
-    Eingabe erhalten. Auch „Staffel abschließen?“ und die Rücksprungbestätigung
-    müssen denselben Aufbau verwenden.
+1. Serie anlegen und bearbeiten. Titel und Genre, optionale Notiz und Erinnerung
+   müssen vorhanden sein. Es darf kein Feld für Gesamtfolgen oder Staffellängen
+   und keine Aktion zur Staffelverwaltung geben.
+2. Ohne Foto einen Stand mit Staffel 3 und Folge 3 speichern. Danach Staffel 2
+   und Folge 2 speichern. Beide Vorgänge müssen direkt speichern. Die Übersicht
+   muss den zeitlich neuesten Eintrag zeigen. Dashboard, Serie und Verlauf dürfen
+   keinen Fortschrittsbalken, Prozentwert oder Zuwachs anzeigen.
+3. Staffel und Folge leer lassen und speichern. Unter beiden Pflichtfeldern
+   müssen Fehler erscheinen und das Formular zum ersten Fehler scrollen. Null,
+   negative Zahlen und Dezimalzahlen müssen am jeweiligen Feld abgelehnt werden.
+   Gültige Zahlen mit optionalem Foto und einer Notiz direkt speichern.
+4. Einen Stand bearbeiten, rückdatieren und löschen. Übersicht, Verlauf und
+   erhaltene Formularentwürfe prüfen. Nur Löschen und Verwerfen benötigen eine
+   Bestätigung. Ein niedrigerer Folgenstand darf keine Nachfrage auslösen.
+5. Serienprotokoll erzeugen. Die PDF muss Titel, Genre, Staffel, Folge und Datum
+   enthalten. Gesamtfolgen, Staffellängen und Differenzspalte dürfen nicht vorkommen.
+   Vorhandene ältere PDFs bleiben unverändert.
+6. Foto aufnehmen, aus Galerie ergänzen, vergrößern, ersetzen und entfernen.
+   Das letzte gespeicherte Foto muss im Dashboard und in der Serie erscheinen.
+   Neuere Stände ohne Foto verdrängen es nicht. Nach dem Löschen des letzten
+   Fotoeintrags wird ein älteres Bild gezeigt. Serien ohne Bild haben keine leere
+   Bildfläche.
+7. „Beispiele ansehen“ öffnen. Vier Beispiele mit Wischen und Pfeilen ansehen.
+   Die Randpfeile müssen deaktiviert sein. Schließen, Android-Zurück und Ziehen
+   schließen die Galerie ohne Fotos oder Folgenstände zu übernehmen.
+8. Erinnerung aktivieren und „Erinnerung jetzt testen“ verwenden. Serientitel
+   und letzter Folgenstand müssen erscheinen. Antippen öffnet die Serie.
+   Intervall und Tag ändern, aus- und einschalten. Die Auswahl bleibt erhalten.
+   Blockierte Benachrichtigungen, „Nicht stören“ und fehlende Alarmfreigabe zeigen
+   passende Hinweise und Android-Einstellungsziele.
+9. Bei aktiver Erinnerung „Alarme & Erinnerungen“ öffnen. Nach Rückkehr müssen
+   Status und gewählte Erinnerungsart stimmen. Zustellung im Hintergrund und
+   nach Geräte-Neustart bei Änderungen der nativen Logik separat prüfen.
+10. Verschlüsseltes Backup erstellen und importieren. Fotos, Folgenstände,
+    Notizen und Erinnerungen prüfen. Ein älteres SerienLog-Backup mit ehemaligen
+    Gesamtzahlen muss ohne neue Staffelabfragen importiert werden können.
+11. „Datenschutzerklärung öffnen“ muss zur Seite
+    `github.com/wasiliy-strecker/series-log/blob/main/PRIVACY.md` führen.
+12. Bei großer Systemschrift und im Querformat kurz prüfen, dass Eingaben,
+    Fehlerhinweise und Speichern erreichbar bleiben.
 
-Die native Testsuite ersetzt keine reale Prüfung von Kamera, Dateiauswahl,
-Hersteller-Energiesparregeln, Benachrichtigungszustellung oder PDF-Druckdiensten.
+Die Tests ersetzen keine reale Prüfung von Kamera, Android-Energiesparregeln,
+Benachrichtigungszustellung und PDF-Druckdiensten. Die zuletzt ausgeführten
+Geräteschritte und noch offene Punkte stehen im jeweiligen Task-Changelog.

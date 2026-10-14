@@ -1,4 +1,3 @@
-import { ProgressCard } from './series-progress';
 import { View, Text } from 'react-native';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import {
@@ -253,7 +252,6 @@ export function RecordsScreen() {
                       Gesicherter Formularentwurf
                     </Body>
                   )}
-                  <ProgressCard record={record} entry={latest} compact />
                   <ReminderInfo
                     record={record}
                     status={vm.status}
@@ -378,7 +376,6 @@ export function RecordDetailScreen() {
           <Body>Zuletzt am {dateTime(vm.entries[0].occurredAt)}</Body>
         )}
         <View style={{ marginTop: 10 }}>
-          <ProgressCard record={r} entry={vm.entries[0] ?? null} />
           {!!r.note && <Body>{r.note}</Body>}
           <ReminderInfo record={r} status={vm.status} onEdit={edit} />
         </View>

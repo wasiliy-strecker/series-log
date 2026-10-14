@@ -1,4 +1,3 @@
-import { validateProgress } from './progress';
 import { z } from 'zod';
 import { MAX_FILE_BYTES, MAX_PDF_PAGES } from '../files/limits';
 
@@ -33,25 +32,36 @@ export const reminderSchema = z
   .refine((r) => r.interval !== 'weekly' || r.day <= 7, {
     message: 'Wochentag muss zwischen 1 und 7 liegen.',
   });
-export const recordSchema = z
-  .object({
-    id,
-    name: short.trim().min(1, 'Bitte einen Serientitel eingeben.'),
-    category: short.trim().min(1, 'Bitte ein Genre eingeben.'),
-    totalEpisodes: z.number().int().min(1).max(1000000).nullable(),
-    seasons: z.array(z.number().int().min(1).max(1000000).nullable()).max(200),
-    note,
-    reminder: reminderSchema.nullable(),
-    createdAt: timestamp,
-    updatedAt: timestamp,
-  })
-  .strict();
+export const recordSchema = z.preprocess(
+  (input) => {
+    if (!input || typeof input !== 'object' || Array.isArray(input))
+      return input;
+    // Read older database rows and backups without their obsolete count fields.
+    const record = { ...input } as Record<string, unknown>;
+    delete record.totalEpisodes;
+    delete record.seasons;
+    return record;
+  },
+  z
+    .object({
+      id,
+      name: short.trim().min(1, 'Bitte einen Serientitel eingeben.'),
+      category: short.trim().min(1, 'Bitte ein Genre eingeben.'),
+      note,
+      reminder: reminderSchema.nullable(),
+      createdAt: timestamp,
+      updatedAt: timestamp,
+    })
+    .strict(),
+);
 export const entrySchema = z
   .object({
     id,
     recordId: id,
-    season: z.number().int().min(1).max(200),
-    episode: z.number().int().min(0).max(1000000),
+    season: z.number().int().positive(),
+    // Retain legacy episode-zero entries in existing data and backups.
+    // New and edited entries require positive values in the application service.
+    episode: z.number().int().nonnegative(),
     occurredAt: timestamp,
     note,
     attachments: z.array(attachmentSchema).max(200),
@@ -107,7 +117,6 @@ export type EntryDraft = {
   form: EntryForm;
   updatedAt: string;
   external: 'camera' | 'gallery' | null;
-  completedSeason?: { season: number; episodes: number };
   captureStage?: 'choose' | 'form';
   captureSource?: 'manual' | 'photo';
 };
@@ -185,10 +194,5 @@ export function validateSnapshot(input: unknown): Snapshot {
     )
       throw new Error('Widersprüchliche Protokollteile.');
   }
-  for (const record of data.records)
-    validateProgress(
-      record,
-      data.entries.filter((e) => e.recordId === record.id),
-    );
   return data;
 }

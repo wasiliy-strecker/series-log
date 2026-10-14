@@ -15,12 +15,8 @@ import {
   reminderSaveWarning,
 } from './reminder-model';
 import { useFormErrors } from '../../core/ui/use-form-errors';
-import {
-  recordFieldOrder,
-  recordSaveFieldErrors,
-  validateRecordForm,
-} from './record-form-validation';
-export function useRecordEditor(id?: string, returnToEntry = false) {
+import { recordFieldOrder, validateRecordForm } from './record-form-validation';
+export function useRecordEditor(id?: string) {
   const { series, refresh, native } = useServices();
   const reminderState = useReminderStatusSnapshot();
   const feedback = useFeedback();
@@ -31,8 +27,6 @@ export function useRecordEditor(id?: string, returnToEntry = false) {
       id: series.env.id(),
       name: '',
       category: 'Drama',
-      totalEpisodes: null,
-      seasons: [],
       note: '',
       reminder: null,
       createdAt: now,
@@ -42,8 +36,6 @@ export function useRecordEditor(id?: string, returnToEntry = false) {
   const [initial, setInitial] = useState(() => JSON.stringify(record));
   const [initialReady, setReady] = useState(!id);
   const [suggestions, setSuggestions] = useState(() => categorySuggestions([]));
-  const [totalInput, setTotalInput] = useState('');
-  const [initialTotal, setInitialTotal] = useState('');
   const task = useTask();
   const { setError } = task;
   const formErrors = useFormErrors();
@@ -60,9 +52,6 @@ export function useRecordEditor(id?: string, returnToEntry = false) {
           setRecord(found);
           setInitial(JSON.stringify(found));
           setReady(true);
-          const total = found.totalEpisodes?.toString() ?? '';
-          setTotalInput(total);
-          setInitialTotal(total);
         }
       })
       .catch((e) => {
@@ -72,9 +61,7 @@ export function useRecordEditor(id?: string, returnToEntry = false) {
       active = false;
     };
   }, [series, id, setError]);
-  const dirty =
-    initialReady &&
-    (JSON.stringify(record) !== initial || totalInput !== initialTotal);
+  const dirty = initialReady && JSON.stringify(record) !== initial;
   const reminderNeedsRepair =
     !!id &&
     reminderState.loaded &&
@@ -105,15 +92,10 @@ export function useRecordEditor(id?: string, returnToEntry = false) {
     reminderNeedsRepair,
     change,
     categorySuggestions: suggestions,
-    totalInput,
-    setTotalInput: (value: string) => {
-      formErrors.clear('totalEpisodes');
-      setTotalInput(value);
-    },
     ...task,
     save: () => {
       if (!record) return Promise.resolve(undefined);
-      const validation = validateRecordForm(record, totalInput);
+      const validation = validateRecordForm(record);
       if (!validation.value) {
         setError('');
         formErrors.show(validation.errors, recordFieldOrder);
@@ -130,15 +112,7 @@ export function useRecordEditor(id?: string, returnToEntry = false) {
           await PermissionsAndroid.request(
             PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
           );
-        let warnings;
-        try {
-          warnings = await series.saveRecord(value);
-        } catch (error) {
-          const errors = recordSaveFieldErrors(error);
-          if (!errors) throw error;
-          formErrors.show(errors, recordFieldOrder);
-          return;
-        }
+        const warnings = await series.saveRecord(value);
         refresh();
         let reminderWarning: string | null;
         try {
@@ -165,8 +139,7 @@ export function useRecordEditor(id?: string, returnToEntry = false) {
           reminderWarning =
             'Daten gespeichert. Die Erinnerung konnte nicht bestätigt werden. Öffne die Erinnerung und speichere erneut.';
         leave(() => {
-          if (id && returnToEntry && router.canGoBack()) router.back();
-          else if (id)
+          if (id)
             router.dismissTo({
               pathname: '/record/[id]',
               params: { id: record.id },
@@ -181,9 +154,7 @@ export function useRecordEditor(id?: string, returnToEntry = false) {
           reminderWarning ||
             warnings.join('\n') ||
             (id
-              ? returnToEntry
-                ? 'Serienangaben gespeichert. Du kannst deinen Folgenstand jetzt speichern.'
-                : 'Änderungen an der Serie gespeichert.'
+              ? 'Änderungen an der Serie gespeichert.'
               : 'Serie gespeichert. Als Nächstes kannst du den ersten Folgenstand erfassen.'),
         );
       });

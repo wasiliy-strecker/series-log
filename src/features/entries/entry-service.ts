@@ -1,4 +1,4 @@
-import { validateProgress, wholeNumber } from '../../core/domain/progress';
+import { wholeNumber } from '../../core/domain/episode-position';
 import {
   entrySchema,
   recordSchema,
@@ -63,11 +63,6 @@ export class SeriesService {
         ...record,
         updatedAt: this.env.now(),
       });
-      const data = await this.repository.snapshot();
-      validateProgress(
-        validated,
-        data.entries.filter((e) => e.recordId === record.id),
-      );
       await this.repository.saveRecord(validated);
       return this.syncReminders();
     });
@@ -137,7 +132,7 @@ export class SeriesService {
       const entry = entrySchema.parse({
         id: draft.entryId ?? this.env.id(),
         recordId: draft.recordId,
-        season: wholeNumber(f.season, 'Staffel', 1, 200),
+        season: wholeNumber(f.season, 'Staffel'),
         episode: wholeNumber(f.episode, 'Folge'),
         occurredAt: new Date(f.occurredAt).toISOString(),
         note: f.note,
@@ -146,37 +141,9 @@ export class SeriesService {
         updatedAt: this.env.now(),
       });
       const before = await this.repository.snapshot();
-      const savedRecord = before.records.find((r) => r.id === entry.recordId);
-      if (!savedRecord) throw new Error('Serie nicht gefunden.');
-      let updatedRecord: SeriesRecord | undefined;
-      if (draft.completedSeason) {
-        const { season, episodes } = draft.completedSeason;
-        if (entry.season !== season + 1 || episodes < 1)
-          throw new Error(
-            'Der Staffelwechsel passt nicht zum Folgenstand. Bitte erneut auswählen.',
-          );
-        const known = savedRecord.seasons[season - 1];
-        if (known != null && known !== episodes)
-          throw new Error(
-            'Die Folgenzahl dieser Staffel wurde geändert. Bitte den Staffelwechsel erneut prüfen.',
-          );
-        const seasons = [...savedRecord.seasons];
-        while (seasons.length < season) seasons.push(null);
-        seasons[season - 1] = episodes;
-        updatedRecord = recordSchema.parse({
-          ...savedRecord,
-          seasons,
-          updatedAt: this.env.now(),
-        });
-      }
-      const record = updatedRecord ?? savedRecord;
-      validateProgress(record, [
-        ...before.entries.filter(
-          (e) => e.recordId === entry.recordId && e.id !== entry.id,
-        ),
-        entry,
-      ]);
-      await this.repository.saveProgress(entry, draft.id, updatedRecord);
+      if (!before.records.some((r) => r.id === entry.recordId))
+        throw new Error('Serie nicht gefunden.');
+      await this.repository.saveEntry(entry, draft.id);
       await this.cleanup(
         before.entries
           .find((e) => e.id === entry.id)

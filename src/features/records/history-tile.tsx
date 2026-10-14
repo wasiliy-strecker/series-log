@@ -1,15 +1,15 @@
-import { positionText } from '../../core/domain/progress';
+import { positionText } from '../../core/domain/episode-position';
 import { useState } from 'react';
 import { Image, StyleSheet, Text, View } from 'react-native';
 import { router } from 'expo-router';
-import { Body, Card, useTheme } from '../../core/ui/components';
+import { Card, useTheme } from '../../core/ui/components';
 import { Icon } from '../../core/ui/icon';
 import { dateTime, type HistoryItem } from './presentation-model';
 
 export function HistoryTile({ item }: { item: HistoryItem }) {
   const c = useTheme();
   const [failedUri, setFailedUri] = useState<string>();
-  const { entry, photoUri, photoCount, positionLabel, comparison } = item;
+  const { entry, photoUri, photoCount, positionLabel } = item;
   const photoFailed = !!photoUri && failedUri === photoUri;
   // Match the reference's category accent at 14 percent opacity.
   const dateAccent = c.primary;
@@ -82,7 +82,6 @@ export function HistoryTile({ item }: { item: HistoryItem }) {
           >
             {positionLabel}
           </Text>
-          {!!comparison && <Body style={s.comparison}>{comparison}</Body>}
         </View>
         <Icon name="chevron_right" color={c.muted} />
       </View>
@@ -152,7 +151,6 @@ const s = StyleSheet.create({
     fontSize: 20,
     lineHeight: 28,
   },
-  comparison: { marginTop: 8 },
   noteRow: { flexDirection: 'row', alignItems: 'flex-start', gap: 8 },
   note: {
     flex: 1,

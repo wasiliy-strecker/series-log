@@ -1,4 +1,4 @@
-import { positionText } from './domain/progress';
+import { positionText } from './domain/episode-position';
 import { StartupError, StartupPending } from './startup/startup';
 import { PdfViewerService } from './pdf/viewer-service';
 import { androidPasswordKey } from './backup/password-key';

@@ -55,6 +55,13 @@ zukünftige neue Stände benötigen eine Bestätigung. Der Verlauf zählt gespei
 Stände, nicht einzelne Seh-Sitzungen. Serienangaben, die vorhandenen Ständen
 widersprechen, werden nicht gespeichert.
 
+Beim Erfassen sind die hinterlegten Folgenzahlen sichtbar. Widerspricht ein
+Stand diesen Angaben, nennt die Fehlermeldung die eingetragene Zahl und die
+Grenze. „Folgenzahlen anpassen“ öffnet direkt die Serienangaben und kehrt nach
+dem Speichern zum angefangenen Folgenstand zurück. Die Eingaben bleiben erhalten.
+Die Gesamtzahl wird nie automatisch erhöht und kann bei unbekannter Länge
+offen bleiben.
+
 ## Erinnerungen zum Weiterschauen
 
 Das Formular und die Statusanzeigen folgen MaschinenLog und dessen

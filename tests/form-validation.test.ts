@@ -77,6 +77,22 @@ it('maps progress errors found during save back to the affected field', () => {
   ).toHaveProperty('episode');
 });
 
+it('explains the entered stand and configured total without silently raising the limit', () => {
+  const form = entry({ episode: '59' });
+  const series = record({ totalEpisodes: 26 });
+  const result = validateEntryForm(form, series);
+  expect(result.position).toBeNull();
+  expect(result.errors.episode).toContain('Gesamtfolgenzahl von 26 Folgen');
+  expect(result.errors.episode).toContain('59 gesehenen Folgen');
+  expect(series.totalEpisodes).toBe(26);
+  expect(
+    validateEntryForm(form, { ...series, totalEpisodes: 80 }).position,
+  ).toEqual({ season: 1, episode: 59 });
+  expect(
+    validateEntryForm(form, { ...series, totalEpisodes: null }).position,
+  ).toEqual({ season: 1, episode: 59 });
+});
+
 it('warns about a lower latest stand but allows older history entries without a warning', () => {
   const latest = {
     id: '11111111-1111-4111-8111-111111111111',

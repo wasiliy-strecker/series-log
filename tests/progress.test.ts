@@ -74,7 +74,7 @@ describe('series progress', () => {
       validateProgress(record({ totalEpisodes: 10, seasons: [8] }), [
         { season: 3, episode: 3 },
       ]),
-    ).toThrow('Gesamtfolgenzahl');
+    ).toThrow('mindestens 12 gesehenen Folgen');
   });
   it('accepts whole numbers only, including pasted input', () => {
     expect(wholeNumber(' 003 ', 'Folge')).toBe(3);

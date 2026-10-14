@@ -22,7 +22,7 @@ import {
   validateEntryForm,
 } from './entry-form-validation';
 export function useEntryEditor(recordId: string, entryId?: string) {
-  const { series, media, refresh } = useServices();
+  const { series, media, revision, refresh } = useServices();
   const feedback = useFeedback();
   const [draft, setDraft] = useState<EntryDraft>(),
     [record, setRecord] = useState<SeriesRecord>(),
@@ -86,6 +86,25 @@ export function useEntryEditor(recordId: string, entryId?: string) {
         void series.discard(d).catch(() => {});
     };
   }, [series, recordId, entryId, setError]);
+  useEffect(() => {
+    if (!current.current) return;
+    let active = true;
+    series.repository
+      .records()
+      .then((records) => {
+        if (!active) return;
+        const updated = records.find((r) => r.id === recordId);
+        if (!updated) throw new Error('Die Serie wurde nicht gefunden.');
+        // Refresh edited series limits without replacing the in-progress entry.
+        setRecord(updated);
+      })
+      .catch((error) => {
+        if (active) setError(errorText(error));
+      });
+    return () => {
+      active = false;
+    };
+  }, [series, recordId, revision, setError]);
   const dirty = !!draft && JSON.stringify(draft.form) !== initialForm;
   const leave = useLeaveGuard({
     dirty,
@@ -130,6 +149,16 @@ export function useEntryEditor(recordId: string, entryId?: string) {
     change,
     setAttachments,
     ...task,
+    editEpisodeCounts: () =>
+      task.run(async () => {
+        if (!current.current) return;
+        await series.persistDraft(current.current);
+        formErrors.clear('episode');
+        router.push({
+          pathname: '/record/edit',
+          params: { id: recordId, returnTo: 'entry' },
+        });
+      }),
     nextSeason: () => {
       const d = current.current;
       if (!d || !record) return Promise.resolve(undefined);

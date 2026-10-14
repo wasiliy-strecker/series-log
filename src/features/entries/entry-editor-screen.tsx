@@ -1,5 +1,5 @@
 import { useRef } from 'react';
-import { View } from 'react-native';
+import { Keyboard, View } from 'react-native';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import {
   Body,
@@ -34,6 +34,8 @@ export function EntryEditorScreen() {
       </Page>
     );
   const form = draft.form;
+  const season = Number(form.season);
+  const seasonEpisodes = vm.record?.seasons[season - 1];
   const actions: AttachmentActions = {
     busy: vm.busy,
     pick: (source, id) => {
@@ -119,6 +121,24 @@ export function EntryEditorScreen() {
                 editable={!vm.busy}
               />
             </View>
+            <Body muted>
+              {vm.record?.totalEpisodes == null
+                ? 'Gesamtfolgenzahl: offen.'
+                : `Für die Serie hinterlegt: ${vm.record.totalEpisodes} Folgen insgesamt.`}
+              {seasonEpisodes != null
+                ? ` Staffel ${season}: ${seasonEpisodes} Folgen.`
+                : ''}
+            </Body>
+            <Button
+              textOnly
+              icon="edit_note_outlined"
+              title="Folgenzahlen anpassen"
+              disabled={vm.busy}
+              onPress={() => {
+                Keyboard.dismiss();
+                void vm.editEpisodeCounts();
+              }}
+            />
             <Body muted>
               Folge 0 bedeutet, dass du diese Staffel noch nicht begonnen hast.
               Die Eingabe zählt vollständig gesehene Folgen ab Staffelbeginn.

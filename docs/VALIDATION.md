@@ -2,7 +2,7 @@
 
 ## Ausgeführt
 
-`npm run check`: Formatierung, ESLint, TypeScript und 21 gezielte Tests für
+`npm run check`: Formatierung, ESLint, TypeScript und 23 gezielte Tests für
 Folgenberechnung, optionale Gesamtzahlen, Staffelwechsel, Rücksprünge,
 SQLite-Persistenz, Suche, Paginierung, Korrekturen, Dateireferenzen, PDF-Erzeugung
 und verschlüsselte Backups sowie Erinnerungsdefaults, Zeitumstellung und
@@ -62,6 +62,13 @@ umfangreiche visuelle Testreihe gestartet.
     Pfeil deaktiviert sein. Galerie mit Schließen, Android-Zurück und nach unten
     Ziehen schließen. Die Beispiele dürfen keine Fotos oder Folgenstände
     übernehmen. Große Schrift und Querformat müssen durch Scrollen nutzbar bleiben.
+14. Eine Serie mit insgesamt 26 Folgen öffnen und Folge 59 eintragen. Speichern
+    muss den Konflikt mit beiden Zahlen direkt am Folgenfeld erklären. Über
+    „Folgenzahlen anpassen“ zu den Serienangaben wechseln. Ohne Änderungen
+    zurückkehren und die erhaltene Eingabe prüfen. Dann die Gesamtzahl bewusst
+    erhöhen oder leer lassen, speichern und zum angefangenen Folgenstand
+    zurückkehren. Die neue Grenze muss sofort gelten. Eine unbekannte Gesamtzahl
+    darf keinen Prozentwert erzeugen.
 
 Die native Testsuite ersetzt keine reale Prüfung von Kamera, Dateiauswahl,
 Hersteller-Energiesparregeln, Benachrichtigungszustellung oder PDF-Druckdiensten.

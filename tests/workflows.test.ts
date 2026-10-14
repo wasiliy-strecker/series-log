@@ -72,6 +72,31 @@ it('saves a confirmed season transition atomically and rolls back on SQL failure
   expect(await f.repo.drafts()).toHaveLength(0);
 });
 
+it('preserves a conflicting draft while episode limits are corrected and then saves that draft', async () => {
+  const f = await setup();
+  const r = record({ totalEpisodes: 26 });
+  await f.series.saveRecord(r);
+  const draft = await f.series.draft(r.id);
+  draft.form.episode = '59';
+  draft.form.note = 'Angefangenen Folgenstand behalten';
+  await f.series.persistDraft(draft);
+  await expect(f.series.saveEntry(draft)).rejects.toThrow('26 Folgen');
+  expect((await f.repo.entries(r.id)).total).toBe(0);
+  expect((await f.repo.drafts())[0]?.form).toEqual(draft.form);
+
+  await f.series.saveRecord({ ...r, totalEpisodes: 80 });
+  const restored = (await f.repo.drafts())[0]!;
+  expect(restored.form).toEqual(draft.form);
+  const result = await f.series.saveEntry(restored);
+  expect(result.entry).toMatchObject({
+    season: 1,
+    episode: 59,
+    note: draft.form.note,
+  });
+  expect((await f.repo.records())[0]?.totalEpisodes).toBe(80);
+  expect(await f.repo.drafts()).toHaveLength(0);
+});
+
 it('rejects invalid edits, renders a PDF, and deletes only associated entries and reports', async () => {
   const f = await setup(),
     r = record({ seasons: [8] }),

@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { View } from 'react-native';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import {
@@ -15,9 +15,17 @@ import { useRecordEditor } from './use-record-editor';
 import { ReminderEditor } from './reminder-editor';
 import { FormErrorScroll } from '../../core/ui/form-error-scroll';
 export function RecordEditorScreen() {
-  const { id } = useLocalSearchParams<{ id?: string }>();
-  const vm = useRecordEditor(id);
+  const { id, returnTo } = useLocalSearchParams<{
+    id?: string;
+    returnTo?: string;
+  }>();
+  const returnToEntry = returnTo === 'entry';
+  const vm = useRecordEditor(id, returnToEntry);
   const anchors = useRef<Record<string, View | null>>({});
+  const initialTarget = useMemo(
+    () => (returnToEntry ? { field: 'totalEpisodes', attempt: 0 } : null),
+    [returnToEntry],
+  );
   const r = vm.record;
   if (!r)
     return (
@@ -62,7 +70,10 @@ export function RecordEditorScreen() {
         </>
       }
     >
-      <FormErrorScroll target={vm.errorTarget} anchors={anchors} />
+      <FormErrorScroll
+        target={vm.errorTarget ?? initialTarget}
+        anchors={anchors}
+      />
       <Stack.Screen
         options={{ title: id ? 'Serie bearbeiten' : 'Serie anlegen' }}
       />

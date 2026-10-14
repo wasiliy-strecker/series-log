@@ -20,7 +20,7 @@ import {
   recordSaveFieldErrors,
   validateRecordForm,
 } from './record-form-validation';
-export function useRecordEditor(id?: string) {
+export function useRecordEditor(id?: string, returnToEntry = false) {
   const { series, refresh, native } = useServices();
   const reminderState = useReminderStatusSnapshot();
   const feedback = useFeedback();
@@ -184,7 +184,8 @@ export function useRecordEditor(id?: string) {
           reminderWarning =
             'Daten gespeichert. Die Erinnerung konnte nicht bestätigt werden. Öffne die Erinnerung und speichere erneut.';
         leave(() => {
-          if (id)
+          if (id && returnToEntry && router.canGoBack()) router.back();
+          else if (id)
             router.dismissTo({
               pathname: '/record/[id]',
               params: { id: record.id },
@@ -199,7 +200,9 @@ export function useRecordEditor(id?: string) {
           reminderWarning ||
             warnings.join('\n') ||
             (id
-              ? 'Änderungen an der Serie gespeichert.'
+              ? returnToEntry
+                ? 'Serienangaben gespeichert. Du kannst deinen Folgenstand jetzt speichern.'
+                : 'Änderungen an der Serie gespeichert.'
               : 'Serie gespeichert. Als Nächstes kannst du den ersten Folgenstand erfassen.'),
         );
       });

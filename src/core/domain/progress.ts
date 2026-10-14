@@ -85,14 +85,18 @@ export function validateProgress(
     const length = record.seasons[position.season - 1];
     if (length !== undefined && length !== null && position.episode > length)
       throw new Error(
-        `Staffel ${position.season} hat ${length} Folgen. Ein gespeicherter Folgenstand darf diese Zahl nicht überschreiten.`,
+        `Staffel ${position.season} hat ${length} Folgen. Eingegeben ist Folge ${position.episode}. Prüfe Staffel und Folge oder passe die hinterlegten Folgenzahlen an.`,
       );
     let minimumWatched = position.episode;
+    let hasUnknownSeasons = false;
     for (let season = 1; season < position.season; season++)
-      minimumWatched += record.seasons[season - 1] ?? 1;
+      if (record.seasons[season - 1] == null) {
+        minimumWatched += 1;
+        hasUnknownSeasons = true;
+      } else minimumWatched += record.seasons[season - 1]!;
     if (record.totalEpisodes !== null && minimumWatched > record.totalEpisodes)
       throw new Error(
-        'Der Folgenstand überschreitet die Gesamtfolgenzahl. Bitte zuerst die Serienangaben anpassen.',
+        `Der Folgenstand überschreitet die hinterlegte Gesamtfolgenzahl von ${record.totalEpisodes} Folgen. Dein Stand entspricht ${hasUnknownSeasons ? 'mindestens ' : ''}${minimumWatched} gesehenen Folgen. Prüfe Staffel und Folge oder passe die hinterlegten Folgenzahlen an.`,
       );
   }
 }

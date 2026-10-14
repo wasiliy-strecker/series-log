@@ -305,8 +305,8 @@ export function useEntryEditor(recordId: string, entryId?: string) {
           position.season > (latest?.season ?? 1) &&
           !(await feedback.confirm(
             'Staffelwechsel bestätigen?',
-            `Du speicherst einen Stand in Staffel ${position.season}. Der Gesamtfortschritt setzt voraus, dass frühere Staffeln vollständig gesehen sind. Bei unbekannten Staffellängen bleibt er offen.`,
-            'Weiter zum Speichern',
+            `Du wechselst zu Staffel ${position.season}. Bestätige, dass du die vorherigen Staffeln vollständig gesehen hast. Ohne bekannte Folgenzahlen bleibt der Gesamtfortschritt unbekannt.`,
+            'Bestätigen & speichern',
           ))
         )
           return;

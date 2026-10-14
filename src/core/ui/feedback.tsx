@@ -125,22 +125,17 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
         title,
         message,
         dialog: true,
-        stackedActions: danger,
-        options: danger
-          ? [
-              {
-                value: 'yes',
-                label: accept,
-                danger: true,
-                filled: true,
-                icon: accept === 'Löschen' ? 'delete_outline' : undefined,
-              },
-              { value: 'cancel', label: cancelLabel, outlined: true },
-            ]
-          : [
-              { value: 'cancel', label: cancelLabel },
-              { value: 'yes', label: accept, filled: true },
-            ],
+        stackedActions: true,
+        options: [
+          {
+            value: 'yes',
+            label: accept,
+            danger,
+            filled: true,
+            icon: danger && accept === 'Löschen' ? 'delete_outline' : undefined,
+          },
+          { value: 'cancel', label: cancelLabel, outlined: true },
+        ],
       })) === 'yes',
     [choose],
   );

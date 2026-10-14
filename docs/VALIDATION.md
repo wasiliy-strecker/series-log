@@ -80,6 +80,13 @@ umfangreiche visuelle Testreihe gestartet.
     muss leer bleiben können. Bei einer älteren Serie mit gespeicherten
     Staffellängen nur Titel oder Genre bearbeiten. Der bisherige Fortschritt
     muss nach dem Speichern erhalten bleiben.
+17. In einem neuen Folgenstand eine spätere Staffel eintragen und speichern.
+    Im Dialog „Staffelwechsel bestätigen?“ muss die rote Hauptaktion in voller
+    Breite über dem umrandeten Abbrechen-Button stehen. Beide Buttons müssen
+    auch bei großer Systemschrift und langen Beschriftungen untereinander
+    bleiben. Abbrechen oder Android-Zurück darf nichts speichern und muss die
+    Eingabe erhalten. Auch „Staffel abschließen?“ und die Rücksprungbestätigung
+    müssen denselben Aufbau verwenden.
 
 Die native Testsuite ersetzt keine reale Prüfung von Kamera, Dateiauswahl,
 Hersteller-Energiesparregeln, Benachrichtigungszustellung oder PDF-Druckdiensten.

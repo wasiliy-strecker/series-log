@@ -1,4 +1,4 @@
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import {
   Body,
   Button,
@@ -224,6 +224,15 @@ export function ReminderEditor(props: {
                   />
                 </Card>
               )}
+            {Platform.OS === 'android' && Number(Platform.Version) >= 31 && (
+              <Button
+                secondary
+                icon="open_in_new"
+                title="„Alarme & Erinnerungen“ öffnen"
+                disabled={vm.disabled}
+                onPress={() => void vm.open('exact')}
+              />
+            )}
             {availability === 'appBlocked' ||
             availability === 'channelBlocked' ? (
               <Card style={{ backgroundColor: c.errorContainer }}>

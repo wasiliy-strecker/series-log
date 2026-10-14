@@ -51,6 +51,10 @@ Testreihe gestartet.
     soll Serientitel und letzten Folgenstand zeigen und zur Serie führen.
     Blockierte App oder Kategorie, „Nicht stören“ und fehlende Alarmfreigabe
     sollen unterschiedliche Hinweise und passende Einstellungsziele zeigen.
+12. Bei aktiver normaler Erinnerung auf Android 12 oder neuer „Alarme &
+    Erinnerungen“ öffnen antippen. Die Android-Einstellung für SerienLog muss
+    erscheinen. Danach zu SerienLog zurückkehren und prüfen, dass die gewählte
+    Erinnerungsart erhalten blieb.
 
 Die native Testsuite ersetzt keine reale Prüfung von Kamera, Dateiauswahl,
 Hersteller-Energiesparregeln, Benachrichtigungszustellung oder PDF-Druckdiensten.

@@ -156,7 +156,7 @@ export function reminderSettingsFailure(
   target: ReminderSettingsTarget,
 ): string {
   if (target === 'exact')
-    return 'Die Android-Einstellung „Alarme & Erinnerungen“ konnte nicht geöffnet werden. „Pünktlich mit Ton“ bleibt ausgewählt.';
+    return 'Die Android-Einstellung „Alarme & Erinnerungen“ konnte nicht geöffnet werden. Öffne sie manuell in den Einstellungen deines Smartphones.';
   if (target === 'doNotDisturb')
     return 'Die Systemeinstellungen konnten nicht geöffnet werden. Du findest „Nicht stören“ in den Einstellungen deines Smartphones.';
   return 'Die Einstellungen konnten nicht geöffnet werden. Öffne in den Einstellungen deines Smartphones „Apps“, dann „SerienLog“ und „Benachrichtigungen“.';

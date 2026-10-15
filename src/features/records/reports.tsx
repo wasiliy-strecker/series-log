@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -19,7 +20,8 @@ import {
 import { Icon } from '../../core/ui/icon';
 import { PAGE_SIZE, type SavedReport } from '../../core/domain/models';
 import { dateTime } from './presentation-model';
-import { useReports } from './use-records';
+import { useReports } from './use-reports';
+import { useScrollHost } from '../../core/ui/scroll-host';
 
 function ReportCard({
   report,
@@ -54,8 +56,7 @@ function ReportCard({
       </View>
       <View style={s.reportBody}>
         <Body style={[s.reportTitle, { color: c.onSecondaryContainer }]}>
-          Serienprotokoll ·{' '}
-          {report.entryId ? 'Einzelner Folgenstand' : 'Serienverlauf'}
+          {report.entryId ? 'Einzelprotokoll' : 'Serienverlauf'}
           {report.partIndex
             ? ` · Teil ${report.partIndex} von ${report.partCount}`
             : ''}
@@ -88,7 +89,11 @@ function ReportCard({
         ) : (
           <IconButton
             icon="delete_outline"
-            label="Serienprotokoll löschen"
+            label={
+              report.entryId
+                ? 'Einzelprotokoll löschen'
+                : 'Serienverlaufsprotokoll löschen'
+            }
             color={c.danger}
             disabled={busy}
             onPress={onDelete}
@@ -99,19 +104,60 @@ function ReportCard({
   );
 }
 
-export function Reports({
-  recordId,
-  entryId = null,
-  hasAttachments,
-  summary,
-}: {
+type ReportsProps = {
   recordId: string;
   entryId?: string | null;
   hasAttachments: boolean;
   summary: string;
-}) {
+};
+
+export function Reports(props: ReportsProps) {
+  return (
+    <ReportSection
+      key={`${props.recordId}/${props.entryId ?? ''}`}
+      {...props}
+    />
+  );
+}
+
+function ReportSection({
+  recordId,
+  entryId = null,
+  hasAttachments,
+  summary,
+}: ReportsProps) {
   const vm = useReports(recordId, entryId, hasAttachments);
   const c = useTheme();
+  const host = useScrollHost();
+  const heading = useRef<View>(null);
+  const revealPage = useRef(false);
+  const previousOffset = useRef(vm.offset);
+  useEffect(() => {
+    if (previousOffset.current !== vm.offset) {
+      previousOffset.current = vm.offset;
+      revealPage.current = true;
+    }
+    if (vm.loading || vm.loadError || !revealPage.current || !host) return;
+    let active = true;
+    const frame = requestAnimationFrame(() => {
+      heading.current?.measureInWindow((_, top) => {
+        host.ref.current
+          ?.getNativeScrollRef()
+          ?.measureInWindow((_, pageTop) => {
+            if (active)
+              host.ref.current?.scrollTo({
+                y: Math.max(0, host.offset.current + top - pageTop - 20),
+                animated: true,
+              });
+          });
+      });
+      revealPage.current = false;
+    });
+    return () => {
+      active = false;
+      cancelAnimationFrame(frame);
+    };
+  }, [vm.loading, vm.loadError, vm.offset, host]);
   const saved = (
     <View>
       {vm.loading || (!vm.availableFiles && !vm.loadError) ? (
@@ -170,18 +216,18 @@ export function Reports({
   return (
     <View style={entryId ? { marginTop: 8 } : undefined}>
       {!!entryId && (
-        <Body strong style={s.heading}>
-          Gespeicherte Serienprotokolle
-        </Body>
+        <View ref={heading} collapsable={false}>
+          <Body strong style={s.heading}>
+            Gespeicherte Einzelprotokolle
+          </Body>
+        </View>
       )}
       <Card style={[s.createCard, { backgroundColor: c.secondaryContainer }]}>
         <View style={s.purposeRow}>
           <Icon name="picture_as_pdf_outlined" color={c.onSecondaryContainer} />
           <View style={{ flex: 1, gap: 4 }}>
             <Body strong style={{ color: c.onSecondaryContainer }}>
-              {entryId
-                ? 'Serienprotokoll dieses Eintrags'
-                : 'Serienprotokoll · Serienverlauf'}
+              {entryId ? 'Einzelprotokoll dieses Eintrags' : 'Serienverlauf'}
             </Body>
             <Body style={{ color: c.onSecondaryContainer }}>
               {entryId
@@ -194,8 +240,8 @@ export function Reports({
           icon="picture_as_pdf_outlined"
           title={
             entryId
-              ? 'Serienprotokoll als PDF erstellen'
-              : 'Serienprotokoll für den Serienverlauf erstellen'
+              ? 'Einzelprotokoll als PDF erstellen'
+              : 'Serienverlaufsprotokoll erstellen'
           }
           disabled={vm.busy}
           onPress={() => void vm.create()}
@@ -205,36 +251,38 @@ export function Reports({
       {entryId ? (
         <View style={{ marginTop: vm.total ? 12 : 0 }}>{saved}</View>
       ) : vm.total > 0 || vm.loading || vm.loadError ? (
-        <Card style={s.historySection}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityState={{ expanded: vm.expanded }}
-            onPress={() => vm.setExpanded(!vm.expanded)}
-            style={({ pressed }) => [
-              s.historyHeading,
-              { opacity: pressed ? 0.8 : 1 },
-            ]}
-          >
-            <Icon name="folder_copy_outlined" color={c.primary} />
-            <View style={{ flex: 1 }}>
-              <Body strong style={s.sectionTitle}>
-                Gespeicherte Serienprotokolle
-              </Body>
-              <Body>
-                {vm.loadError
-                  ? 'Serienprotokolle konnten nicht geladen werden'
-                  : vm.loading
-                    ? 'Serienprotokolle werden geladen …'
-                    : `${vm.total} ${vm.total === 1 ? 'Serienprotokoll' : 'Serienprotokolle'}`}
-              </Body>
-            </View>
-            <Icon
-              name={vm.expanded ? 'expand_less' : 'expand_more'}
-              color={c.muted}
-            />
-          </Pressable>
-          {vm.expanded && <View style={s.historyChildren}>{saved}</View>}
-        </Card>
+        <View ref={heading} collapsable={false}>
+          <Card style={s.historySection}>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityState={{ expanded: vm.expanded }}
+              onPress={() => vm.setExpanded(!vm.expanded)}
+              style={({ pressed }) => [
+                s.historyHeading,
+                { opacity: pressed ? 0.8 : 1 },
+              ]}
+            >
+              <Icon name="folder_copy_outlined" color={c.primary} />
+              <View style={{ flex: 1 }}>
+                <Body strong style={s.sectionTitle}>
+                  Gespeicherte Serienverlaufsprotokolle
+                </Body>
+                <Body>
+                  {vm.loadError
+                    ? 'Serienverlaufsprotokolle konnten nicht geladen werden'
+                    : vm.loading
+                      ? 'Serienverlaufsprotokolle werden geladen …'
+                      : `${vm.total} ${vm.total === 1 ? 'Protokoll' : 'Protokolle'}`}
+                </Body>
+              </View>
+              <Icon
+                name={vm.expanded ? 'expand_less' : 'expand_more'}
+                color={c.muted}
+              />
+            </Pressable>
+            {vm.expanded && <View style={s.historyChildren}>{saved}</View>}
+          </Card>
+        </View>
       ) : null}
       <BusyOverlay
         visible={vm.busy && !vm.deletingId}

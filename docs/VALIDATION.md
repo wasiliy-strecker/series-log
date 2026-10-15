@@ -69,6 +69,15 @@ ersten drei Schritte. Die übrigen Schritte dokumentieren bestehende Funktionen.
     ebenfalls kurz prüfen.
     Android-Zurück zum Schließen der Tastatur und anschließend Antippen außerhalb
     muss die Vorschlagsliste schließen und die Formularfelder freigeben.
+14. Gespeicherte Einzel- und Serienverlaufsprotokolle getrennt öffnen. Bei genau
+    zehn Dateien darf keine Seitennavigation erscheinen. Ab elf Dateien müssen
+    höchstens zehn pro Seite sowie „Seite 1 von 2“, „Zurück“ und „Weiter“ sichtbar
+    sein. Nach Weiter muss der Anfang des PDF-Bereichs mit der verbleibenden Datei
+    sichtbar werden. Erste und letzte Seite müssen den jeweiligen Randbutton
+    deaktivieren. Andere Serien und Folgenstände beginnen auf Seite eins.
+    Die Fälle mit elf PDFs, Löschen auf der letzten Seite und Ladefehlern werden
+    gezielt mit Testdaten in SQLite und dem echten React-Bereich automatisiert
+    geprüft. Dafür keine zusätzlichen PDFs auf dem Nutzergerät anlegen.
 
 Die Tests ersetzen keine reale Prüfung von Kamera, Android-Energiesparregeln,
 Benachrichtigungszustellung und PDF-Druckdiensten. Die zuletzt ausgeführten

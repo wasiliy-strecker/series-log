@@ -12,6 +12,16 @@ export interface SqlConnection {
   run(sql: string, ...params: (string | number | null)[]): Promise<void>;
   all<T>(sql: string, ...params: (string | number | null)[]): Promise<T[]>;
 }
+export type ReportPageRequest = {
+  recordId: string;
+  entryId: string | null;
+  offset: number;
+};
+export type ReportPage = {
+  rows: SavedReport[];
+  total: number;
+  offset: number;
+};
 export interface Repository {
   snapshot(): Promise<Snapshot>;
   records(): Promise<SeriesRecord[]>;
@@ -32,6 +42,7 @@ export interface Repository {
     limit?: number,
   ): Promise<{ rows: EpisodeEntry[]; total: number; hasAttachments: boolean }>;
   reports(recordId: string): Promise<SavedReport[]>;
+  reportPage(request: ReportPageRequest): Promise<ReportPage>;
   drafts(): Promise<EntryDraft[]>;
   saveDraft(draft: EntryDraft): Promise<void>;
   removeDraft(id: string): Promise<void>;

@@ -1,0 +1,144 @@
+import { useCallback, useState } from 'react';
+import { router, useFocusEffect } from 'expo-router';
+import { useIsFocused } from 'expo-router/react-navigation';
+import { useStartupHold } from '../../core/startup/startup';
+import { useServices } from '../../core/composition';
+import type { SavedReport } from '../../core/domain/models';
+import { errorText } from '../../core/ui/components';
+import { useTask } from '../../core/ui/use-task';
+import { useFeedback } from '../../core/ui/feedback';
+
+export function useReports(
+  recordId: string,
+  entryId: string | null,
+  hasAttachments: boolean,
+) {
+  const focused = useIsFocused();
+  const [loading, setLoading] = useState(true);
+  const { series, revision, refresh } = useServices();
+  const feedback = useFeedback();
+  const task = useTask();
+  const [reports, setReports] = useState<SavedReport[]>([]),
+    [total, setTotal] = useState(0),
+    [loadedOffset, setLoadedOffset] = useState<number | null>(null),
+    [offset, setOffset] = useState(0),
+    [expanded, setExpanded] = useState(false),
+    [availableFiles, setAvailableFiles] = useState<Set<string> | null>(null),
+    [loadError, setLoadError] = useState(''),
+    [attempt, setAttempt] = useState(0),
+    [deletingId, setDeletingId] = useState<string>();
+  const pageLoading = loading || (!loadError && loadedOffset !== offset);
+  useStartupHold(focused && pageLoading);
+  useFocusEffect(
+    useCallback(() => {
+      let active = true;
+      setLoading(true);
+      setLoadError('');
+      setAvailableFiles(null);
+      Promise.all([
+        series.repository.reportPage({ recordId, entryId, offset }),
+        entryId || expanded ? series.vault.list() : Promise.resolve(null),
+      ])
+        .then(([page, files]) => {
+          if (active) {
+            setReports(page.rows);
+            setTotal(page.total);
+            setLoadedOffset(page.offset);
+            setAvailableFiles(files ? new Set(files) : null);
+            if (page.offset !== offset) setOffset(page.offset);
+          }
+        })
+        .catch((e) => {
+          if (active) setLoadError(errorText(e));
+        })
+        .finally(() => {
+          if (active) setLoading(false);
+        });
+      return () => {
+        active = false;
+      };
+      // Revision/retry tokens intentionally reload persisted data on focus.
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [series, recordId, entryId, offset, revision, expanded, attempt]),
+  );
+  return {
+    ...task,
+    loading: pageLoading,
+    loadError,
+    expanded,
+    setExpanded,
+    availableFiles,
+    deletingId,
+    retry: () => setAttempt((n) => n + 1),
+    reports,
+    total,
+    offset,
+    setOffset,
+    create: async () => {
+      const mode = await feedback.choose({
+        title: 'PDF-Inhalt wählen',
+        message: 'Wähle, welche Inhalte deine PDF enthalten soll.',
+        optionStyle: 'cards',
+        options: [
+          {
+            value: 'compact',
+            label: 'Kompakt ohne Anhänge',
+            description:
+              'Staffel, Folge, Datum und Notizen ohne eingebettete Fotos.',
+            icon: 'description_outlined',
+          },
+          {
+            value: 'full',
+            label: 'Mit Fotos',
+            description: hasAttachments
+              ? entryId
+                ? 'Enthält alle aktuellen Fotos und alle Seiten der PDF-Dokumente.'
+                : 'Enthält pro Eintrag alle aktuellen Fotos und PDF-Dokumente.'
+              : 'Keine aktuellen Fotos oder PDFs vorhanden.',
+            icon: 'photo_outlined',
+            disabled: !hasAttachments,
+          },
+        ],
+      });
+      if (mode === null) return;
+      await task.run(async () => {
+        const report = await series.createReport(
+          recordId,
+          entryId,
+          mode === 'full',
+        );
+        refresh();
+        setOffset(0);
+        router.push({ pathname: '/pdf/[id]', params: { id: report.id } });
+      });
+    },
+    open: (report: SavedReport) =>
+      router.push({ pathname: '/pdf/[id]', params: { id: report.id } }),
+    remove: async (report: SavedReport) => {
+      if (
+        await feedback.confirm(
+          report.entryId
+            ? 'Einzelprotokoll löschen?'
+            : 'Serienverlaufsprotokoll löschen?',
+          'Die gespeicherte PDF wird entfernt. Bereits exportierte Kopien bleiben erhalten.',
+          'Löschen',
+          true,
+        )
+      )
+        await task.run(async () => {
+          setDeletingId(report.id);
+          try {
+            await series.delete('report', report.id);
+            refresh();
+            feedback.notify(
+              report.entryId
+                ? 'Einzelprotokoll gelöscht.'
+                : 'Serienverlaufsprotokoll gelöscht.',
+            );
+          } finally {
+            setDeletingId(undefined);
+          }
+        });
+    },
+  };
+}

@@ -1,21 +1,17 @@
 import { positionText } from '../../core/domain/episode-position';
 import { useCallback, useState } from 'react';
 import { useFocusEffect, router } from 'expo-router';
-import { useIsFocused } from 'expo-router/react-navigation';
-import { useStartupHold } from '../../core/startup/startup';
 import { useServices } from '../../core/composition';
 import type {
   EntryDraft,
   SeriesRecord,
   EpisodeEntry,
-  SavedReport,
   SeriesPhoto,
 } from '../../core/domain/models';
 import { PAGE_SIZE } from '../../core/domain/models';
 import { useReminderStatus } from './use-reminder-status';
 import { errorText } from '../../core/ui/components';
 import { useTask } from '../../core/ui/use-task';
-import { useFeedback } from '../../core/ui/feedback';
 import {
   visibleRecords,
   type DashboardItem,
@@ -155,136 +151,5 @@ export function useRecordDetail(id: string, history = false) {
         refresh();
         router.replace('/');
       }),
-  };
-}
-export function useReports(
-  recordId: string,
-  entryId: string | null,
-  hasAttachments: boolean,
-) {
-  const focused = useIsFocused();
-  const [loading, setLoading] = useState(true);
-  useStartupHold(focused && loading);
-  const { series, revision, refresh } = useServices();
-  const feedback = useFeedback();
-  const task = useTask();
-  const [reports, setReports] = useState<SavedReport[]>([]),
-    [offset, setOffset] = useState(0),
-    [expanded, setExpanded] = useState(false),
-    [availableFiles, setAvailableFiles] = useState<Set<string> | null>(null),
-    [loadError, setLoadError] = useState(''),
-    [attempt, setAttempt] = useState(0),
-    [deletingId, setDeletingId] = useState<string>();
-  useFocusEffect(
-    useCallback(() => {
-      let active = true;
-      setLoading(true);
-      setLoadError('');
-      setAvailableFiles(null);
-      Promise.all([
-        series.repository.reports(recordId),
-        entryId || expanded ? series.vault.list() : Promise.resolve(null),
-      ])
-        .then(([rows, files]) => {
-          if (active) {
-            const filtered = rows.filter((r) => r.entryId === entryId);
-            setReports(filtered);
-            setAvailableFiles(files ? new Set(files) : null);
-            setOffset((old) =>
-              old >= filtered.length
-                ? Math.max(
-                    0,
-                    Math.floor((filtered.length - 1) / PAGE_SIZE) * PAGE_SIZE,
-                  )
-                : old,
-            );
-          }
-        })
-        .catch((e) => {
-          if (active) setLoadError(errorText(e));
-        })
-        .finally(() => {
-          if (active) setLoading(false);
-        });
-      return () => {
-        active = false;
-      };
-      // Revision/retry tokens intentionally reload persisted data on focus.
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [series, recordId, entryId, revision, expanded, attempt]),
-  );
-  return {
-    ...task,
-    loading,
-    loadError,
-    expanded,
-    setExpanded,
-    availableFiles,
-    deletingId,
-    retry: () => setAttempt((n) => n + 1),
-    reports: reports.slice(offset, offset + PAGE_SIZE),
-    total: reports.length,
-    offset,
-    setOffset,
-    create: async () => {
-      const mode = await feedback.choose({
-        title: 'PDF-Inhalt wählen',
-        message: 'Wähle, welche Inhalte deine PDF enthalten soll.',
-        optionStyle: 'cards',
-        options: [
-          {
-            value: 'compact',
-            label: 'Kompakt ohne Anhänge',
-            description:
-              'Staffel, Folge, Datum und Notizen ohne eingebettete Fotos.',
-            icon: 'description_outlined',
-          },
-          {
-            value: 'full',
-            label: 'Mit Fotos',
-            description: hasAttachments
-              ? entryId
-                ? 'Enthält alle aktuellen Fotos und alle Seiten der PDF-Dokumente.'
-                : 'Enthält pro Eintrag alle aktuellen Fotos und PDF-Dokumente.'
-              : 'Keine aktuellen Fotos oder PDFs vorhanden.',
-            icon: 'photo_outlined',
-            disabled: !hasAttachments,
-          },
-        ],
-      });
-      if (mode === null) return;
-      await task.run(async () => {
-        const report = await series.createReport(
-          recordId,
-          entryId,
-          mode === 'full',
-        );
-        refresh();
-        setOffset(0);
-        router.push({ pathname: '/pdf/[id]', params: { id: report.id } });
-      });
-    },
-    open: (report: SavedReport) =>
-      router.push({ pathname: '/pdf/[id]', params: { id: report.id } }),
-    remove: async (report: SavedReport) => {
-      if (
-        await feedback.confirm(
-          'Serienprotokoll löschen?',
-          'Die gespeicherte PDF wird entfernt. Bereits exportierte Kopien bleiben erhalten.',
-          'Löschen',
-          true,
-        )
-      )
-        await task.run(async () => {
-          setDeletingId(report.id);
-          try {
-            await series.delete('report', report.id);
-            refresh();
-            feedback.notify('Serienprotokoll gelöscht.');
-          } finally {
-            setDeletingId(undefined);
-          }
-        });
-    },
   };
 }

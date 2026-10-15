@@ -53,6 +53,17 @@ Entwürfe dienen nicht als Vorschaubild. Nach Bildänderungen oder Löschungen
 aktualisiert sich die Vorschau und greift gegebenenfalls auf ein älteres Bild
 zurück. In den Seriendetails lässt sich das Original durch Antippen öffnen.
 
+## Gespeicherte PDF-Protokolle
+
+Einzelprotokolle eines Folgenstands und Serienverlaufsprotokolle werden getrennt
+angezeigt. Wie in MaschinenLog lädt jede Seite höchstens zehn PDF-Metadaten aus
+SQLite. Ab elf Dateien erscheinen „Seite x von y“, „Zurück“ und „Weiter“.
+Beim Blättern scrollt die Ansicht zum Beginn des gespeicherten PDF-Bereichs.
+Nach dem Löschen der letzten Datei einer Seite wird die vorherige gültige Seite
+angezeigt. Ein anderer Eintrag oder eine andere Serie beginnt auf Seite eins.
+Ladefehler lassen sich erneut versuchen. Der gespeicherte Serienverlauf bleibt
+einklappbar. Vorhandene PDF-Dateien behalten ihren Inhalt.
+
 ## Erinnerungen zum Weiterschauen
 
 Das Formular und die Statusanzeigen folgen MaschinenLog und dessen

@@ -78,6 +78,14 @@ ersten drei Schritte. Die übrigen Schritte dokumentieren bestehende Funktionen.
     Die Fälle mit elf PDFs, Löschen auf der letzten Seite und Ladefehlern werden
     gezielt mit Testdaten in SQLite und dem echten React-Bereich automatisiert
     geprüft. Dafür keine zusätzlichen PDFs auf dem Nutzergerät anlegen.
+15. „PDF-Inhalt wählen“ öffnen und ohne Auswahl schließen. Die abgerundete
+    Außenkante des unteren Panels muss einen dünnen, gedeckt roten Rahmen haben
+    und sich vom abgedunkelten Hintergrund abheben. Die Löschabfrage eines
+    bestehenden Protokolls öffnen und mit „Abbrechen“ schließen. Dieselbe
+    dezente Kontur muss den mittigen Dialog umgeben. Keine Datei löschen.
+    Datum-/Uhrzeitauswahl, Passwortabfragen, Ladeanzeige und „Beispiele ansehen“
+    verwenden denselben Rahmen. Beim Schließen und Ziehen darf er nicht stehen
+    bleiben oder Inhalte überdecken.
 
 Die Tests ersetzen keine reale Prüfung von Kamera, Android-Energiesparregeln,
 Benachrichtigungszustellung und PDF-Druckdiensten. Die zuletzt ausgeführten

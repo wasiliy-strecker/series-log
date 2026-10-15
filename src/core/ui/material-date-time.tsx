@@ -529,6 +529,8 @@ function Picker({
             maxWidth: r.mode === 'date' && !input ? 360 : 328,
             maxHeight: window.height - safe.top - safe.bottom - 48,
             backgroundColor: c.card,
+            borderWidth: 1,
+            borderColor: c.overlayBorder,
             borderRadius: 28,
             overflow: 'hidden',
           }}

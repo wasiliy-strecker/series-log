@@ -133,6 +133,8 @@ function PhotoExamplesGallery({ close }: { close(): void }) {
               style={[
                 {
                   backgroundColor: c.card,
+                  borderWidth: 1,
+                  borderColor: c.overlayBorder,
                   borderTopLeftRadius: 28,
                   borderTopRightRadius: 28,
                   width: '100%',

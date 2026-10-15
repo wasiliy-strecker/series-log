@@ -191,6 +191,8 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
                 style={[
                   {
                     backgroundColor: c.card,
+                    borderWidth: 1,
+                    borderColor: c.overlayBorder,
                     borderRadius: 28,
                     borderBottomLeftRadius: question?.dialog ? 28 : 0,
                     borderBottomRightRadius: question?.dialog ? 28 : 0,

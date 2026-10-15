@@ -852,6 +852,8 @@ export function BusyOverlay({
           accessibilityLiveRegion="polite"
           style={{
             backgroundColor: c.card,
+            borderWidth: 1,
+            borderColor: c.overlayBorder,
             borderRadius: 28,
             padding: 24,
             width: '100%',

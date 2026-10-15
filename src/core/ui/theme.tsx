@@ -16,6 +16,7 @@ export const dark = {
   errorContainer: '#4C171D',
   onErrorContainer: '#FFD9DC',
   border: '#35353D',
+  overlayBorder: '#63343A',
   outline: '#9898A5',
   danger: '#FF858C',
   onDanger: '#370007',

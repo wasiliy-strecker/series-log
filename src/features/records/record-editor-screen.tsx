@@ -1,5 +1,5 @@
-import { useRef } from 'react';
-import { View } from 'react-native';
+import { useRef, useState } from 'react';
+import { Keyboard, View } from 'react-native';
 import { Stack, useLocalSearchParams } from 'expo-router';
 import {
   Body,
@@ -19,6 +19,7 @@ export function RecordEditorScreen() {
   }>();
   const vm = useRecordEditor(id);
   const anchors = useRef<Record<string, View | null>>({});
+  const [suggestionsOpen, setSuggestionsOpen] = useState(false);
   const r = vm.record;
   if (!r)
     return (
@@ -74,6 +75,8 @@ export function RecordEditorScreen() {
             anchors.current.category = view;
           }}
           collapsable={false}
+          // Keep the whole suggestion branch above the following form fields.
+          style={{ zIndex: 1 }}
         >
           <SuggestionField
             label="Genre *"
@@ -85,46 +88,58 @@ export function RecordEditorScreen() {
             disabled={vm.busy}
             showAllOnFocus
             onChange={(v) => vm.change('category', v)}
+            onOpenChange={setSuggestionsOpen}
           />
         </View>
         <View
-          ref={(view) => {
-            anchors.current.name = view;
-          }}
-          collapsable={false}
+          // Outside taps close the popup without reaching native inputs below it.
+          pointerEvents={suggestionsOpen ? 'box-only' : 'auto'}
+          onTouchStart={suggestionsOpen ? Keyboard.dismiss : undefined}
+          accessibilityElementsHidden={suggestionsOpen}
+          importantForAccessibility={
+            suggestionsOpen ? 'no-hide-descendants' : 'auto'
+          }
+          style={{ gap: 16 }}
         >
-          <Field
-            label="Serientitel *"
-            error={vm.fieldErrors.name}
-            value={r.name}
-            onChangeText={(v) => vm.change('name', v)}
-            editable={!vm.busy}
+          <View
+            ref={(view) => {
+              anchors.current.name = view;
+            }}
+            collapsable={false}
+          >
+            <Field
+              label="Serientitel *"
+              error={vm.fieldErrors.name}
+              value={r.name}
+              onChangeText={(v) => vm.change('name', v)}
+              editable={!vm.busy}
+            />
+          </View>
+          <ReminderEditor
+            reminder={r.reminder}
+            busy={vm.busy}
+            onChange={(value) => vm.change('reminder', value)}
+            recordId={id ? r.id : null}
+            label={r.name}
+            categoryLabel={r.category}
+            status={vm.reminderStatus}
+            refreshStatus={vm.refreshReminderStatus}
           />
-        </View>
-        <ReminderEditor
-          reminder={r.reminder}
-          busy={vm.busy}
-          onChange={(value) => vm.change('reminder', value)}
-          recordId={id ? r.id : null}
-          label={r.name}
-          categoryLabel={r.category}
-          status={vm.reminderStatus}
-          refreshStatus={vm.refreshReminderStatus}
-        />
-        <View
-          ref={(view) => {
-            anchors.current.note = view;
-          }}
-          collapsable={false}
-        >
-          <Field
-            label="Notiz (optional)"
-            error={vm.fieldErrors.note}
-            multiline
-            value={r.note}
-            onChangeText={(v) => vm.change('note', v)}
-            editable={!vm.busy}
-          />
+          <View
+            ref={(view) => {
+              anchors.current.note = view;
+            }}
+            collapsable={false}
+          >
+            <Field
+              label="Notiz (optional)"
+              error={vm.fieldErrors.note}
+              multiline
+              value={r.note}
+              onChangeText={(v) => vm.change('note', v)}
+              editable={!vm.busy}
+            />
+          </View>
         </View>
       </View>
     </Page>

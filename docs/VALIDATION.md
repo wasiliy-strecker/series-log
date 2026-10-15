@@ -59,6 +59,16 @@ ersten drei Schritte. Die übrigen Schritte dokumentieren bestehende Funktionen.
     `github.com/wasiliy-strecker/series-log/blob/main/PRIVACY.md` führen.
 12. Bei großer Systemschrift und im Querformat kurz prüfen, dass Eingaben,
     Fehlerhinweise und Speichern erreichbar bleiben.
+13. Beim Anlegen oder Bearbeiten das Genre-Feld fokussieren. Die Vorschlagsliste
+    muss Serientitel und Erinnerung vollständig überdecken. Einen Vorschlag in
+    diesem Bereich antippen. Er muss das Genre übernehmen und die Liste schließen.
+    Das darunterliegende Titelfeld darf dabei keinen Fokus erhalten und die
+    Erinnerung darf nicht umgeschaltet werden.
+    Danach Serientitel und Notiz fokussieren. Beide Felder müssen wieder frei
+    bedienbar sein. Gefilterte Vorschläge und die Auswahl mit offener Tastatur
+    ebenfalls kurz prüfen.
+    Android-Zurück zum Schließen der Tastatur und anschließend Antippen außerhalb
+    muss die Vorschlagsliste schließen und die Formularfelder freigeben.
 
 Die Tests ersetzen keine reale Prüfung von Kamera, Android-Energiesparregeln,
 Benachrichtigungszustellung und PDF-Druckdiensten. Die zuletzt ausgeführten

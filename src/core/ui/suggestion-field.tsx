@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Keyboard,
   Pressable,
@@ -18,6 +18,7 @@ export function SuggestionField({
   value,
   suggestions,
   onChange,
+  onOpenChange,
   disabled = false,
   autoFocus = false,
   showAllOnFocus = false,
@@ -30,6 +31,7 @@ export function SuggestionField({
   value: string;
   suggestions: string[];
   onChange(value: string): void;
+  onOpenChange?(open: boolean): void;
   disabled?: boolean;
   autoFocus?: boolean;
   showAllOnFocus?: boolean;
@@ -45,6 +47,11 @@ export function SuggestionField({
   const options = suggestions.filter((s) =>
     s.toLocaleLowerCase('de-DE').includes(query),
   );
+  const open = focused && !disabled && !!options.length;
+  useEffect(() => {
+    onOpenChange?.(open);
+    return () => onOpenChange?.(false);
+  }, [onOpenChange, open]);
   function close() {
     setFocused(false);
     Keyboard.dismiss();
@@ -79,7 +86,7 @@ export function SuggestionField({
       >
         {helper}
       </Body>
-      {focused && !disabled && !!options.length && (
+      {open && (
         <ScrollView
           keyboardShouldPersistTaps="handled"
           nestedScrollEnabled

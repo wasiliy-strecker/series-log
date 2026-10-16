@@ -2,6 +2,7 @@ import { positionText } from './domain/episode-position';
 import { StartupError, StartupPending } from './startup/startup';
 import { PdfViewerService } from './pdf/viewer-service';
 import { androidPasswordKey } from './backup/password-key';
+import { expoBackupCrypto } from './backup/expo-backup-crypto';
 import {
   createContext,
   useContext,
@@ -115,7 +116,10 @@ async function createServices(): Promise<Services> {
   await series.syncReminders();
   return {
     series,
-    backup: new BackupService(series, new BackupCodec(env, androidPasswordKey)),
+    backup: new BackupService(
+      series,
+      new BackupCodec(env, androidPasswordKey, expoBackupCrypto),
+    ),
     media,
     links: new DeviceExternalLinks(),
     native: seriesNative,

@@ -6,6 +6,20 @@ import { useLeaveGuard } from '../../core/ui/use-leave-guard';
 import { errorText } from '../../core/ui/components';
 import type { PreparedBackup } from '../../core/media/media-service';
 import { privacyUrl } from './project-links';
+import type { BackupProgress } from '../../core/backup/backup-progress';
+
+function progressLabel(progress: BackupProgress): string {
+  const label = {
+    preparing: 'Backup wird vorbereitet',
+    checking: 'Dateien werden geprüft',
+    encrypting: 'Backup wird verschlüsselt',
+    decrypting: 'Backup wird entschlüsselt',
+    restoring: 'Backup wird wiederhergestellt',
+  }[progress.phase];
+  return progress.totalFiles && progress.completedFiles !== undefined
+    ? `${label} · ${progress.completedFiles} von ${progress.totalFiles}`
+    : `${label} …`;
+}
 export function useSettings(
   askPassword: (confirm: boolean) => Promise<string | null>,
 ) {
@@ -13,6 +27,8 @@ export function useSettings(
   const task = useTask(),
     feedback = useFeedback();
   const [phase, setPhase] = useState('');
+  const onProgress = (progress: BackupProgress) =>
+    setPhase(progressLabel(progress));
   useLeaveGuard({ dirty: false, busy: task.busy, discard: async () => {} });
   return {
     ...task,
@@ -32,8 +48,11 @@ export function useSettings(
         if (password === null) return;
         let prepared: PreparedBackup | undefined;
         try {
-          setPhase('Backup wird vorbereitet und verschlüsselt …');
-          prepared = await media.prepareBackup(await backup.create(password));
+          setPhase('Backup wird vorbereitet …');
+          const bytes = await backup.create(password, onProgress);
+          setPhase('Speicherort wird vorbereitet …');
+          await new Promise<void>((resolve) => setTimeout(resolve, 0));
+          prepared = await media.prepareBackup(bytes);
           setPhase('');
           let finished = false;
           while (!finished) {
@@ -107,7 +126,11 @@ export function useSettings(
         if (password === null) return;
         try {
           setPhase('Backup wird geprüft …');
-          const decoded = await backup.codec.decode(bytes, password);
+          const decoded = await backup.codec.decode(
+            bytes,
+            password,
+            onProgress,
+          );
           setPhase('');
           if (
             !(await feedback.confirm(
@@ -119,7 +142,7 @@ export function useSettings(
           )
             return;
           setPhase('Backup wird wiederhergestellt …');
-          const result = await backup.restore(decoded);
+          const result = await backup.restore(decoded, onProgress);
           refresh();
           feedback.notify(
             [

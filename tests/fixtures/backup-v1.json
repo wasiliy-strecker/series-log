@@ -1,0 +1,93 @@
+{
+  "records": [
+    {
+      "id": "a4f5ec4b-7a56-47a0-90d5-9923d11c7c44",
+      "name": "Synthetische Testserie",
+      "category": "Drama",
+      "note": "Keine echten Nutzerdaten",
+      "reminder": {
+        "interval": "weekly",
+        "day": 5,
+        "month": 1,
+        "hour": 20,
+        "minute": 15,
+        "deliveryMode": "normal",
+        "startsAtMillis": 1790884800000
+      },
+      "createdAt": "2026-10-16T20:42:44.794Z",
+      "updatedAt": "2026-10-16T20:42:44.794Z"
+    }
+  ],
+  "entries": [
+    {
+      "id": "17455826-96ff-493e-b9e0-1a9516faeb4e",
+      "recordId": "a4f5ec4b-7a56-47a0-90d5-9923d11c7c44",
+      "season": 2,
+      "episode": 1,
+      "occurredAt": "2026-10-01T20:00:00.000Z",
+      "note": "Synthetische Notiz 1",
+      "attachments": [
+        {
+          "id": "d6979e99-786c-4d94-93b5-5d546f003f34",
+          "kind": "photo",
+          "name": "Früheres Foto.jpg",
+          "file": "64f58323-9283-40f5-8ddd-44fa243c4136.jpg",
+          "sha256": "cc626fd9294ab0135089850a256c5ce389b664e4a282580ca7cb396e53759c40",
+          "size": 300
+        },
+        {
+          "id": "4eb0b518-5632-4bfd-a095-809aeb425eb4",
+          "kind": "pdf",
+          "name": "Synthetischer Anhang.pdf",
+          "file": "d15a6a66-5a09-424e-9c9b-28e010ee3802.pdf",
+          "sha256": "f19588cf8c6fecaaa2aff5d606d24350dfcd5695ccc3bf3e084282a4eaa74d33",
+          "size": 1087,
+          "pages": 2
+        }
+      ],
+      "createdAt": "2026-10-16T20:42:44.830Z",
+      "updatedAt": "2026-10-16T20:42:44.844Z"
+    },
+    {
+      "id": "49cc588a-eec3-4056-aecc-4b00d9f9494a",
+      "recordId": "a4f5ec4b-7a56-47a0-90d5-9923d11c7c44",
+      "season": 2,
+      "episode": 2,
+      "occurredAt": "2026-10-02T20:00:00.000Z",
+      "note": "Synthetische Notiz 2",
+      "attachments": [
+        {
+          "id": "2bfd7bb5-ecc8-49dc-942a-698bc4e0013b",
+          "kind": "photo",
+          "name": "Aktuelles Foto.jpg",
+          "file": "e23197c3-e83d-4bd8-8993-bdb4bcd5d1fc.jpg",
+          "sha256": "165c5cccb87b969500696de13505b4764ee4ef67ba552dc5204f32af8af68649",
+          "size": 305
+        },
+        {
+          "id": "4eb0b518-5632-4bfd-a095-809aeb425eb4",
+          "kind": "pdf",
+          "name": "Synthetischer Anhang.pdf",
+          "file": "d15a6a66-5a09-424e-9c9b-28e010ee3802.pdf",
+          "sha256": "f19588cf8c6fecaaa2aff5d606d24350dfcd5695ccc3bf3e084282a4eaa74d33",
+          "size": 1087,
+          "pages": 2
+        }
+      ],
+      "createdAt": "2026-10-16T20:42:44.870Z",
+      "updatedAt": "2026-10-16T20:42:44.879Z"
+    }
+  ],
+  "reports": [
+    {
+      "id": "f5829fea-a9d5-4d41-bda2-cf6e20c2338c",
+      "recordId": "a4f5ec4b-7a56-47a0-90d5-9923d11c7c44",
+      "entryId": null,
+      "name": "Synthetisches Altprotokoll",
+      "file": "d15a6a66-5a09-424e-9c9b-28e010ee3802.pdf",
+      "sha256": "f19588cf8c6fecaaa2aff5d606d24350dfcd5695ccc3bf3e084282a4eaa74d33",
+      "createdAt": "2026-10-16T20:42:44.894Z",
+      "full": true
+    }
+  ]
+}

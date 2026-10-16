@@ -24,7 +24,7 @@ export class ExpoVault implements FileVault {
     const temp = new File(this.directory, `${randomUUID()}.tmp`);
     try {
       temp.write(bytes);
-      temp.move(this.file(name));
+      await temp.move(this.file(name));
       return name;
     } catch (error) {
       if (temp.exists) temp.delete();

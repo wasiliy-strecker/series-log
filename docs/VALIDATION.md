@@ -10,6 +10,15 @@ Staffel 3, Folge 3 und danach Staffel 2, Folge 2. Ehemalige Gesamtzahlen dürfen
 keinen dieser Stände blockieren. Ein verschlüsseltes Archiv mit den alten
 Serienfeldern, echtem Foto und PDF wird mit Node/OpenSSL erzeugt und importiert.
 
+Die Backup-Prüfungen verwenden außerdem eine feste synthetische Sicherung des
+bisherigen SerienLog-Codes. Die echten Expo-JavaScript-Schnittstellen laufen im
+Test mit einer durch Node/OpenSSL ersetzten nativen Grenze. Geprüft werden
+Formatkompatibilität, einzelne und mehrfach referenzierte Dateien, ältere Fotos,
+PDFs, Fortschritt, falsches Passwort, beschädigte Inhalte und Schreibfehler.
+Weitere Fälle prüfen den atomaren Rückweg bei einem SQLite-Fehler, erhaltene
+lokale Entwürfe und neuere Einträge sowie vollständig abgewartete Dateikopien.
+Die Tests führen keine Wiederherstellung auf dem Nutzergerät aus.
+
 Die bestehende native Prüfung `npm run check:native` umfasst 44 JVM-Tests und
 Android-Lint für das eigene Modul. Sie wurde für die vorherige Änderung der
 nativen Erinnerungslogik ausgeführt. Der aktuelle Umbau ändert kein natives Modul.
@@ -59,6 +68,14 @@ ersten drei Schritte. Die übrigen Schritte dokumentieren bestehende Funktionen.
 10. Verschlüsseltes Backup erstellen und importieren. Fotos, Folgenstände,
     Notizen und Erinnerungen prüfen. Ein älteres SerienLog-Backup mit ehemaligen
     Gesamtzahlen muss ohne neue Staffelabfragen importiert werden können.
+    Für eine manuelle Wiederherstellung ein separates Testgerät mit Testdaten
+    verwenden. Ältere und aktuelle Fotos müssen enthalten sein, auch wenn die
+    PDF-Ausgabe nur das aktuelle Foto verwendet. Formularentwürfe bleiben lokal.
+    Passwortbestätigung und Fortschritt prüfen. Speicherortauswahl abbrechen
+    und erneut versuchen. Dieselbe vorbereitete Datei muss verfügbar bleiben.
+    Nach dem Speichern „Teilen“ prüfen. Ein falsches Passwort oder ein Abbruch
+    vor der Übernahme darf keine Datenbankänderung auslösen. Nach einem Fehler
+    müssen Ladeanzeige und Bediensperre verschwinden.
 11. „Datenschutzerklärung öffnen“ muss zur Seite
     `github.com/wasiliy-strecker/series-log/blob/main/PRIVACY.md` führen.
 12. Bei großer Systemschrift und im Querformat kurz prüfen, dass Eingaben,

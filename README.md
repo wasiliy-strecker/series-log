@@ -169,9 +169,26 @@ SQLite- und Backup-Tests. `npm run check:native` prüft das eigene Android-Modul
 `docs/VALIDATION.md` nennt Ergebnisse und kurze noch offene Geräteprüfschritte.
 
 Backups verwenden AES-256-GCM und PBKDF2-SHA-256 mit 600000 Iterationen, zufälligem
-Salt und Nonce. Die vorhandene Grenze beträgt 128 MiB pro Backup. Entwürfe sind
-nicht enthalten. Neuere lokale Datensätze bleiben beim Import erhalten.
-Datenbankänderungen werden vor dem Entfernen ungenutzter Dateien abgeschlossen.
+Salt und Nonce. SHA-256 und AES-GCM laufen auf Android über die vorhandenen
+nativen Expo-Crypto-Funktionen. Die Schlüsselableitung verwendet ab Android 8
+den bestehenden nativen PBKDF2-Port. Android 7 behält seinen bisherigen
+kompatiblen PBKDF2-Pfad. Native Fehler brechen den Vorgang ab.
+
+Die Sicherung enthält alle gespeicherten Serien, Folgenstände, Notizen,
+Erinnerungseinstellungen, älteren und aktuellen Fotos sowie gespeicherten PDFs.
+Jede eindeutige Datei wird beim Erstellen einmal gelesen und einmal gehasht.
+Die Formatkennung und der Dateiaufbau bleiben unverändert. Bestehende
+`.slbackup`-Dateien bleiben lesbar. Fortschrittsanzeigen zeigen die Phase und
+bei Dateioperationen die Anzahl. Nach abgebrochener oder fehlgeschlagener
+Speicherortauswahl kann dieselbe verschlüsselte Datei erneut gespeichert werden.
+Nach dem Speichern lässt sie sich teilen.
+
+Die vorhandene Grenze beträgt 128 MiB pro Backup. Formularentwürfe sind nicht
+enthalten und bleiben beim Import lokal erhalten. Neuere lokale Datensätze
+bleiben erhalten. Vor dem Übernehmen werden die entschlüsselten Inhalte sowie
+die vollständig geschriebenen Dateien einschließlich Hash und Größe geprüft.
+Dateiverschiebungen und Kopien werden abgewartet. Die Datenbank wird atomar
+übernommen. Erst danach werden ungenutzte Dateien entfernt.
 
 [Datenschutz](PRIVACY.md). Schriftlizenzen liegen unter `assets/ui/`.
 Das SerienLog-Icon ist eine eigene SVG-Grafik unter `assets/serienlog.svg`.

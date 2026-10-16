@@ -89,12 +89,12 @@ export function useReports(
           },
           {
             value: 'full',
-            label: 'Mit Fotos',
+            label: 'Mit aktuellem Foto',
             description: hasAttachments
               ? entryId
-                ? 'Enthält alle aktuellen Fotos und alle Seiten der PDF-Dokumente.'
-                : 'Enthält pro Eintrag alle aktuellen Fotos und PDF-Dokumente.'
-              : 'Keine aktuellen Fotos oder PDFs vorhanden.',
+                ? 'Enthält das erste aktuelle Foto dieses Folgenstands und vorhandene PDF-Dokumente.'
+                : 'Enthält nur das erste Foto des neuesten Folgenstands und vorhandene PDF-Dokumente. Ältere Fotos bleiben ausgeschlossen.'
+              : 'Kein aktuelles Foto oder PDF-Dokument vorhanden.',
             icon: 'photo_outlined',
             disabled: !hasAttachments,
           },

@@ -108,7 +108,7 @@ function reportHeading(
   );
   layout.gap(6);
   layout.text(
-    `PDF erstellt am ${dateTime(options.createdAt)} · ${full ? 'Mit Fotos' : 'Kompakt ohne Anhänge'}`,
+    `PDF erstellt am ${dateTime(options.createdAt)} · ${full ? 'Mit aktuellem Foto' : 'Kompakt ohne Anhänge'}`,
     { size: 9, color: REPORT_GREY },
   );
   layout.gap(18);
@@ -235,8 +235,26 @@ export class PdfService {
     full: boolean,
     options: ReportOptions,
   ): Promise<Uint8Array> {
+    const ordered = [...entries]
+      .sort(
+        (a, b) =>
+          Date.parse(b.occurredAt) - Date.parse(a.occurredAt) ||
+          b.id.localeCompare(a.id),
+      )
+      .map((entry, index) => {
+        const photo =
+          options.kind === 'single' || index === 0
+            ? entry.attachments.find((a) => a.kind === 'photo')
+            : undefined;
+        return {
+          ...entry,
+          attachments: entry.attachments.filter(
+            (a) => a.kind === 'pdf' || a === photo,
+          ),
+        };
+      });
     if (
-      entries.reduce(
+      ordered.reduce(
         (sum, entry) =>
           sum +
           entry.attachments.reduce(
@@ -266,11 +284,6 @@ export class PdfService {
       regular: await pdf.embedFont(bytes.regular, { subset: true }),
       bold: await pdf.embedFont(bytes.bold, { subset: true }),
     };
-    const ordered = [...entries].sort(
-      (a, b) =>
-        Date.parse(b.occurredAt) - Date.parse(a.occurredAt) ||
-        b.id.localeCompare(a.id),
-    );
     const withDocuments =
       full &&
       ordered.some((entry) => entry.attachments.some((a) => a.kind === 'pdf'));
@@ -299,8 +312,8 @@ export class PdfService {
     for (const [index, entry] of ordered.entries()) {
       const number = options.kind === 'single' ? 1 : ordered.length - index;
       const images: PDFImage[] = [];
-      // Verify every reference, also for compact output. A broken file must fail
-      // the whole report before SeriesService persists a completed report.
+      // Verify included references, also for compact output. Excluded older
+      // photos must neither be read nor block a new report.
       for (const attachment of entry.attachments) {
         const content = await verifiedFile(this.vault, attachment);
         if (attachment.kind === 'pdf') {

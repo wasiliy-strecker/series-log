@@ -1,5 +1,5 @@
 import { positionText } from '../../core/domain/episode-position';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { useFocusEffect, router } from 'expo-router';
 import { useServices } from '../../core/composition';
 import type {
@@ -27,14 +27,16 @@ export function useRecords() {
     [loading, setLoading] = useState(true),
     [error, setError] = useState(''),
     [retry, setRetry] = useState(0);
+  const loaded = useRef(false);
   const status = useReminderStatus();
   useFocusEffect(
     useCallback(() => {
       let active = true;
-      setLoading(true);
+      setLoading(!loaded.current);
       Promise.all([series.repository.dashboard(), series.repository.drafts()])
         .then(([r, d]) => {
           if (active) {
+            loaded.current = true;
             setItems(r);
             setDrafts(d);
             setError('');
@@ -53,8 +55,12 @@ export function useRecords() {
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [series, revision, retry]),
   );
+  const visibleItems = useMemo(
+    () => visibleRecords(items, search, sort),
+    [items, search, sort],
+  );
   return {
-    items: visibleRecords(items, search, sort),
+    items: visibleItems,
     empty: !items.length,
     drafts,
     search,

@@ -35,6 +35,10 @@ ersten drei Schritte. Die übrigen Schritte dokumentieren bestehende Funktionen.
    Bestätigung. Ein niedrigerer Folgenstand darf keine Nachfrage auslösen.
 5. Serienprotokoll erzeugen. Die PDF muss Titel, Genre, Staffel, Folge und Datum
    enthalten. Gesamtfolgen, Staffellängen und Differenzspalte dürfen nicht vorkommen.
+   Mit Foto darf nur das erste Bild des neuesten Folgenstands erscheinen.
+   Hat der neueste Stand kein Foto, darf kein älteres Bild nachrücken. Im
+   Einzelprotokoll erscheint nur das erste Foto des ausgewählten Stands.
+   Ältere Folgenstände und Notizen bleiben im Verlauf als Text enthalten.
    Vorhandene ältere PDFs bleiben unverändert.
 6. Foto aufnehmen, aus Galerie ergänzen, vergrößern, ersetzen und entfernen.
    Das letzte gespeicherte Foto muss im Dashboard und in der Serie erscheinen.
@@ -86,6 +90,13 @@ ersten drei Schritte. Die übrigen Schritte dokumentieren bestehende Funktionen.
     Datum-/Uhrzeitauswahl, Passwortabfragen, Ladeanzeige und „Beispiele ansehen“
     verwenden denselben Rahmen. Beim Schließen und Ziehen darf er nicht stehen
     bleiben oder Inhalte überdecken.
+16. In der Hauptansicht die Serienliste scrollen, eine Serie öffnen und
+    zurückkehren. Die Scrollposition muss erhalten bleiben. Eine Serie über die
+    Suche finden, die außerhalb des sichtbaren Bereichs lag. Mehrere Zeichen
+    hintereinander eingeben. Der Fokus muss im Suchfeld bleiben. Suche ohne
+    Treffer, Leeren der Suche und Sortieren nach Titel und Genre kurz prüfen.
+    Die Serienbilder bleiben sichtbar. Die FlatList läuft ohne umgebende
+    ScrollView. Die automatisierten Tests prüfen diese Abläufe mit 24 Serien.
 
 Die Tests ersetzen keine reale Prüfung von Kamera, Android-Energiesparregeln,
 Benachrichtigungszustellung und PDF-Druckdiensten. Die zuletzt ausgeführten

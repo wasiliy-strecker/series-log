@@ -53,6 +53,10 @@ Entwürfe dienen nicht als Vorschaubild. Nach Bildänderungen oder Löschungen
 aktualisiert sich die Vorschau und greift gegebenenfalls auf ein älteres Bild
 zurück. In den Seriendetails lässt sich das Original durch Antippen öffnen.
 
+Die Hauptansicht verwendet wie MaschinenLog eine virtualisierte FlatList.
+Suche und Sortierung berücksichtigen weiterhin alle Serien. Suchfeld und Liste
+bleiben beim Zurückkehren aus einer Serie erhalten.
+
 ## Gespeicherte PDF-Protokolle
 
 Einzelprotokolle eines Folgenstands und Serienverlaufsprotokolle werden getrennt
@@ -63,6 +67,13 @@ Nach dem Löschen der letzten Datei einer Seite wird die vorherige gültige Seit
 angezeigt. Ein anderer Eintrag oder eine andere Serie beginnt auf Seite eins.
 Ladefehler lassen sich erneut versuchen. Der gespeicherte Serienverlauf bleibt
 einklappbar. Vorhandene PDF-Dateien behalten ihren Inhalt.
+
+Neue PDFs mit Foto zeigen höchstens ein Bild. Im Einzelprotokoll ist es das
+erste Foto des gewählten Folgenstands. Im Serienverlauf ist es das erste Foto
+des zeitlich neuesten Folgenstands. Hat dieser kein Foto, wird kein älteres
+Bild verwendet. Frühere Stände und Notizen bleiben als Text enthalten.
+Weitere gespeicherte Fotos bleiben in der App und im Backup erhalten.
+Vorhandene PDF-Dokumente können weiterhin eingebettet werden.
 
 ## Erinnerungen zum Weiterschauen
 

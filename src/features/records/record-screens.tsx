@@ -1,4 +1,5 @@
-import { View, Text } from 'react-native';
+import { FlatList, View, Text, useWindowDimensions } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import {
   Body,
@@ -27,6 +28,7 @@ import {
   reminderSummary,
   sortLabels,
   type RecordSort,
+  type DashboardItem,
 } from './presentation-model';
 import { PAGE_SIZE, type SeriesRecord } from '../../core/domain/models';
 import type { ReminderStatus } from '../../core/native/series-native';
@@ -78,19 +80,203 @@ export function ReminderInfo({
     </View>
   );
 }
+type DashboardHeaderProps = Pick<
+  ReturnType<typeof useRecords>,
+  'search' | 'setSearch' | 'sort' | 'setSort' | 'error' | 'retry'
+> & { count: number };
+
+// Keep the header type stable so typing never remounts the search input.
+function DashboardHeader({
+  search,
+  setSearch,
+  sort,
+  setSort,
+  count,
+  error,
+  retry,
+}: DashboardHeaderProps) {
+  const feedback = useFeedback();
+  return (
+    <View style={{ gap: 12, paddingBottom: 12 }}>
+      {!!error && (
+        <>
+          <Notice error text={error} />
+          <Button title="Erneut laden" onPress={retry} />
+        </>
+      )}
+      <Title subtitle="Dein nächster Serienabend beginnt hier.">
+        Deine Serien
+      </Title>
+      <View style={{ marginTop: 4 }}>
+        <Field
+          label="Serien suchen"
+          leading="search"
+          value={search}
+          onChangeText={setSearch}
+          trailing={search ? 'close' : undefined}
+          onTrailingPress={() => setSearch('')}
+          returnKeyType="search"
+        />
+      </View>
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: 12,
+          flexWrap: 'wrap',
+        }}
+      >
+        <Body muted>
+          {count} {search ? 'Treffer' : count === 1 ? 'Serie' : 'Serien'}
+        </Body>
+        <Button
+          secondary
+          icon="sort"
+          menu
+          title={sortLabels[sort]}
+          onPress={(anchor) =>
+            void feedback
+              .choose({
+                title: 'Serien sortieren',
+                anchor,
+                options: (Object.keys(sortLabels) as RecordSort[]).map(
+                  (value) => ({
+                    value,
+                    label: sortLabels[value],
+                    icon: value === sort ? 'check' : undefined,
+                  }),
+                ),
+              })
+              .then((value) => {
+                if (value) setSort(value as RecordSort);
+              })
+          }
+        />
+      </View>
+    </View>
+  );
+}
+
+function DashboardCard({
+  item,
+  hasDraft,
+  status,
+}: {
+  item: DashboardItem;
+  hasDraft: boolean;
+  status?: ReminderStatus;
+}) {
+  const { record, latest, lastEdited, photo } = item;
+  const c = useTheme();
+  return (
+    <Card
+      style={{ padding: 0, gap: 0 }}
+      onPress={() =>
+        router.push({
+          pathname: '/record/[id]',
+          params: { id: record.id },
+        })
+      }
+    >
+      <SeriesCover photo={photo} title={record.name} />
+      <View
+        style={{
+          padding: 16,
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 14,
+        }}
+      >
+        <View
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: 20,
+            backgroundColor: c.primary + '1F',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Icon name={categoryIcon(record.category)} color={c.primary} />
+          {status?.schedules.find((s) => s.recordId === record.id)
+            ?.isNotificationActive && (
+            <View
+              style={{
+                position: 'absolute',
+                right: -2,
+                top: -4,
+                backgroundColor: c.danger,
+                borderRadius: 10,
+                paddingHorizontal: 5,
+              }}
+            >
+              <Text style={{ color: c.background, fontSize: 11 }}>1</Text>
+            </View>
+          )}
+        </View>
+        <View style={{ flex: 1, gap: 4 }}>
+          <Body strong style={{ fontSize: 16, lineHeight: 24 }}>
+            {record.name}
+          </Body>
+          <Body muted>{record.category}</Body>
+          <Text
+            style={{
+              fontFamily: 'RobotoBlack',
+              fontSize: 22,
+              lineHeight: 28,
+              color: c.ink,
+              marginTop: 2,
+            }}
+          >
+            {entrySummary(latest)}
+          </Text>
+          <Body muted style={{ fontSize: 12, lineHeight: 16 }}>
+            Zuletzt bearbeitet: {dateTime(lastEdited)}
+          </Body>
+          {hasDraft && (
+            <Body muted style={{ fontSize: 12 }}>
+              Gesicherter Formularentwurf
+            </Body>
+          )}
+          <ReminderInfo
+            record={record}
+            status={status}
+            onEdit={() =>
+              router.push({
+                pathname: '/record/edit',
+                params: { id: record.id },
+              })
+            }
+          />
+        </View>
+        <Icon name="chevron_right" />
+      </View>
+    </Card>
+  );
+}
+
+function SeriesSeparator() {
+  return <View style={{ height: 12 }} />;
+}
+const dashboardKey = (item: DashboardItem) => item.record.id;
+
 export function RecordsScreen() {
   const vm = useRecords(),
     c = useTheme(),
-    feedback = useFeedback();
+    safe = useSafeAreaInsets(),
+    { fontScale } = useWindowDimensions();
   const create = () => router.push('/record/edit');
+  const showList = !vm.loading && !vm.empty;
   return (
     <Page
       ready={!vm.loading}
+      scroll={!showList}
       fab={<Fab title="Serie anlegen" onPress={create} />}
     >
       {vm.loading ? (
         <Busy label="Serien werden geladen …" />
-      ) : vm.error ? (
+      ) : vm.error && vm.empty ? (
         <>
           <Notice error text={vm.error} />
           <Button title="Erneut laden" onPress={vm.retry} />
@@ -114,160 +300,47 @@ export function RecordsScreen() {
           </Body>
         </View>
       ) : (
-        <>
-          <Title subtitle="Dein nächster Serienabend beginnt hier.">
-            Deine Serien
-          </Title>
-          <View style={{ marginTop: 4 }}>
-            <Field
-              label="Serien suchen"
-              leading="search"
-              value={vm.search}
-              onChangeText={vm.setSearch}
-              trailing={vm.search ? 'close' : undefined}
-              onTrailingPress={() => vm.setSearch('')}
-              returnKeyType="search"
+        <FlatList
+          style={{ flex: 1 }}
+          contentContainerStyle={{
+            paddingHorizontal: 16,
+            paddingTop: 8,
+            paddingBottom: Math.max(112, 56 * fontScale + 48) + safe.bottom,
+            width: '100%',
+            maxWidth: 800,
+            alignSelf: 'center',
+            flexGrow: 1,
+          }}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+          data={vm.items}
+          keyExtractor={dashboardKey}
+          ListHeaderComponent={
+            <DashboardHeader
+              search={vm.search}
+              setSearch={vm.setSearch}
+              sort={vm.sort}
+              setSort={vm.setSort}
+              count={vm.items.length}
+              error={vm.error}
+              retry={vm.retry}
             />
-          </View>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              gap: 12,
-              flexWrap: 'wrap',
-            }}
-          >
-            <Body muted>
-              {vm.items.length}{' '}
-              {vm.search
-                ? 'Treffer'
-                : vm.items.length === 1
-                  ? 'Serie'
-                  : 'Serien'}
-            </Body>
-            <Button
-              secondary
-              icon="sort"
-              menu
-              title={sortLabels[vm.sort]}
-              onPress={(anchor) =>
-                void feedback
-                  .choose({
-                    title: 'Serien sortieren',
-                    anchor,
-                    options: (Object.keys(sortLabels) as RecordSort[]).map(
-                      (value) => ({
-                        value,
-                        label: sortLabels[value],
-                        icon: value === vm.sort ? 'check' : undefined,
-                      }),
-                    ),
-                  })
-                  .then((value) => {
-                    if (value) vm.setSort(value as RecordSort);
-                  })
-              }
-            />
-          </View>
-          {!vm.items.length && (
+          }
+          ListEmptyComponent={
             <Card>
               <Icon name="search" size={42} color={c.primary} />
               <Body>Keine passenden Serien gefunden.</Body>
             </Card>
+          }
+          ItemSeparatorComponent={SeriesSeparator}
+          renderItem={({ item }) => (
+            <DashboardCard
+              item={item}
+              hasDraft={vm.drafts.some((d) => d.recordId === item.record.id)}
+              status={vm.status}
+            />
           )}
-          {vm.items.map(({ record, latest, lastEdited, photo }) => (
-            <Card
-              key={record.id}
-              style={{ padding: 0, gap: 0 }}
-              onPress={() =>
-                router.push({
-                  pathname: '/record/[id]',
-                  params: { id: record.id },
-                })
-              }
-            >
-              <SeriesCover photo={photo} title={record.name} />
-              <View
-                style={{
-                  padding: 16,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: 14,
-                }}
-              >
-                <View
-                  style={{
-                    width: 40,
-                    height: 40,
-                    borderRadius: 20,
-                    backgroundColor: c.primary + '1F',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                  }}
-                >
-                  <Icon
-                    name={categoryIcon(record.category)}
-                    color={c.primary}
-                  />
-                  {vm.status?.schedules.find((s) => s.recordId === record.id)
-                    ?.isNotificationActive && (
-                    <View
-                      style={{
-                        position: 'absolute',
-                        right: -2,
-                        top: -4,
-                        backgroundColor: c.danger,
-                        borderRadius: 10,
-                        paddingHorizontal: 5,
-                      }}
-                    >
-                      <Text style={{ color: c.background, fontSize: 11 }}>
-                        1
-                      </Text>
-                    </View>
-                  )}
-                </View>
-                <View style={{ flex: 1, gap: 4 }}>
-                  <Body strong style={{ fontSize: 16, lineHeight: 24 }}>
-                    {record.name}
-                  </Body>
-                  <Body muted>{record.category}</Body>
-                  <Text
-                    style={{
-                      fontFamily: 'RobotoBlack',
-                      fontSize: 22,
-                      lineHeight: 28,
-                      color: c.ink,
-                      marginTop: 2,
-                    }}
-                  >
-                    {entrySummary(latest)}
-                  </Text>
-                  <Body muted style={{ fontSize: 12, lineHeight: 16 }}>
-                    Zuletzt bearbeitet: {dateTime(lastEdited)}
-                  </Body>
-                  {vm.drafts.some((d) => d.recordId === record.id) && (
-                    <Body muted style={{ fontSize: 12 }}>
-                      Gesicherter Formularentwurf
-                    </Body>
-                  )}
-                  <ReminderInfo
-                    record={record}
-                    status={vm.status}
-                    onEdit={() =>
-                      router.push({
-                        pathname: '/record/edit',
-                        params: { id: record.id },
-                      })
-                    }
-                  />
-                </View>
-                <Icon name="chevron_right" />
-              </View>
-            </Card>
-          ))}
-        </>
+        />
       )}
     </Page>
   );

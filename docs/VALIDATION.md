@@ -20,8 +20,21 @@ lokale Entwürfe und neuere Einträge sowie vollständig abgewartete Dateikopien
 Die Tests führen keine Wiederherstellung auf dem Nutzergerät aus.
 
 Die bestehende native Prüfung `npm run check:native` umfasst 44 JVM-Tests und
-Android-Lint für das eigene Modul. Sie wurde für die vorherige Änderung der
-nativen Erinnerungslogik ausgeführt. Der aktuelle Umbau ändert kein natives Modul.
+Android-Lint für das eigene Modul.
+
+Starttests prüfen die Freigabe erst nach Layout, Daten und verschachtelten
+Ladevorgängen sowie die erreichbare Fehleransicht. Genre-Tests prüfen
+Platzberechnung, Tastaturänderungen, Formularbewegungen, freie Eingaben,
+Auswahl, Außenberührungen und Android-Zurück. Die nativen Layout- und
+Tastaturschnittstellen sind dabei ersetzt. Eine tatsächliche Geräteansicht
+wird dadurch nicht simuliert.
+
+`npm run check:permissions` führt nur die Manifest-Merges für Store, Dev-Preview
+und Dev-Debug aus. Store und Preview dürfen keine Internet- oder Netzwerkstatus-
+Berechtigung enthalten. Debug muss INTERNET für Metro behalten. Die Vorschau-
+Installationshilfe wird zusätzlich mit synthetischen SDK-Werkzeugen getestet.
+Unzulässige Netzwerkrechte müssen vor jedem Gerätezugriff zum Abbruch führen.
+Der Abhängigkeits- und Audit-Prüfstand steht in `DEPENDENCIES.md`.
 
 ## Kurze manuelle Abnahme auf einem Gerät
 
@@ -81,15 +94,20 @@ ersten drei Schritte. Die übrigen Schritte dokumentieren bestehende Funktionen.
 12. Bei großer Systemschrift und im Querformat kurz prüfen, dass Eingaben,
     Fehlerhinweise und Speichern erreichbar bleiben.
 13. Beim Anlegen oder Bearbeiten das Genre-Feld fokussieren. Die Vorschlagsliste
-    muss Serientitel und Erinnerung vollständig überdecken. Einen Vorschlag in
-    diesem Bereich antippen. Er muss das Genre übernehmen und die Liste schließen.
+    muss vollständig vor dem Formular liegen. Mit offener Tastatur oben und
+    unten im Formular sowie kurz im Querformat prüfen. Bei Platzmangel unterhalb
+    muss sie oberhalb öffnen und im sichtbaren Bereich bleiben. Durch die Liste
+    scrollen. Das Formular darf dabei nicht mitscrollen. Einen Vorschlag antippen.
+    Er muss das Genre übernehmen und die Liste schließen.
     Das darunterliegende Titelfeld darf dabei keinen Fokus erhalten und die
     Erinnerung darf nicht umgeschaltet werden.
     Danach Serientitel und Notiz fokussieren. Beide Felder müssen wieder frei
     bedienbar sein. Gefilterte Vorschläge und die Auswahl mit offener Tastatur
     ebenfalls kurz prüfen.
-    Android-Zurück zum Schließen der Tastatur und anschließend Antippen außerhalb
-    muss die Vorschlagsliste schließen und die Formularfelder freigeben.
+    Android-Zurück oder Antippen außerhalb muss die Vorschlagsliste schließen
+    und die Formularfelder freigeben. Die Außenberührung darf weder ein anderes
+    Feld aktivieren noch Speichern auslösen. Das Genre-Feld selbst bleibt auch
+    mit geöffneter Liste für Textkorrekturen erreichbar.
 14. Gespeicherte Einzel- und Serienverlaufsprotokolle getrennt öffnen. Bei genau
     zehn Dateien darf keine Seitennavigation erscheinen. Ab elf Dateien müssen
     höchstens zehn pro Seite sowie „Seite 1 von 2“, „Zurück“ und „Weiter“ sichtbar
@@ -114,6 +132,13 @@ ersten drei Schritte. Die übrigen Schritte dokumentieren bestehende Funktionen.
     Treffer, Leeren der Suche und Sortieren nach Titel und Genre kurz prüfen.
     Die Serienbilder bleiben sichtbar. Die FlatList läuft ohne umgebende
     ScrollView. Die automatisierten Tests prüfen diese Abläufe mit 24 Serien.
+17. Eine gespeicherte Sitzung regulär schließen und die Dev-Preview neu öffnen.
+    Das SerienLog-Icon muss auf dunklem Hintergrund vollständig sichtbar sein.
+    Die fertige Übersicht blendet kurz und weich ein, ohne weiße Zwischenfläche.
+    Keine zusätzliche Wartezeit und kein erneutes Startbild beim Wechsel zwischen
+    Seiten. Die eigentliche Gerätedarstellung wird mit der eigenständigen Preview
+    geprüft, nicht mit Expo Go. Danach den GitHub-Link öffnen und eine vorhandene
+    Datei über den Android-Dialog teilen. Dafür bleiben externe Apps zuständig.
 
 Die Tests ersetzen keine reale Prüfung von Kamera, Android-Energiesparregeln,
 Benachrichtigungszustellung und PDF-Druckdiensten. Die zuletzt ausgeführten

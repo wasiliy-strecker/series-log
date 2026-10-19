@@ -30,6 +30,10 @@ nativen Installationsbedarf die Dev-APK. `npm run install:dev -- DEVICE` prüft
 Kennung und Signatur und installiert datenbewahrend. Normale TS-/UI-Änderungen
 per Fast Refresh. Für eine ausdrücklich gewünschte eigenständige Testinstallation
 stehen `build:preview` und `install:preview` zur Verfügung.
+Store und Dev-Preview dürfen weder INTERNET noch ACCESS_NETWORK_STATE anfordern.
+Dev-Debug behält Metro-Zugriff. Nach Änderungen an Android-Konfiguration oder
+Abhängigkeiten zusätzlich `npm run check:permissions` ausführen. Dieser Befehl
+prüft nur die Manifest-Merges und erstellt keine Store-APK oder AAB.
 
 Android-Änderungen auch im Plugin `plugins/with-series-android.js` pflegen.
 Dev nutzt `com.appfactory.series_log.dev` und das Label `SerienLog Dev`.

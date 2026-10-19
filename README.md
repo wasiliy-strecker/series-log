@@ -22,6 +22,14 @@ weiße Schrift und rote Akzente geben SerienLog ein eigenes Erscheinungsbild.
 
 Kein Konto, kein Server, keine Streaming-Anbindung, keine eigene Telemetrie.
 
+Beim Start erscheint das eigene SerienLog-Icon auf dunklem Hintergrund. Sobald
+die erste Ansicht bereit ist, blendet sie in 180 Millisekunden ein. Es gibt keine
+zusätzliche Mindestwartezeit. Fehler beim Start bleiben mit Wiederholen erreichbar.
+
+Genre-Vorschläge erscheinen je nach verfügbarem Platz oberhalb oder unterhalb
+des Feldes. Die Liste bleibt über dem Formular unabhängig scrollbar und passt
+sich an Tastatur und Bildschirmgröße an. Eigene Genres sind weiterhin möglich.
+
 ## Einfacher Folgenstand
 
 Beim Anlegen einer Serie werden Titel, Genre, optionale Notiz und Erinnerung
@@ -149,6 +157,13 @@ Eine eigenständige Dev-Testversion mit eingebettetem JavaScript kann bei Bedarf
 mit `npm run build:preview` und `npm run install:preview -- DEVICE` bereitgestellt
 werden. Sie benötigt für Codeänderungen ein neues APK-Update.
 
+Store und Dev-Preview besitzen weder `INTERNET` noch `ACCESS_NETWORK_STATE`.
+Nur Dev-Debug behält Netzwerkzugriff für Metro. Die Manifest-Overlays werden vom
+Expo-Plugin erhalten. `npm run check:permissions` prüft die zusammengeführten
+Manifeste aller drei Varianten, ohne eine Store-APK oder AAB zu erzeugen.
+Der Preview-Installer lehnt APKs mit Netzwerkrechten vor jedem Gerätezugriff ab.
+Browserlinks und das Teilen von Dateien verwenden weiterhin externe Apps.
+
 | Variante | Name          | Android-Paket                   |
 | -------- | ------------- | ------------------------------- |
 | Dev      | SerienLog Dev | `com.appfactory.series_log.dev` |
@@ -167,6 +182,10 @@ private Signatur. Hier wurde kein Store-Build erstellt und nichts veröffentlich
 `npm run check` prüft Format, ESLint, TypeScript und die fokussierten Domain-,
 SQLite- und Backup-Tests. `npm run check:native` prüft das eigene Android-Modul.
 `docs/VALIDATION.md` nennt Ergebnisse und kurze noch offene Geräteprüfschritte.
+
+Expo bleibt auf SDK 57 mit den kompatiblen Patches aus MaschinenLog. React
+bleibt auf 19.2.3 und React Native auf 0.86.3. Der Abhängigkeitsprüfstand und
+verbleibende Audit-Meldungen stehen in `docs/DEPENDENCIES.md`.
 
 Backups verwenden AES-256-GCM und PBKDF2-SHA-256 mit 600000 Iterationen, zufälligem
 Salt und Nonce. SHA-256 und AES-GCM laufen auf Android über die vorhandenen

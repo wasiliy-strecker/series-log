@@ -22,16 +22,10 @@ module.exports = function withSeriesAndroid(config) {
     const app = styles.find((style) => style.$.name === 'AppTheme');
     if (!splash || !app)
       throw new Error('SerienLog: Android start themes missing.');
-    // Explicitly suppress Android's default launcher icon, including API 31+.
-    setItem(
-      splash,
-      'windowSplashScreenAnimatedIcon',
-      '@drawable/serienlog_splash_empty',
-    );
-    setItem(
-      splash,
-      'android:windowBackground',
-      '@color/splashscreen_background',
+    // Preserve Expo's icon and Android < 12 compatibility background.
+    // Remove the earlier flat background override on existing native projects.
+    splash.item = (splash.item ?? []).filter(
+      (item) => item.$.name !== 'android:windowBackground',
     );
     setItem(splash, 'android:windowLightStatusBar', 'false');
     setItem(splash, 'android:windowLightNavigationBar', 'false');
@@ -111,22 +105,27 @@ ${startup}`,
   config = withDangerousMod(config, [
     'android',
     async (mod) => {
+      for (const sourceSet of ['store', 'devRelease']) {
+        const target = path.join(
+          mod.modRequest.platformProjectRoot,
+          'app/src',
+          sourceSet,
+        );
+        await fs.mkdir(target, { recursive: true });
+        await fs.copyFile(
+          path.join(__dirname, 'offline-AndroidManifest.xml'),
+          path.join(target, 'AndroidManifest.xml'),
+        );
+      }
       const res = path.join(
         mod.modRequest.platformProjectRoot,
         'app/src/main/res',
       );
       await fs.mkdir(path.join(res, 'anim'), { recursive: true });
       await fs.mkdir(path.join(res, 'values'), { recursive: true });
-      await fs.mkdir(path.join(res, 'drawable'), { recursive: true });
-      await fs.writeFile(
-        path.join(res, 'drawable/serienlog_splash_empty.xml'),
-        `<?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-    <solid android:color="@android:color/transparent" />
-    <size android:width="1dp" android:height="1dp" />
-</shape>
-`,
-      );
+      await fs.rm(path.join(res, 'drawable/serienlog_splash_empty.xml'), {
+        force: true,
+      });
       await fs.writeFile(
         path.join(res, 'values/serienlog_navigation.xml'),
         `<?xml version="1.0" encoding="utf-8"?>

@@ -25,6 +25,10 @@ if [ "$mode" = 'debug' ]; then
     exit 1
   fi
 else
+  if rg -q "^uses-permission[^:]*: name='android\.permission\.(INTERNET|ACCESS_NETWORK_STATE)'" <<< "$badging"; then
+    echo 'Abbruch. Die Dev-Preview darf keine Netzwerkberechtigungen anfordern.' >&2
+    exit 1
+  fi
   if rg -q '^application-debuggable' <<< "$badging"; then
     echo 'Abbruch. Die eigenständige Testversion darf kein Debug-Build sein.' >&2
     exit 1

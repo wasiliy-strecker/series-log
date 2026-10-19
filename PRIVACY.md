@@ -1,6 +1,6 @@
 # Datenschutzerklärung für SerienLog
 
-Stand: 12. Oktober 2026
+Stand: 19. Oktober 2026
 
 SerienLog ist eine App von Wasiliy Strecker, AppFabrik AI. Die App dient der
 privaten Dokumentation von Serien und gesehenen Folgen. Die dabei entstehenden
@@ -19,7 +19,7 @@ E-Mail: contact@appfabrik-ai.de
 
 Je nach Nutzung speichert SerienLog im privaten App-Speicher auf Ihrem Gerät:
 
-- Serientitel, Genre, optionale Gesamtfolgenzahl und Folgenzahlen je Staffel
+- Serientitel, Genre und optionale Notizen
 - gespeicherte Staffel- und Folgenstände, Zeitpunkte, Notizen und deren Verlauf
 - aufgenommene oder ausgewählte Fotos zu Folgenständen
 - Einstellungen für optionale Erinnerungen
@@ -32,7 +32,7 @@ an dem von Ihnen gewählten Speicherort.
 ## Zwecke und Rechtsgrundlage
 
 Die Daten werden benötigt, um die von Ihnen gewünschten App-Funktionen
-bereitzustellen: Serien und Folgenstände verwalten, Fortschritte berechnen,
+bereitzustellen: Serien und Folgenstände verwalten,
 Fotos und Notizen zuordnen, Erinnerungen anzeigen, Serienprotokolle erstellen
 und Backups sichern oder wiederherstellen. Die Verarbeitung erfolgt auf Ihren
 Wunsch zur Bereitstellung dieser Funktionen.
@@ -52,9 +52,10 @@ verschlüsseltes Backup über einen Systemdialog speichern oder teilen. Für die
 weitere Verarbeitung am gewählten Speicherort oder durch eine ausgewählte App
 gelten deren Datenschutzbedingungen. Wenn Sie die Datenschutzerklärung in der
 App öffnen, wird GitHub im Browser oder in einer geeigneten App aufgerufen.
-Dabei wird eine Verbindung zu GitHub hergestellt. Die Entwicklungsvariante
-kann außerdem für JavaScript-Aktualisierungen mit dem lokalen
-Metro-Entwicklungsserver kommunizieren.
+Dabei wird durch die externe App eine Verbindung zu GitHub hergestellt.
+Store-Version und eigenständige Dev-Preview fordern keine Android-Berechtigung
+für Internetzugriff oder Netzwerkstatus an. Nur Dev-Debug kann für
+JavaScript-Aktualisierungen mit dem lokalen Metro-Entwicklungsserver kommunizieren.
 
 ## Berechtigungen
 

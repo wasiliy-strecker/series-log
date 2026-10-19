@@ -14,5 +14,8 @@ if [ -z "${JAVA_HOME:-}" ] && [ -x "$HOME/.local/jdk-21/bin/javac" ]; then
 fi
 bash scripts/prepare-dev-key.sh
 npx expo prebuild --platform android --no-install
+for source_set in store devRelease; do
+  cmp plugins/offline-AndroidManifest.xml "android/app/src/$source_set/AndroidManifest.xml"
+done
 cd android
 ./gradlew :app:"$task" -PreactNativeArchitectures=arm64-v8a,x86_64 --max-workers=4 "$@"

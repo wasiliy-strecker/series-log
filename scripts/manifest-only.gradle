@@ -1,0 +1,12 @@
+// Manifest checks do not consume JavaScript or Metro-generated resources.
+// Keep the tasks in the graph so AGP can resolve their directory providers.
+// Excluding them with -x leaves those providers unresolved on a clean checkout.
+gradle.beforeProject { project ->
+    if (project.path == ':app') {
+        project.tasks.configureEach { task ->
+            if (task.name in ['createBundleStoreReleaseJsAndAssets', 'createBundleDevReleaseJsAndAssets']) {
+                task.enabled = false
+            }
+        }
+    }
+}

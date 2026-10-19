@@ -72,6 +72,9 @@ ersten drei Schritte. Die übrigen Schritte dokumentieren bestehende Funktionen.
    schließen die Galerie ohne Fotos oder Folgenstände zu übernehmen.
 8. Erinnerung aktivieren und „Erinnerung jetzt testen“ verwenden. Serientitel
    und letzter Folgenstand müssen erscheinen. Antippen öffnet die Serie.
+   Test-Erinnerung und reguläre Erinnerung verwenden das SerienLog-Symbol und
+   den roten Akzent #E50914, soweit Androids Benachrichtigungsdesign ihn zeigt.
+   Dies für „Normal“ und „Pünktlich mit Ton“ prüfen.
    Intervall und Tag ändern, aus- und einschalten. Die Auswahl bleibt erhalten.
    Blockierte Benachrichtigungen, „Nicht stören“ und fehlende Alarmfreigabe zeigen
    passende Hinweise und Android-Einstellungsziele.
@@ -143,3 +146,11 @@ ersten drei Schritte. Die übrigen Schritte dokumentieren bestehende Funktionen.
 Die Tests ersetzen keine reale Prüfung von Kamera, Android-Energiesparregeln,
 Benachrichtigungszustellung und PDF-Druckdiensten. Die zuletzt ausgeführten
 Geräteschritte und noch offene Punkte stehen im jeweiligen Task-Changelog.
+
+Für eine gezielte Entwicklerprüfung der Fehlerbehandlung beim Wechsel der
+Erinnerungsart einen Fehler von `refreshStatus` simulieren. Bei „Normal“ muss
+„Der Erinnerungsstatus konnte nicht bestätigt werden.“ erscheinen. Bei
+„Pünktlich mit Ton“ muss der Hinweis auf „Alarme & Erinnerungen“ samt erhaltener
+Auswahl erscheinen. Beide Fälle müssen die Bediensperre wieder aufheben und
+die gewählte Erinnerungsart beibehalten. Auch das fehlgeschlagene Öffnen der
+Alarmfreigabe muss denselben passenden Hinweis liefern.

@@ -152,6 +152,7 @@ internal enum class ReminderAvailability(val wireValue: String) {
 }
 
 internal object ReminderNotifier {
+    private val notificationColor = Color.rgb(229, 9, 20)
     private const val normalChannelId = "serienlog_reminders"
     private const val alarmChannelId = "serienlog_alarm_reminders_v1"
     private const val recordNotificationId = 1001
@@ -234,8 +235,8 @@ internal object ReminderNotifier {
         }
         val summary = "${reminder.categoryLabel} · $latestReading"
         val notification = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(notificationIcon(reminder.category))
-            .setColor(notificationColor(reminder.category))
+            .setSmallIcon(R.drawable.ic_stat_series)
+            .setColor(notificationColor)
             .setContentTitle("${reminder.categoryLabel} · ${reminder.label}")
             .setContentText(summary)
             .setStyle(
@@ -257,32 +258,6 @@ internal object ReminderNotifier {
             notification,
         )
         return postedAt
-    }
-
-    private fun notificationIcon(category: String): Int = when (category) {
-        "electricity" -> R.drawable.ic_stat_series
-        "electricityFeedIn" -> R.drawable.ic_stat_series
-        "gas" -> R.drawable.ic_stat_series
-        "water" -> R.drawable.ic_stat_series
-        "coldWater" -> R.drawable.ic_stat_series
-        "hotWater" -> R.drawable.ic_stat_series
-        "heat" -> R.drawable.ic_stat_series
-        "heatingCostAllocator" -> R.drawable.ic_stat_series
-        "oil" -> R.drawable.ic_stat_series
-        else -> R.drawable.ic_stat_series
-    }
-
-    private fun notificationColor(category: String): Int = when (category) {
-        "electricity" -> Color.rgb(18, 102, 107)
-        "electricityFeedIn" -> Color.rgb(18, 102, 107)
-        "gas" -> Color.rgb(18, 102, 107)
-        "water" -> Color.rgb(18, 102, 107)
-        "coldWater" -> Color.rgb(18, 102, 107)
-        "hotWater" -> Color.rgb(18, 102, 107)
-        "heat" -> Color.rgb(18, 102, 107)
-        "heatingCostAllocator" -> Color.rgb(18, 102, 107)
-        "oil" -> Color.rgb(18, 102, 107)
-        else -> Color.rgb(18, 102, 107)
     }
 
     fun migrateLegacyNotification(context: Context, reminder: StoredReminder) {
@@ -324,8 +299,8 @@ internal object ReminderNotifier {
             context,
             channelId(punctual),
         )
-            .setSmallIcon(notificationIcon(category))
-            .setColor(notificationColor(category))
+            .setSmallIcon(R.drawable.ic_stat_series)
+            .setColor(notificationColor)
             .setContentTitle("Test: $categoryLabel · $label")
             .setContentText(latestReading)
             .setStyle(

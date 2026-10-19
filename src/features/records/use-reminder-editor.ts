@@ -137,10 +137,9 @@ export function useReminderEditor({
     patch({ deliveryMode: mode });
     operation.current = true;
     setAction('settings');
-    const exactSettingsFailure = () =>
-      feedback.notify(
-        `${reminderSettingsFailure('exact')} „Pünktlich mit Ton“ bleibt ausgewählt.`,
-      );
+    const settingsFailure =
+      reminderSettingsFailure('exact') +
+      ' „Pünktlich mit Ton“ bleibt ausgewählt.';
     try {
       const current = await refreshStatus();
       if (mode === 'punctualWithSound' && current?.exact !== true) {
@@ -148,10 +147,15 @@ export function useReminderEditor({
           !(await native.openReminderSettings('exact', null)) &&
           mounted.current
         )
-          exactSettingsFailure();
+          feedback.notify(settingsFailure);
       }
     } catch {
-      if (mounted.current) exactSettingsFailure();
+      if (mounted.current)
+        feedback.notify(
+          mode === 'punctualWithSound'
+            ? settingsFailure
+            : 'Der Erinnerungsstatus konnte nicht bestätigt werden.',
+        );
     } finally {
       operation.current = false;
       if (mounted.current) setAction(null);

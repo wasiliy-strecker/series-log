@@ -11,7 +11,8 @@ import {
 import { Icon } from '../../core/ui/icon';
 import { Sortable } from '../../core/ui/sortable';
 import { useServices } from '../../core/composition';
-import { useFeedback, type MenuAnchor } from '../../core/ui/feedback';
+import { useFeedback, type Choice } from '../../core/ui/feedback';
+import { messages } from '../../core/i18n';
 import type { Attachment, EntryDraft } from '../../core/domain/models';
 type Source = NonNullable<EntryDraft['external']>;
 export type AttachmentActions = {
@@ -48,30 +49,44 @@ export function PhotoGallery({
   const { series } = useServices();
   const feedback = useFeedback();
   const [gallery, setGallery] = useState<number | null>(null);
-  async function menu(a: Attachment, index: number, anchor?: MenuAnchor) {
+  const text = messages.photoActions;
+  const menuTitle = (index: number) =>
+    text.title.replace('{number}', String(index + 1));
+  async function menu(a: Attachment, index: number) {
+    const orderOptions: Choice[] =
+      photos.length > 1
+        ? [
+            {
+              value: 'earlier',
+              label: text.earlier,
+              icon: 'chevron_left',
+              disabled: index === 0,
+            },
+            {
+              value: 'later',
+              label: text.later,
+              icon: 'chevron_right',
+              disabled: index + 1 === photos.length,
+            },
+          ]
+        : [];
     const selected = await feedback.choose({
-      title: `Foto ${index + 1} bearbeiten`,
-      anchor,
-      optionStyle: 'plain',
+      title: menuTitle(index),
+      optionStyle: 'cards',
       options: [
-        ...(photos.length > 1
-          ? [
-              {
-                value: 'earlier',
-                label: 'Nach vorne',
-                disabled: index === 0,
-              },
-              {
-                value: 'later',
-                label: 'Nach hinten',
-                disabled: index + 1 === photos.length,
-              },
-            ]
-          : []),
-        { value: 'replace', label: 'Foto ersetzen' },
+        {
+          value: 'replace',
+          label: text.replace,
+          description: text.replaceHint,
+          icon: 'edit_outlined',
+        },
+        ...orderOptions,
         {
           value: 'remove',
-          label: 'Foto entfernen',
+          label: text.remove,
+          description: text.removeHint,
+          icon: 'delete_outline',
+          danger: true,
         },
       ],
     });
@@ -80,16 +95,17 @@ export function PhotoGallery({
     if (selected === 'remove') actions?.remove(a.id);
     if (selected === 'replace') {
       const source = await feedback.choose({
-        title: 'Foto ersetzen',
+        title: text.replace,
+        optionStyle: 'cards',
         options: [
           {
             value: 'camera',
-            label: 'Neu fotografieren',
+            label: text.camera,
             icon: 'photo_camera_outlined',
           },
           {
             value: 'gallery',
-            label: 'Aus Galerie wählen',
+            label: text.gallery,
             icon: 'photo_library_outlined',
           },
         ],
@@ -152,10 +168,9 @@ export function PhotoGallery({
                 {actions && (
                   <IconButton
                     icon="more_vert"
-                    menu
-                    label={`Foto ${index + 1} bearbeiten`}
+                    label={menuTitle(index)}
                     disabled={actions.busy}
-                    onPress={(anchor) => void menu(a, index, anchor)}
+                    onPress={() => void menu(a, index)}
                   />
                 )}
               </View>

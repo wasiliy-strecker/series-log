@@ -1,7 +1,11 @@
 import { positionText } from '../domain/episode-position';
 import { PDFDocument, type PDFImage } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
-import { type EpisodeEntry, type SeriesRecord } from '../domain/models';
+import {
+  type Attachment,
+  type EpisodeEntry,
+  type SeriesRecord,
+} from '../domain/models';
 import {
   ReportLayout,
   REPORT_ACCENT,
@@ -119,7 +123,6 @@ function entrySection(
   layout: ReportLayout,
   entry: EpisodeEntry,
   number: number,
-  images: PDFImage[],
   history: boolean,
   full: boolean,
 ) {
@@ -127,13 +130,9 @@ function entrySection(
     ['Folgenstand', positionText(entry)],
     ['Gesehen am', dateTime(entry.occurredAt, true)],
   ];
-  // Keep heading, fields and the first photo pair together whenever they fit.
+  // Keep the entry heading and fields together whenever they fit.
   layout.ensure(
-    (history ? 18 : 0) +
-      (17 * 2400) / 2048 +
-      8 +
-      layout.dataHeight(rows) +
-      (images.length ? 10 + layout.photoRowHeight() : 0),
+    (history ? 18 : 0) + (17 * 2400) / 2048 + 8 + layout.dataHeight(rows),
   );
   if (history) layout.gap(18);
   layout.text(`Eintrag ${number}`, {
@@ -143,20 +142,6 @@ function entrySection(
   });
   layout.gap(8);
   layout.dataTable(rows);
-  if (images.length) {
-    layout.gap(10);
-    layout.photos(images, 0);
-    for (let start = 2; start < images.length; start += 2) {
-      const caption = `Eintrag ${number} · ${summary(entry)} · ${dateTime(entry.occurredAt, true)}`;
-      layout.ensure(
-        12 + layout.textHeight(caption, 10) + 6 + layout.photoRowHeight(),
-      );
-      layout.gap(12);
-      layout.text(caption, { size: 10 });
-      layout.gap(6);
-      layout.photos(images, start);
-    }
-  }
   const photos = entry.attachments.filter((a) => a.kind === 'photo');
   if (!full && photos.length) {
     layout.ensure(40);
@@ -311,7 +296,7 @@ export class PdfService {
     }
     for (const [index, entry] of ordered.entries()) {
       const number = options.kind === 'single' ? 1 : ordered.length - index;
-      const images: PDFImage[] = [];
+      const photos: { attachment: Attachment; image: PDFImage }[] = [];
       // Verify included references, also for compact output. Excluded older
       // photos must neither be read nor block a new report.
       for (const attachment of entry.attachments) {
@@ -328,20 +313,20 @@ export class PdfService {
           const image = await (
             full ? pdf : await PDFDocument.create()
           ).embedJpg(content);
-          if (full) images.push(image);
+          if (full) photos.push({ attachment, image });
         }
       }
       const current = layout ?? section(number);
       const hasDetails = entry.note.trim() || entry.attachments.length;
       if (options.kind === 'single' || withDocuments || hasDetails)
-        entrySection(
-          current,
-          entry,
-          number,
-          images,
-          options.kind === 'history',
-          full,
-        );
+        entrySection(current, entry, number, options.kind === 'history', full);
+      for (const [photoIndex, { attachment, image }] of photos.entries())
+        current.photo(image, {
+          title: `Eintrag ${number} · ${summary(entry)}`,
+          name: attachment.name,
+          number: photoIndex + 1,
+          total: photos.length,
+        });
       if (withDocuments) {
         current.finish();
         for (const attachment of entry.attachments.filter(

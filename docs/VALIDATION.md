@@ -61,12 +61,24 @@ ersten drei Schritte. Die übrigen Schritte dokumentieren bestehende Funktionen.
    Hat der neueste Stand kein Foto, darf kein älteres Bild nachrücken. Im
    Einzelprotokoll erscheint nur das erste Foto des ausgewählten Stands.
    Ältere Folgenstände und Notizen bleiben im Verlauf als Text enthalten.
+   Das aktuelle Foto bekommt wie in MaschinenLog eine eigene Seite mit Eintrag,
+   Folgenstand und Dateiname. Es ist deutlich größer, proportional und horizontal
+   zentriert. Die dünne Kontur liegt direkt am Bild. Nachfolgende Einträge beginnen
+   auf einer neuen Seite. Hoch- und Querformat bleiben vollständig sichtbar.
    Vorhandene ältere PDFs bleiben unverändert.
 6. Foto aufnehmen, aus Galerie ergänzen, vergrößern, ersetzen und entfernen.
    Das letzte gespeicherte Foto muss im Dashboard und in der Serie erscheinen.
    Neuere Stände ohne Foto verdrängen es nicht. Nach dem Löschen des letzten
    Fotoeintrags wird ein älteres Bild gezeigt. Serien ohne Bild haben keine leere
    Bildfläche.
+   Das Drei-Punkte-Menü eines Fotos öffnet ein abgerundetes unteres Panel mit
+   dezenter Außenkontur. „Foto ersetzen“ und „Foto entfernen“ haben Symbole,
+   kurze Hilfetexte und große abgerundete Aktionsflächen. Entfernen ist rot
+   hervorgehoben. Ersetzen öffnet die Kamera-/Galerie-Auswahl im gleichen Stil.
+   Bei mehreren Fotos bleiben Nach-vorne-/Nach-hinten-Aktionen verfügbar und
+   am jeweiligen Ende deaktiviert. Android-Zurück, Außenberührung und Herunterziehen
+   schließen die Auswahl ohne Änderungen. Für die Sichtprüfung auf dem Nutzergerät
+   keine Fotos ersetzen oder entfernen.
 7. „Beispiele ansehen“ öffnen. Vier Beispiele mit Wischen und Pfeilen ansehen.
    Die Randpfeile müssen deaktiviert sein. Schließen, Android-Zurück und Ziehen
    schließen die Galerie ohne Fotos oder Folgenstände zu übernehmen.

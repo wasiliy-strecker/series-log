@@ -19,8 +19,7 @@ const BLACK = rgb(0, 0, 0);
 // Metrics of the bundled Roboto fonts, identical to Fahrzeugakte's PDF fonts.
 const ASCENT = 1900 / 2048;
 const LINE_HEIGHT = 2400 / 2048;
-const PHOTO_HEIGHT = 170;
-const PHOTO_GAP = 12;
+const PHOTO_MAX_FRACTION = 0.7;
 
 export type ReportFonts = { regular: PDFFont; bold: PDFFont };
 type TextStyle = { size?: number; bold?: boolean; color?: RGB };
@@ -276,41 +275,39 @@ export class ReportLayout {
     );
   }
 
-  photoRowHeight() {
-    return 11 * LINE_HEIGHT + 6 + PHOTO_HEIGHT;
-  }
-
-  photos(images: PDFImage[], start: number) {
-    this.ensure(this.photoRowHeight());
-    const width = (this.width - PHOTO_GAP) / 2;
-    const row = images.slice(start, start + 2);
-    const left = this.margin + (row.length === 1 ? (width + PHOTO_GAP) / 2 : 0);
-    row.forEach((image, i) => {
-      const x = left + i * (width + PHOTO_GAP);
-      this.drawLine(
-        `Foto ${start + i + 1} von ${images.length}`,
-        x,
-        this.top,
-        11,
-        this.fonts.bold,
-      );
-      const y = PAGE_HEIGHT - this.top - this.photoRowHeight();
-      const fit = image.scaleToFit(width, PHOTO_HEIGHT);
-      this.page.drawImage(image, {
-        x: x + (width - fit.width) / 2,
-        y: y + (PHOTO_HEIGHT - fit.height) / 2,
-        ...fit,
-      });
-      this.page.drawRectangle({
-        x,
-        y,
-        width,
-        height: PHOTO_HEIGHT,
-        borderWidth: 0.5,
-        borderColor: rgb(189 / 255, 189 / 255, 189 / 255),
-      });
+  photo(
+    image: PDFImage,
+    {
+      title,
+      name,
+      number,
+      total,
+    }: { title: string; name: string; number: number; total: number },
+  ) {
+    this.newPage();
+    this.text(title, { size: 17, bold: true, color: REPORT_ACCENT });
+    this.gap(6);
+    this.text(`Foto ${number} von ${total}`, { size: 11, bold: true });
+    this.gap(4);
+    this.text(name, { size: 9 });
+    this.gap(12);
+    // Match MaschinenLog's dedicated photo pages without cropping the original.
+    const fit = image.scaleToFit(
+      this.width * PHOTO_MAX_FRACTION,
+      (this.bottom - this.top) * PHOTO_MAX_FRACTION,
+    );
+    const x = this.margin + (this.width - fit.width) / 2;
+    const y = PAGE_HEIGHT - this.top - fit.height;
+    this.page.drawImage(image, { x, y, ...fit });
+    this.page.drawRectangle({
+      x,
+      y,
+      ...fit,
+      borderWidth: 0.5,
+      borderColor: rgb(189 / 255, 189 / 255, 189 / 255),
     });
-    this.top += this.photoRowHeight();
+    // Keep any following history entries on a separate page.
+    this.top = this.bottom;
   }
 
   finish() {

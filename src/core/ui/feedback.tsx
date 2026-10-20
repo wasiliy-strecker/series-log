@@ -450,7 +450,7 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
                               </Text>
                             )}
                           </View>
-                          {cardOptions && !o.disabled && (
+                          {cardOptions && !o.disabled && !o.danger && (
                             <Icon name="chevron_right" color={c.muted} />
                           )}
                         </Pressable>

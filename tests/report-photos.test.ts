@@ -1,6 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
-import { PDFDocument, PDFName, PDFRawStream } from 'pdf-lib';
+import { PDFDocument, PDFName, PDFPage, PDFRawStream } from 'pdf-lib';
 import type { Attachment } from '../src/core/domain/models';
 import { ReportLayout } from '../src/core/pdf/report-layout';
 import { fixture, record, sourcePdf } from './support';
@@ -129,3 +129,38 @@ it('never falls back to older photos in a PDF and keeps the dashboard cover inde
     await f.vault.read(current.file),
   ]);
 });
+
+it.each(['single', 'history'] as const)(
+  'gives the current photo a larger, centered page in a %s report',
+  async (kind) => {
+    await entry(1, []);
+    const current = await photo(1);
+    const latest = await entry(2, [current]);
+    // Spy on the real PDF drawing call without replacing its implementation.
+    const draw = vi.spyOn(PDFPage.prototype, 'drawImage');
+    const report = await f.series.createReport(
+      series.id,
+      kind === 'single' ? latest.id : null,
+      true,
+    );
+    const bytes = await f.vault.read(report.file);
+    const pdf = await PDFDocument.load(bytes);
+    expect(draw).toHaveBeenCalledTimes(1);
+    const [image, bounds] = draw.mock.calls[0]!;
+    const page = draw.mock.contexts[0] as PDFPage;
+    expect(bounds!.width).toBeGreaterThan(350);
+    expect(bounds!.width).toBeLessThan(370);
+    expect(bounds!.height).toBeGreaterThan(350);
+    expect(bounds!.width! / bounds!.height!).toBeCloseTo(
+      image.width / image.height,
+      5,
+    );
+    expect(bounds!.x! * 2 + bounds!.width!).toBeCloseTo(page.getWidth(), 5);
+    expect(bounds!.y).toBeGreaterThan(60);
+    expect(bounds!.y! + bounds!.height!).toBeLessThan(page.getHeight() - 100);
+    expect(page.doc.getPages().indexOf(page)).toBe(1);
+    // History resumes on its own page after the photo, preserving older notes.
+    expect(pdf.getPageCount()).toBe(kind === 'single' ? 2 : 3);
+    expect(await images(bytes)).toEqual([await f.vault.read(current.file)]);
+  },
+);

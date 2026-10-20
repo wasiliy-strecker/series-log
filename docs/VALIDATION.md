@@ -141,6 +141,10 @@ ersten drei Schritte. Die übrigen Schritte dokumentieren bestehende Funktionen.
     umrandete Standardbuttons müssen wie in MaschinenLog pillenförmig gerundet
     sein. Textbuttons bleiben ohne Füllung, reine Symbolbuttons ohne Rahmen.
     Der schwebende Anlegen-Button behält seine weniger starke Rundung.
+    Geräteabnahme am 20. Oktober 2026, 19:08: Die eigenständige Dev-Preview
+    von `e3115ff` ist datenbewahrend installiert. Ein neuer Screenshot bestätigt
+    pillenförmige umrandete Bearbeiten-/Löschen-Buttons und die gefüllte
+    Erstellen-Aktion. Vorhandene Serien und der gespeicherte Entwurf sind erhalten.
 16. In der Hauptansicht die Serienliste scrollen, eine Serie öffnen und
     zurückkehren. Die Scrollposition muss erhalten bleiben. Eine Serie über die
     Suche finden, die außerhalb des sichtbaren Bereichs lag. Mehrere Zeichen

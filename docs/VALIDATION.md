@@ -97,8 +97,17 @@ ersten drei Schritte. Die übrigen Schritte dokumentieren bestehende Funktionen.
 12. Bei großer Systemschrift und im Querformat kurz prüfen, dass Eingaben,
     Fehlerhinweise und Speichern erreichbar bleiben.
 13. Beim Anlegen oder Bearbeiten das Genre-Feld fokussieren. Die Vorschlagsliste
-    muss vollständig vor dem Formular liegen. Mit offener Tastatur oben und
-    unten im Formular sowie kurz im Querformat prüfen. Bei Platzmangel unterhalb
+    enthält genau sechs deutsche Genres: Drama, Komödie, Krimi, Abenteuer,
+    Zeichentrick und Dokumentation. Bei wenig Platz bleiben sie in der Liste
+    scrollbar. Gespeicherte eigene oder frühere englische Genres dürfen keine
+    zusätzlichen Vorschläge erzeugen. Beim Bearbeiten bleiben solche Angaben
+    im Eingabefeld unverändert. Freie Eingaben und die Auswahl von „Komödie“
+    speichern und erneut öffnen. Auch der Platzhalter verwendet „Komödie“.
+    Die Genre-Texte liegen mit stabilen Schlüsseln im deutschen Sprachkatalog
+    unter src/core/i18n. Die App bleibt vorerst durchgehend auf Deutsch.
+    Die Vorschlagsliste muss vollständig vor dem Formular liegen. Mit offener
+    Tastatur oben und unten im Formular sowie kurz im Querformat prüfen.
+    Bei Platzmangel unterhalb
     muss sie oberhalb öffnen und im sichtbaren Bereich bleiben. Durch die Liste
     scrollen. Das Formular darf dabei nicht mitscrollen. Einen Vorschlag antippen.
     Er muss das Genre übernehmen und die Liste schließen.

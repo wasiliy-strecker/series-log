@@ -7,6 +7,7 @@ import { SuggestionField } from '../src/core/ui/suggestion-field';
 import { ScrollContext } from '../src/core/ui/scroll-host';
 import { PageOverlayHost } from '../src/core/ui/page-overlay';
 import { suggestionLayout } from '../src/core/ui/suggestion-layout';
+import { genreSuggestions } from '../src/features/records/presentation-model';
 
 const ports = vi.hoisted(() => ({
   keyboardTop: undefined as number | undefined,
@@ -95,7 +96,7 @@ function Harness() {
         label: 'Genre *',
         helper: 'Vorschlag auswählen oder eigenes Genre eingeben.',
         value,
-        suggestions: ['Drama', 'Comedy', 'Krimi', 'Dokumentation', 'Fantasy'],
+        suggestions: genreSuggestions,
         showAllOnFocus: true,
         onOpenChange: ports.opened,
         onChange: (next) => {
@@ -191,7 +192,7 @@ it('repositions an open list when the keyboard appears and selects with one tap'
   await act(async () =>
     root.findAllByProps({ accessibilityRole: 'button' })[1]!.props.onPress(),
   );
-  expect(ports.changed).toHaveBeenLastCalledWith('Comedy');
+  expect(ports.changed).toHaveBeenLastCalledWith('Komödie');
   expect(ports.dismiss).toHaveBeenCalledOnce();
   expect(root.findAllByType(ScrollView)).toHaveLength(0);
   expect(ports.listeners.size).toBe(0);

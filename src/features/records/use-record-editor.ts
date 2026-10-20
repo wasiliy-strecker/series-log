@@ -7,7 +7,8 @@ import { useTask } from '../../core/ui/use-task';
 import { errorText } from '../../core/ui/components';
 import { useFeedback } from '../../core/ui/feedback';
 import { useLeaveGuard } from '../../core/ui/use-leave-guard';
-import { categorySuggestions } from './presentation-model';
+import { genreSuggestions } from './presentation-model';
+import { messages } from '../../core/i18n';
 import { useReminderStatusSnapshot } from './use-reminder-status';
 import {
   needsReminderRepair,
@@ -26,7 +27,7 @@ export function useRecordEditor(id?: string) {
     return {
       id: series.env.id(),
       name: '',
-      category: 'Drama',
+      category: messages.genres.drama,
       note: '',
       reminder: null,
       createdAt: now,
@@ -35,7 +36,6 @@ export function useRecordEditor(id?: string) {
   });
   const [initial, setInitial] = useState(() => JSON.stringify(record));
   const [initialReady, setReady] = useState(!id);
-  const [suggestions, setSuggestions] = useState(() => categorySuggestions([]));
   const task = useTask();
   const { setError } = task;
   const formErrors = useFormErrors();
@@ -45,7 +45,6 @@ export function useRecordEditor(id?: string) {
       .records()
       .then((records) => {
         if (!active) return;
-        setSuggestions(categorySuggestions(records));
         if (id) {
           const found = records.find((r) => r.id === id);
           if (!found) throw new Error('Die Serie wurde nicht gefunden.');
@@ -91,7 +90,7 @@ export function useRecordEditor(id?: string) {
     refreshReminderStatus: reminderState.refresh,
     reminderNeedsRepair,
     change,
-    categorySuggestions: suggestions,
+    categorySuggestions: genreSuggestions,
     ...task,
     save: () => {
       if (!record) return Promise.resolve(undefined);

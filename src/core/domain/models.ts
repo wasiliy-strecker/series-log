@@ -120,18 +120,6 @@ export type EntryDraft = {
   captureStage?: 'choose' | 'form';
   captureSource?: 'manual' | 'photo';
 };
-export const categories = [
-  'Drama',
-  'Krimi',
-  'Thriller',
-  'Comedy',
-  'Science-Fiction',
-  'Fantasy',
-  'Action',
-  'Animation',
-  'Dokumentation',
-  'Sonstiges',
-];
 export const PAGE_SIZE = 10;
 export function snapshotFiles(data: Snapshot): string[] {
   return [

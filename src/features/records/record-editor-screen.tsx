@@ -13,6 +13,7 @@ import { SuggestionField } from '../../core/ui/suggestion-field';
 import { useRecordEditor } from './use-record-editor';
 import { ReminderEditor } from './reminder-editor';
 import { FormErrorScroll } from '../../core/ui/form-error-scroll';
+import { messages } from '../../core/i18n';
 export function RecordEditorScreen() {
   const { id } = useLocalSearchParams<{
     id?: string;
@@ -79,10 +80,10 @@ export function RecordEditorScreen() {
           style={{ zIndex: 1 }}
         >
           <SuggestionField
-            label="Genre *"
+            label={messages.genreField.label}
             error={vm.fieldErrors.category}
-            placeholder="z. B. Drama oder Comedy"
-            helper="Vorschlag auswählen oder eigenes Genre eingeben."
+            placeholder={messages.genreField.placeholder}
+            helper={messages.genreField.helper}
             value={r.category}
             suggestions={vm.categorySuggestions}
             disabled={vm.busy}

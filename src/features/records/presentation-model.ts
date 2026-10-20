@@ -5,7 +5,7 @@ import type {
   EntryDraft,
   SeriesPhoto,
 } from '../../core/domain/models';
-import { categories } from '../../core/domain/models';
+import { messages } from '../../core/i18n';
 import { positionText } from '../../core/domain/episode-position';
 
 export type HistoryItem = {
@@ -14,17 +14,7 @@ export type HistoryItem = {
   photoCount: number;
   positionLabel: string;
 };
-export function categorySuggestions(records: SeriesRecord[]): string[] {
-  const unique = new Map<string, string>();
-  for (const category of [
-    ...categories,
-    ...records.map((r) => r.category.trim()).filter(Boolean),
-  ]) {
-    const key = category.toLocaleLowerCase('de-DE');
-    if (!unique.has(key)) unique.set(key, category);
-  }
-  return [...unique.values()];
-}
+export const genreSuggestions = Object.values(messages.genres);
 export type DashboardItem = {
   record: SeriesRecord;
   latest: EpisodeEntry | null;

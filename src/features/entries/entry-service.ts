@@ -1,4 +1,5 @@
 import { wholeNumber } from '../../core/domain/episode-position';
+import { messages } from '../../core/i18n';
 import {
   entrySchema,
   recordSchema,
@@ -233,7 +234,7 @@ export class SeriesService {
             id: this.env.id(),
             recordId,
             entryId,
-            name: `${record.name.slice(0, 200)} · ${entryId ? 'Einzelprotokoll' : 'Gesamtprotokoll'} · ${full ? 'vollständig' : 'kompakt'}${partCount > 1 ? ` · Teil ${index + 1} von ${partCount}` : ''}`,
+            name: `${record.name.slice(0, 200)} · ${entryId ? 'Einzelprotokoll' : 'Gesamtprotokoll'} · ${full ? messages.reportContent.withPhotoLabel : messages.reportContent.withoutPhotoLabel}${partCount > 1 ? ` · Teil ${index + 1} von ${partCount}` : ''}`,
             file,
             sha256: digest(part),
             createdAt,

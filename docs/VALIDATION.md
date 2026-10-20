@@ -58,7 +58,11 @@ ersten drei Schritte. Die übrigen Schritte dokumentieren bestehende Funktionen.
 5. Serienprotokoll erzeugen. Die PDF muss Titel, Genre, Staffel, Folge und Datum
    enthalten. Gesamtfolgen, Staffellängen und Differenzspalte dürfen nicht vorkommen.
    Mit Foto darf nur das erste Bild des neuesten Folgenstands mit Foto erscheinen.
-   Auch nach neueren Ständen ohne Foto muss „Mit aktuellem Foto“ verfügbar bleiben.
+   Auch nach neueren Ständen ohne Foto muss „PDF mit Foto erstellen“ verfügbar bleiben.
+   „PDF erstellen“ öffnet genau die beiden Aktionen „PDF mit Foto erstellen“ und
+   „PDF ohne Foto erstellen“. Lange Erklärtexte entfallen. Nur bei fehlendem Foto
+   erscheint „Kein Foto vorhanden.“ unter der deaktivierten Foto-Aktion.
+   Gespeicherte PDFs und neu erzeugte Dokumente verwenden „Mit Foto“ oder „Ohne Foto“.
    Suche und Seitenwechsel im Verlauf dürfen die Verfügbarkeit nicht einschränken.
    Im Einzelprotokoll erscheint nur das erste Foto des ausgewählten Stands.
    Einzelprotokolle ohne Foto übernehmen kein Bild aus anderen Folgenständen.
@@ -144,7 +148,7 @@ ersten drei Schritte. Die übrigen Schritte dokumentieren bestehende Funktionen.
     Die Fälle mit elf PDFs, Löschen auf der letzten Seite und Ladefehlern werden
     gezielt mit Testdaten in SQLite und dem echten React-Bereich automatisiert
     geprüft. Dafür keine zusätzlichen PDFs auf dem Nutzergerät anlegen.
-15. „PDF-Inhalt wählen“ öffnen und ohne Auswahl schließen. Die abgerundete
+15. „PDF erstellen“ öffnen und ohne Auswahl schließen. Die abgerundete
     Außenkante des unteren Panels muss einen dünnen, gedeckt roten Rahmen haben
     und sich vom abgedunkelten Hintergrund abheben. Die Löschabfrage eines
     bestehenden Protokolls öffnen und mit „Abbrechen“ schließen. Dieselbe

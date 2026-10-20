@@ -85,6 +85,9 @@ Text enthalten. Entwürfe und Fotos anderer Serien werden nicht verwendet.
 Weitere gespeicherte Fotos bleiben in der App und im Backup erhalten.
 Vorhandene PDF-Dokumente können weiterhin eingebettet werden.
 
+Die Auswahl unter „PDF erstellen“ lautet einfach „PDF mit Foto erstellen“ oder
+„PDF ohne Foto erstellen“. Gespeicherte PDFs tragen „Mit Foto“ oder „Ohne Foto“.
+
 ## Erinnerungen zum Weiterschauen
 
 Das Formular und die Statusanzeigen folgen MaschinenLog und dessen

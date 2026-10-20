@@ -1,4 +1,5 @@
 import { positionText } from '../domain/episode-position';
+import { messages } from '../i18n';
 import { PDFDocument, type PDFImage } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
 import {
@@ -112,7 +113,7 @@ function reportHeading(
   );
   layout.gap(6);
   layout.text(
-    `PDF erstellt am ${dateTime(options.createdAt)} · ${full ? 'Mit aktuellem Foto' : 'Kompakt ohne Anhänge'}`,
+    `PDF erstellt am ${dateTime(options.createdAt)} · ${full ? messages.reportContent.withPhotoLabel : messages.reportContent.withoutPhotoLabel}`,
     { size: 9, color: REPORT_GREY },
   );
   layout.gap(18);

@@ -79,25 +79,19 @@ export function useReports(
       const text = messages.reportContent;
       const mode = await feedback.choose({
         title: text.title,
-        message: text.helper,
         optionStyle: 'cards',
         options: [
           {
-            value: 'compact',
-            label: text.compact,
-            description: text.compactHint,
-            icon: 'description_outlined',
-          },
-          {
             value: 'full',
             label: text.withPhoto,
-            description: hasAttachments
-              ? entryId
-                ? text.singlePhotoHint
-                : text.historyPhotoHint
-              : text.noAttachments,
+            description: hasAttachments ? undefined : text.noAttachments,
             icon: 'photo_outlined',
             disabled: !hasAttachments,
+          },
+          {
+            value: 'compact',
+            label: text.compact,
+            icon: 'description_outlined',
           },
         ],
       });

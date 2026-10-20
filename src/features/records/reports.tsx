@@ -68,7 +68,9 @@ function ReportCard({
         <Body strong style={{ color: c.onSecondaryContainer, marginTop: 4 }}>
           {summary}
           {'\n'}
-          {report.full ? 'Mit Fotos' : 'Kompakt ohne Anhänge'}
+          {report.full
+            ? messages.reportContent.withPhotoLabel
+            : messages.reportContent.withoutPhotoLabel}
         </Body>
         <View style={[s.status, { backgroundColor }]}>
           <Icon
@@ -226,24 +228,15 @@ function ReportSection({
       <Card style={[s.createCard, { backgroundColor: c.secondaryContainer }]}>
         <View style={s.purposeRow}>
           <Icon name="picture_as_pdf_outlined" color={c.onSecondaryContainer} />
-          <View style={{ flex: 1, gap: 4 }}>
-            <Body strong style={{ color: c.onSecondaryContainer }}>
-              {entryId ? 'Einzelprotokoll dieses Eintrags' : 'Serienverlauf'}
-            </Body>
-            <Body style={{ color: c.onSecondaryContainer }}>
-              {entryId
-                ? messages.reportContent.singleSummary
-                : messages.reportContent.historySummary}
-            </Body>
-          </View>
+          <Body strong style={{ flex: 1, color: c.onSecondaryContainer }}>
+            {entryId
+              ? messages.reportContent.singleTitle
+              : messages.reportContent.historyTitle}
+          </Body>
         </View>
         <Button
           icon="picture_as_pdf_outlined"
-          title={
-            entryId
-              ? 'Einzelprotokoll als PDF erstellen'
-              : 'Serienverlaufsprotokoll erstellen'
-          }
+          title={messages.reportContent.title}
           disabled={vm.busy}
           onPress={() => void vm.create()}
         />

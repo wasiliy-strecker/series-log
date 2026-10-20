@@ -351,7 +351,7 @@ it('enables and creates a history report using a photo from an older stand', asy
       }),
     );
   });
-  await press('Serienverlaufsprotokoll erstellen');
+  await press('PDF erstellen');
   expect(ports.choose).toHaveBeenCalledWith(
     expect.objectContaining({
       options: expect.arrayContaining([

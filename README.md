@@ -179,8 +179,14 @@ Backup-Kennung: `serienlog_backup`, Dateikopf: `SLBACK01`.
 Fremde Hausakte- oder LeseLog-Backups werden nicht importiert.
 Der Dev-Schlüssel wird beim ersten Dev-Build in `.local/dev.keystore` erzeugt
 und übersteht `expo prebuild`. Er bleibt außerhalb von Git. Store-Debug ist
-abgeschaltet. Store-Releases benötigen vor einer Veröffentlichung eine eigene
-private Signatur. Hier wurde kein Store-Build erstellt und nichts veröffentlicht.
+abgeschaltet. Store-Releases verwenden eine eigene private Upload-Signatur
+außerhalb des Repositorys. Ohne gültigen Schlüssel bricht die Auslieferung ab.
+Einrichtung und Prüfung stehen in [Android-Releases](docs/ANDROID_RELEASES.md).
+Die Release-Vorbereitung erstellt keine Store-APK oder AAB.
+
+Automatische Android-Cloud-Backups und Geräteübertragungen sind für sämtliche
+App-Speicherbereiche ausgeschlossen. Die Regeln bleiben durch das Expo-Plugin
+erhalten und werden zusammen mit den Netzwerkberechtigungen geprüft.
 
 ## Prüfung und Grenzen
 
@@ -214,5 +220,9 @@ die vollständig geschriebenen Dateien einschließlich Hash und Größe geprüft
 Dateiverschiebungen und Kopien werden abgewartet. Die Datenbank wird atomar
 übernommen. Erst danach werden ungenutzte Dateien entfernt.
 
-[Datenschutz](PRIVACY.md). Schriftlizenzen liegen unter `assets/ui/`.
+[Datenschutz](https://wasiliy-strecker.github.io/series-log/datenschutz/) und
+[Privacy Policy](https://wasiliy-strecker.github.io/series-log/privacy/) folgen
+dem gemeinsamen Aufbau aus MaschinenLog mit SerienLog-spezifischen Angaben.
+GitHub Pages veröffentlicht die statischen Seiten aus `main/docs`.
+Schriftlizenzen liegen unter `assets/ui/`.
 Das SerienLog-Icon ist eine eigene SVG-Grafik unter `assets/serienlog.svg`.

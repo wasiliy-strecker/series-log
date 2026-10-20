@@ -10,6 +10,8 @@ android/**/build/
 android/**/.cxx/
 *.jks
 *.keystore
+*.p12
+android/key.properties
 .env*
 *.log
 *.slbackup

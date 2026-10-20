@@ -1,6 +1,6 @@
 # Abhängigkeitsprüfung
 
-Stand: 19. Oktober 2026. Die Aktualisierung folgt den kompatiblen SDK-57-Patches
+Stand: 20. Oktober 2026. Die Aktualisierung folgt den kompatiblen SDK-57-Patches
 aus MaschinenLogs Lockfile bei Commit `44078f4`. SerienLog besitzt weiterhin
 eigene Abhängigkeiten, ein eigenes Lockfile und ein eigenes natives Projekt.
 React bleibt bei 19.2.3 und React Native bei 0.86.3.
@@ -51,3 +51,38 @@ Overrides für uuid und decode-uri-component bleiben erhalten.
 `--omit=dev` ist keine Analyse des Android-Bundles. Expo enthält auch Werkzeuge
 innerhalb normaler Abhängigkeitsketten. Aus dieser Einordnung folgt keine
 pauschale Aussage über Unbedenklichkeit oder eine Store-Freigabe.
+
+## Native Android-Abhängigkeiten
+
+Die app-eigene `plugins/dependency-versions.gradle` ersetzt gezielt zwei
+transitive Android-Versionen. Das Expo-Plugin erhält diese Konfiguration bei
+Prebuild. Die JavaScript-Abhängigkeiten und das Lockfile bleiben unverändert.
+
+| Bibliothek | Bisher    | Jetzt  |
+| ---------- | --------- | ------ |
+| Gson       | 2.8.6     | 2.13.2 |
+| Commons IO | 1.4 / 2.6 | 2.14.0 |
+
+Gson enthält damit die Sicherheitskorrektur ab 2.8.9. Die gewählte Version
+unterstützt Android ab API 21 und passt zur SerienLog-Mindestversion API 24.
+[Gson-Korrektur](https://github.com/google/gson/pull/1991),
+[Gson-Anforderungen](https://github.com/google/gson#requirements).
+
+Commons IO 2.14.0 enthält die Korrektur für CVE-2024-47554 und benötigt Java 8.
+Expo verwendet unter anderem Dateikopien, Verzeichniskopien, Löschen,
+Stream-Kopien und Dateiendungen. Eine Nutzung des betroffenen XmlStreamReader
+wurde in diesen Aufrufen nicht gefunden. Das Update beseitigt trotzdem die
+betroffene alte Bibliotheksversion im aufgelösten Store-Abhängigkeitsbaum.
+[Apache-Sicherheitshinweis](https://commons.apache.org/proper/commons-io/security.html).
+
+`DependencyCompatibilityTest` prüft Gson-JSON-Roundtrips sowie die verwendeten
+Commons-IO-Dateioperationen auf API 24, 25 und 35. Zusätzlich wird die Auflösung
+im `storeReleaseRuntimeClasspath` per Gradle `dependencyInsight` geprüft.
+
+Commons IO verwendet inzwischen `java.nio.file`. Für Android 7 verwendet die
+App deshalb `desugar_jdk_libs_nio:2.1.5` statt der bisherigen Standardvariante.
+Das Expo-Plugin erhält auch diesen Wechsel. Die JVM-Tests allein bilden fehlende
+Java-Plattformklassen auf einem echten Android-7-Gerät nicht ab. Deshalb wird
+zusätzlich im erzeugten Dev-DEX geprüft, dass die Dateiaufrufe auf die
+mitgelieferten `j$.nio.file`-Klassen umgeschrieben wurden.
+[Android-NIO-Desugaring](https://android-developers.googleblog.com/2023/02/api-desugaring-supporting-android-13-and-java-nio.html).

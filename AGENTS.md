@@ -38,7 +38,8 @@ prüft nur die Manifest-Merges und erstellt keine Store-APK oder AAB.
 Android-Änderungen auch im Plugin `plugins/with-series-android.js` pflegen.
 Dev nutzt `com.appfactory.series_log.dev` und das Label `SerienLog Dev`.
 Store nutzt `com.appfactory.series_log`. Store-Debug ist deaktiviert.
-Store-Release ist bis zur eigenen privaten Upload-Signatur unsigniert vorbereitet.
+Store-Release benötigt die eigene private Upload-Signatur. Einrichtung und
+Prüfung stehen in `docs/ANDROID_RELEASES.md`. Keine unsignierten Store-Artefakte.
 Keine fremden Signaturen kopieren. Lokaler Dev-Schlüssel liegt unter `.local/`.
 Keine Store-Builds, Veröffentlichung oder Push ohne ausdrücklichen Auftrag.
 

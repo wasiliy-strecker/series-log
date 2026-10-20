@@ -204,7 +204,7 @@ androidComponents {
     }
 }
 
-// SerienLog standalone Dev preview. Store releases remain unsigned.
+// SerienLog standalone Dev preview.
 android.productFlavors.dev.signingConfig = android.signingConfigs.debug
 
 // SerienLog Android 7 time API support
@@ -212,8 +212,11 @@ android {
     compileOptions { coreLibraryDesugaringEnabled true }
 }
 dependencies {
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs_nio:2.1.5'
 }
 
 // SerienLog stable local Dev signing
 android.signingConfigs.debug.storeFile = rootProject.file("../.local/dev.keystore")
+
+// SerienLog private Store upload signing.
+apply from: file('store-signing.gradle')

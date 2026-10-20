@@ -8,6 +8,7 @@ const {
 } = require('expo/config-plugins');
 const fs = require('node:fs/promises');
 const path = require('node:path');
+const os = require('node:os');
 
 module.exports = function withSeriesAndroid(config) {
   config = withAndroidStyles(config, (mod) => {
@@ -105,6 +106,37 @@ ${startup}`,
   config = withDangerousMod(config, [
     'android',
     async (mod) => {
+      const androidRoot = mod.modRequest.platformProjectRoot;
+      for (const [source, target] of [
+        ['store-signing.gradle', 'app/store-signing.gradle'],
+        ['key.properties.example', 'key.properties.example'],
+        ['dependency-versions.gradle', 'dependency-versions.gradle'],
+        [
+          'data-extraction-rules.xml',
+          'app/src/main/res/xml/serienlog_data_extraction_rules.xml',
+        ],
+      ]) {
+        const destination = path.join(androidRoot, target);
+        await fs.mkdir(path.dirname(destination), { recursive: true });
+        await fs.copyFile(path.join(__dirname, source), destination);
+      }
+      // A prebuild must never create or replace a private key.
+      const privateProperties = path.join(
+        os.homedir(),
+        '.local/share/app-factory/signing/serienlog/key.properties',
+      );
+      try {
+        await fs.access(privateProperties);
+        const localProperties = path.join(androidRoot, 'key.properties');
+        try {
+          await fs.lstat(localProperties);
+        } catch (error) {
+          if (error.code !== 'ENOENT') throw error;
+          await fs.symlink(privateProperties, localProperties);
+        }
+      } catch (error) {
+        if (error.code !== 'ENOENT') throw error;
+      }
       for (const sourceSet of ['store', 'devRelease']) {
         const target = path.join(
           mod.modRequest.platformProjectRoot,
@@ -158,6 +190,13 @@ ${startup}`,
     if (!mod.modResults.contents.includes('ext.ndkVersion'))
       mod.modResults.contents =
         'ext.ndkVersion = "28.2.13676358"\n' + mod.modResults.contents;
+    if (
+      !mod.modResults.contents.includes(
+        "apply from: file('dependency-versions.gradle')",
+      )
+    )
+      mod.modResults.contents +=
+        "\n// SerienLog transitive dependency security updates.\napply from: file('dependency-versions.gradle')\n";
     return mod;
   });
   config = withAppBuildGradle(config, (mod) => {
@@ -213,7 +252,7 @@ android {
     compileOptions { coreLibraryDesugaringEnabled true }
 }
 dependencies {
-    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs_nio:2.1.5'
 }
 `;
     }
@@ -223,6 +262,18 @@ dependencies {
 android.signingConfigs.debug.storeFile = rootProject.file("../.local/dev.keystore")
 `;
     }
+    // Commons IO uses java.nio.file, which Android 7 does not provide.
+    source = source.replaceAll(
+      'com.android.tools:desugar_jdk_libs:2.1.5',
+      'com.android.tools:desugar_jdk_libs_nio:2.1.5',
+    );
+    source = source.replace(
+      '// SerienLog standalone Dev preview. Store releases remain unsigned.',
+      '// SerienLog standalone Dev preview.',
+    );
+    if (!source.includes("apply from: file('store-signing.gradle')"))
+      source +=
+        "\n// SerienLog private Store upload signing.\napply from: file('store-signing.gradle')\n";
     mod.modResults.contents = source;
     return mod;
   });
@@ -238,6 +289,8 @@ android.signingConfigs.debug.storeFile = rootProject.file("../.local/dev.keystor
     const app = manifest.application[0];
     app.$['android:allowBackup'] = 'false';
     app.$['android:fullBackupContent'] = 'false';
+    app.$['android:dataExtractionRules'] =
+      '@xml/serienlog_data_extraction_rules';
     const menuDefaults = {
       EXDevMenuShowFloatingActionButton: false,
       EXDevMenuShowsAtLaunch: false,

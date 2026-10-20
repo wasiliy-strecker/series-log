@@ -112,7 +112,8 @@ ersten drei Schritte. Die übrigen Schritte dokumentieren bestehende Funktionen.
     vor der Übernahme darf keine Datenbankänderung auslösen. Nach einem Fehler
     müssen Ladeanzeige und Bediensperre verschwinden.
 11. „Datenschutzerklärung öffnen“ muss zur Seite
-    `github.com/wasiliy-strecker/series-log/blob/main/PRIVACY.md` führen.
+    `https://wasiliy-strecker.github.io/series-log/datenschutz/` führen.
+    Sprachwechsel zu Englisch und GitHub-Quellcode-Link müssen erreichbar sein.
 12. Bei großer Systemschrift und im Querformat kurz prüfen, dass Eingaben,
     Fehlerhinweise und Speichern erreichbar bleiben.
 13. Beim Anlegen oder Bearbeiten das Genre-Feld fokussieren. Die Vorschlagsliste

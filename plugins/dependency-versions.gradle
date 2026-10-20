@@ -1,0 +1,17 @@
+// App-local security updates for Expo's transitive Android dependencies.
+ext.seriesGsonVersion = '2.13.2'
+ext.seriesCommonsIoVersion = '2.14.0'
+allprojects {
+    configurations.configureEach {
+        resolutionStrategy.eachDependency { details ->
+            if (details.requested.group == 'com.google.code.gson' && details.requested.name == 'gson') {
+                details.useVersion(rootProject.ext.seriesGsonVersion)
+                details.because('Avoid the vulnerable Gson 2.8.6 pulled in by Expo.')
+            }
+            if (details.requested.group == 'commons-io' && details.requested.name == 'commons-io') {
+                details.useVersion(rootProject.ext.seriesCommonsIoVersion)
+                details.because('Include the Commons IO security fixes through CVE-2024-47554.')
+            }
+        }
+    }
+}

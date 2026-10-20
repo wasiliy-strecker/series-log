@@ -22,6 +22,7 @@ import { PAGE_SIZE, type SavedReport } from '../../core/domain/models';
 import { dateTime } from './presentation-model';
 import { useReports } from './use-reports';
 import { useScrollHost } from '../../core/ui/scroll-host';
+import { messages } from '../../core/i18n';
 
 function ReportCard({
   report,
@@ -231,8 +232,8 @@ function ReportSection({
             </Body>
             <Body style={{ color: c.onSecondaryContainer }}>
               {entryId
-                ? 'Du wählst vor dem Erstellen: kompakt ohne Anhänge oder mit dem ersten aktuellen Foto dieses Folgenstands. Eintrag, Zeitpunkt und Notizen sind in beiden Varianten enthalten – zum Speichern, Drucken oder Teilen.'
-                : 'Die PDF bündelt alle Einträge der Serie mit Folgenständen und Notizen. Auf Wunsch erscheint nur das erste Foto des neuesten Folgenstands. Frühere Fotos werden nicht eingebettet – zum Speichern, Drucken oder Teilen.'}
+                ? messages.reportContent.singleSummary
+                : messages.reportContent.historySummary}
             </Body>
           </View>
         </View>

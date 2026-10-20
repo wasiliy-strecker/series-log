@@ -108,26 +108,62 @@ it('uses the selected stand for a single report and still rejects a broken inclu
   expect(await f.repo.reports(series.id)).toHaveLength(1);
 });
 
-it('never falls back to older photos in a PDF and keeps the dashboard cover independent', async () => {
+it('uses the newest photo-bearing stand even when newer stands have no photo', async () => {
   const old = await photo(1);
+  const current = await photo(2);
+  const extra = await photo(3);
+  await entry(2, [current, extra]);
+  // A backdated stand saved afterwards must not override the newer photo.
   await entry(1, [old]);
-  await entry(2, []);
-  expect((await f.repo.entries(series.id)).hasAttachments).toBe(false);
-  expect((await f.repo.dashboard())[0]!.photo?.attachment).toEqual(old);
+  const latest = await entry(3, []);
+  const page = await f.repo.entries(series.id, 'Notiz zum Stand 3', 0, 1);
+  expect(page.rows.map((entry) => entry.id)).toEqual([latest.id]);
+  expect(page.hasAttachments).toBe(true);
+  expect((await f.repo.latestPhoto(series.id))?.attachment).toEqual(current);
+  const snapshot = await f.repo.snapshot();
   const report = await f.series.createReport(series.id, null, true);
-  expect(await images(await f.vault.read(report.file))).toHaveLength(0);
+  expect(await images(await f.vault.read(report.file))).toEqual([
+    await f.vault.read(current.file),
+  ]);
+  expect((await f.repo.snapshot()).entries).toEqual(snapshot.entries);
+  // Single reports stay scoped to the selected stand and never borrow a photo.
+  const single = await f.series.createReport(series.id, latest.id, true);
+  expect(await images(await f.vault.read(single.file))).toHaveLength(0);
+  const compact = await f.series.createReport(series.id, null, false);
+  expect(await images(await f.vault.read(compact.file))).toHaveLength(0);
   // An excluded file must not be read or prevent generation of a new report.
   await f.vault.remove(old.file);
-  await expect(
-    f.series.createReport(series.id, null, true),
-  ).resolves.toBeDefined();
-  const current = await photo(2);
-  await entry(3, [current]);
-  expect((await f.repo.entries(series.id)).hasAttachments).toBe(true);
   const updated = await f.series.createReport(series.id, null, true);
   expect(await images(await f.vault.read(updated.file))).toEqual([
     await f.vault.read(current.file),
   ]);
+});
+
+it('ignores photos in drafts and other series while still allowing saved PDF documents', async () => {
+  const other = record();
+  await f.series.saveRecord(other);
+  const image = await photo(1);
+  const otherDraft = await f.series.draft(other.id);
+  otherDraft.form.episode = '1';
+  otherDraft.form.attachments = [image];
+  await f.series.saveEntry(otherDraft);
+  await entry(1, []);
+  const pending = await f.series.draft(series.id);
+  pending.form.attachments = [image];
+  await f.series.persistDraft(pending);
+  expect((await f.repo.entries(series.id)).hasAttachments).toBe(false);
+  const report = await f.series.createReport(series.id, null, true);
+  expect(await images(await f.vault.read(report.file))).toHaveLength(0);
+  await f.series.discard(pending);
+  const document = await f.series.importAttachment(
+    await sourcePdf(),
+    'pdf',
+    'Dokument.pdf',
+  );
+  const saved = await entry(2, [document]);
+  expect((await f.repo.entries(series.id)).hasAttachments).toBe(true);
+  await f.series.delete('entry', saved.id);
+  expect((await f.repo.entries(series.id)).hasAttachments).toBe(false);
 });
 
 it.each(['single', 'history'] as const)(

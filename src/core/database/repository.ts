@@ -150,14 +150,8 @@ export class SqlRepository implements Repository {
       const any = await this.db.all<{ found: number }>(
         `SELECT EXISTS(
           SELECT 1 FROM entries e,json_each(e.body,'$.attachments') a
-          WHERE e.record_id=? AND json_extract(a.value,'$.kind')='pdf'
-        ) OR EXISTS(
-          SELECT 1 FROM json_each(
-            (SELECT body FROM entries WHERE record_id=? ORDER BY occurred_at DESC,id DESC LIMIT 1),
-            '$.attachments'
-          ) a WHERE json_extract(a.value,'$.kind')='photo'
+          WHERE e.record_id=? AND json_extract(a.value,'$.kind') IN ('photo','pdf')
         ) found`,
-        recordId,
         recordId,
       );
       return { rows, total, hasAttachments: any[0]?.found === 1 };

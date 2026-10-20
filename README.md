@@ -78,8 +78,10 @@ einklappbar. Vorhandene PDF-Dateien behalten ihren Inhalt.
 
 Neue PDFs mit Foto zeigen höchstens ein Bild. Im Einzelprotokoll ist es das
 erste Foto des gewählten Folgenstands. Im Serienverlauf ist es das erste Foto
-des zeitlich neuesten Folgenstands. Hat dieser kein Foto, wird kein älteres
-Bild verwendet. Frühere Stände und Notizen bleiben als Text enthalten.
+des zeitlich neuesten Folgenstands mit Foto. Neuere Stände ohne Foto verdrängen
+dieses Bild nicht. Die Option bleibt verfügbar, solange ein gespeicherter
+Folgenstand der Serie ein Foto enthält. Alle Stände und Notizen bleiben als
+Text enthalten. Entwürfe und Fotos anderer Serien werden nicht verwendet.
 Weitere gespeicherte Fotos bleiben in der App und im Backup erhalten.
 Vorhandene PDF-Dokumente können weiterhin eingebettet werden.
 

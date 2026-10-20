@@ -7,6 +7,7 @@ import type { SavedReport } from '../../core/domain/models';
 import { errorText } from '../../core/ui/components';
 import { useTask } from '../../core/ui/use-task';
 import { useFeedback } from '../../core/ui/feedback';
+import { messages } from '../../core/i18n';
 
 export function useReports(
   recordId: string,
@@ -75,26 +76,26 @@ export function useReports(
     offset,
     setOffset,
     create: async () => {
+      const text = messages.reportContent;
       const mode = await feedback.choose({
-        title: 'PDF-Inhalt wählen',
-        message: 'Wähle, welche Inhalte deine PDF enthalten soll.',
+        title: text.title,
+        message: text.helper,
         optionStyle: 'cards',
         options: [
           {
             value: 'compact',
-            label: 'Kompakt ohne Anhänge',
-            description:
-              'Staffel, Folge, Datum und Notizen ohne eingebettete Fotos.',
+            label: text.compact,
+            description: text.compactHint,
             icon: 'description_outlined',
           },
           {
             value: 'full',
-            label: 'Mit aktuellem Foto',
+            label: text.withPhoto,
             description: hasAttachments
               ? entryId
-                ? 'Enthält das erste aktuelle Foto dieses Folgenstands und vorhandene PDF-Dokumente.'
-                : 'Enthält nur das erste Foto des neuesten Folgenstands und vorhandene PDF-Dokumente. Ältere Fotos bleiben ausgeschlossen.'
-              : 'Kein aktuelles Foto oder PDF-Dokument vorhanden.',
+                ? text.singlePhotoHint
+                : text.historyPhotoHint
+              : text.noAttachments,
             icon: 'photo_outlined',
             disabled: !hasAttachments,
           },

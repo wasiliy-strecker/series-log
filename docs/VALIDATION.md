@@ -57,9 +57,12 @@ ersten drei Schritte. Die übrigen Schritte dokumentieren bestehende Funktionen.
    Bestätigung. Ein niedrigerer Folgenstand darf keine Nachfrage auslösen.
 5. Serienprotokoll erzeugen. Die PDF muss Titel, Genre, Staffel, Folge und Datum
    enthalten. Gesamtfolgen, Staffellängen und Differenzspalte dürfen nicht vorkommen.
-   Mit Foto darf nur das erste Bild des neuesten Folgenstands erscheinen.
-   Hat der neueste Stand kein Foto, darf kein älteres Bild nachrücken. Im
-   Einzelprotokoll erscheint nur das erste Foto des ausgewählten Stands.
+   Mit Foto darf nur das erste Bild des neuesten Folgenstands mit Foto erscheinen.
+   Auch nach neueren Ständen ohne Foto muss „Mit aktuellem Foto“ verfügbar bleiben.
+   Suche und Seitenwechsel im Verlauf dürfen die Verfügbarkeit nicht einschränken.
+   Im Einzelprotokoll erscheint nur das erste Foto des ausgewählten Stands.
+   Einzelprotokolle ohne Foto übernehmen kein Bild aus anderen Folgenständen.
+   Entwürfe und andere Serien beeinflussen die Auswahl nicht.
    Ältere Folgenstände und Notizen bleiben im Verlauf als Text enthalten.
    Das aktuelle Foto bekommt wie in MaschinenLog eine eigene Seite mit Eintrag,
    Folgenstand und Dateiname. Es ist deutlich größer, proportional und horizontal

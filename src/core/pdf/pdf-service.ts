@@ -220,24 +220,26 @@ export class PdfService {
     full: boolean,
     options: ReportOptions,
   ): Promise<Uint8Array> {
-    const ordered = [...entries]
-      .sort(
-        (a, b) =>
-          Date.parse(b.occurredAt) - Date.parse(a.occurredAt) ||
-          b.id.localeCompare(a.id),
-      )
-      .map((entry, index) => {
-        const photo =
-          options.kind === 'single' || index === 0
-            ? entry.attachments.find((a) => a.kind === 'photo')
-            : undefined;
-        return {
-          ...entry,
-          attachments: entry.attachments.filter(
-            (a) => a.kind === 'pdf' || a === photo,
-          ),
-        };
-      });
+    const sorted = [...entries].sort(
+      (a, b) =>
+        Date.parse(b.occurredAt) - Date.parse(a.occurredAt) ||
+        b.id.localeCompare(a.id),
+    );
+    const photoEntry = sorted.find((entry) =>
+      entry.attachments.some((a) => a.kind === 'photo'),
+    );
+    const ordered = sorted.map((entry) => {
+      const photo =
+        options.kind === 'single' || entry.id === photoEntry?.id
+          ? entry.attachments.find((a) => a.kind === 'photo')
+          : undefined;
+      return {
+        ...entry,
+        attachments: entry.attachments.filter(
+          (a) => a.kind === 'pdf' || a === photo,
+        ),
+      };
+    });
     if (
       ordered.reduce(
         (sum, entry) =>

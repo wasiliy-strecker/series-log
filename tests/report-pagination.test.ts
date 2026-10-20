@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { readFile } from 'node:fs/promises';
 import { createContext, createElement, useContext, useState } from 'react';
 import { act, create, type ReactTestRenderer } from 'react-test-renderer';
 import { Reports } from '../src/features/records/reports';
@@ -102,7 +103,13 @@ const text = () =>
     .map((node) => node.children.join(''))
     .join('\n');
 const button = (title: string) => root().findByProps({ title });
-function Harness({ single }: { single: boolean }) {
+function Harness({
+  single,
+  hasAttachments = false,
+}: {
+  single: boolean;
+  hasAttachments?: boolean;
+}) {
   const [revision, setRevision] = useState(0);
   return createElement(
     servicesContext.Provider,
@@ -116,7 +123,7 @@ function Harness({ single }: { single: boolean }) {
     createElement(Reports, {
       recordId: series.id,
       entryId: single ? entryId : null,
-      hasAttachments: false,
+      hasAttachments,
       summary: series.name,
     }),
   );
@@ -175,6 +182,7 @@ beforeEach(async () => {
   vi.clearAllMocks();
   ports.frames.clear();
   ports.confirm.mockResolvedValue(true);
+  ports.choose.mockResolvedValue(null);
   vi.stubGlobal('requestAnimationFrame', (callback: (time: number) => void) => {
     const id = ++ports.nextFrame;
     ports.frames.set(id, callback);
@@ -316,4 +324,47 @@ it('shows a load failure with retry instead of an endless page spinner', async (
   );
   await press('Erneut versuchen');
   await settled(() => expect(cards(true)).toHaveLength(10));
+});
+
+it('enables and creates a history report using a photo from an older stand', async () => {
+  const earlier = (await active.repo.entry(entryId))!;
+  const draft = await active.series.draft(series.id, earlier);
+  draft.form.attachments = [
+    await active.series.importAttachment(
+      new Uint8Array(
+        await readFile(new URL('./fixtures/photo.jpg', import.meta.url)),
+      ),
+      'photo',
+      'Serienfoto.jpg',
+    ),
+  ];
+  await active.series.saveEntry(draft);
+  const page = await active.repo.entries(series.id, '', 0, 1);
+  expect(page.rows[0]!.id).toBe(otherEntryId);
+  expect(page.rows[0]!.attachments).toHaveLength(0);
+  ports.choose.mockResolvedValue('full');
+  await act(async () => {
+    renderer = create(
+      createElement(Harness, {
+        single: false,
+        hasAttachments: page.hasAttachments,
+      }),
+    );
+  });
+  await press('Serienverlaufsprotokoll erstellen');
+  expect(ports.choose).toHaveBeenCalledWith(
+    expect.objectContaining({
+      options: expect.arrayContaining([
+        expect.objectContaining({ value: 'full', disabled: false }),
+      ]),
+    }),
+  );
+  await settled(() => expect(ports.push).toHaveBeenCalledTimes(1));
+  const reports = await active.repo.reports(series.id);
+  expect(reports).toHaveLength(1);
+  expect(reports[0]).toMatchObject({ entryId: null, full: true });
+  expect(ports.push).toHaveBeenCalledWith({
+    pathname: '/pdf/[id]',
+    params: { id: reports[0]!.id },
+  });
 });

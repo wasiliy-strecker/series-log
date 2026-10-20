@@ -42,6 +42,12 @@
   -r -t -g --no-streaming erfolgreich. App gestartet, Daten nicht gelöscht.
 - DEX-Prüfung bestätigt Commons-IO-Dateikopien über j$.nio.file und die
   mitgelieferte Files-Klasse. Android 7 wurde nicht auf einem realen Gerät geprüft.
-- GitHub-Pages-Veröffentlichung und öffentlicher Linktest folgen dem Commit.
+- Gesamtstand einschließlich der 13 vorherigen Commits mit 2f49d91 nach
+  origin/main gepusht. GitHub Pages aus main/docs aktiviert. Deutsche und
+  englische Datenschutzseite, Startseite und CSS öffentlich mit HTTP 200
+  geprüft und mit lokalen Inhalten verglichen.
+- Dev-Prozess läuft ohne fatalen Startfehler. Smartphone ist gesperrt.
+  Deshalb bleibt nur der Klicktest des Datenschutzlinks in der App offen.
+  Die Zielseiten selbst sind öffentlich geprüft.
   Version bleibt 1.0.0 (1). Kein Store-Build und kein Play-Upload.
   MaschinenLog, ZählerstandLog, LeseLog und Hausakte bleiben unverändert.

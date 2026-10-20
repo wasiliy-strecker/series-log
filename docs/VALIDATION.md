@@ -19,8 +19,10 @@ Weitere Fälle prüfen den atomaren Rückweg bei einem SQLite-Fehler, erhaltene
 lokale Entwürfe und neuere Einträge sowie vollständig abgewartete Dateikopien.
 Die Tests führen keine Wiederherstellung auf dem Nutzergerät aus.
 
-Die bestehende native Prüfung `npm run check:native` umfasst 44 JVM-Tests und
-Android-Lint für das eigene Modul.
+Die native Prüfung `npm run check:native` umfasst 53 JVM-Tests und Android-Lint
+für das eigene Modul. Neun davon prüfen die aktualisierten Gson-/Commons-IO-
+Aufrufe auf API 24, 25 und 35. Im Dev-APK sind zusätzlich die auf `j$.nio.file`
+umgeschriebenen Dateikopien und die mitgelieferte Files-Klasse geprüft.
 
 Starttests prüfen die Freigabe erst nach Layout, Daten und verschachtelten
 Ladevorgängen sowie die erreichbare Fehleransicht. Genre-Tests prüfen
@@ -35,6 +37,19 @@ Berechtigung enthalten. Debug muss INTERNET für Metro behalten. Die Vorschau-
 Installationshilfe wird zusätzlich mit synthetischen SDK-Werkzeugen getestet.
 Unzulässige Netzwerkrechte müssen vor jedem Gerätezugriff zum Abbruch führen.
 Der Abhängigkeits- und Audit-Prüfstand steht in `DEPENDENCIES.md`.
+
+Die Manifestprüfung kontrolliert außerdem `allowBackup=false`,
+`fullBackupContent=false` und alle neun ausgeschlossenen Speicherbereiche
+für Cloud-Backup und Geräteübertragung. Die Store-Signatur lässt sich ohne
+Store-Artefakt prüfen. Vorgehen und Schlüsselablage stehen in `ANDROID_RELEASES.md`.
+
+Release-Vorbereitung am 20. Oktober 2026: 82 App-Tests und 53 native Tests
+erfolgreich, keine Lint-Fehler. Beide öffentlichen Datenschutzseiten und ihr
+Stylesheet liefern HTTP 200 und entsprechen den versionierten Dateien.
+Die Dev-Preview wurde mit gleicher Signatur datenbewahrend auf dem HONOR BVL_N49
+aktualisiert. Der App-Prozess läuft ohne fatalen Startfehler. Der Sperrbildschirm
+verhinderte den Klicktest des Datenschutzlinks in der App. Diesen kurzen Schritt
+nach dem Entsperren noch ausführen. Ein echtes Android-7-Gerät wurde nicht getestet.
 
 ## Kurze manuelle Abnahme auf einem Gerät
 

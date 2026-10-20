@@ -137,6 +137,10 @@ ersten drei Schritte. Die übrigen Schritte dokumentieren bestehende Funktionen.
     Datum-/Uhrzeitauswahl, Passwortabfragen, Ladeanzeige und „Beispiele ansehen“
     verwenden denselben Rahmen. Beim Schließen und Ziehen darf er nicht stehen
     bleiben oder Inhalte überdecken.
+    „Serie speichern“, „Änderungen speichern“ und andere gefüllte oder
+    umrandete Standardbuttons müssen wie in MaschinenLog pillenförmig gerundet
+    sein. Textbuttons bleiben ohne Füllung, reine Symbolbuttons ohne Rahmen.
+    Der schwebende Anlegen-Button behält seine weniger starke Rundung.
 16. In der Hauptansicht die Serienliste scrollen, eine Serie öffnen und
     zurückkehren. Die Scrollposition muss erhalten bleiben. Eine Serie über die
     Suche finden, die außerhalb des sichtbaren Bereichs lag. Mehrere Zeichen

@@ -366,7 +366,7 @@ export function Button({
         minHeight: 56,
         paddingVertical: 12,
         paddingHorizontal: 20,
-        borderRadius: 12,
+        borderRadius: 40,
         borderWidth: secondary ? 1 : 0,
         borderColor: disabled ? c.ink + '1F' : danger ? c.danger : c.outline,
         backgroundColor:

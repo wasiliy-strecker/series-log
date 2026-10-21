@@ -1,6 +1,6 @@
 # Abhängigkeitsprüfung
 
-Stand: 20. Oktober 2026. Die Aktualisierung folgt den kompatiblen SDK-57-Patches
+Stand: 21. Oktober 2026. Die Aktualisierung folgt den kompatiblen SDK-57-Patches
 aus MaschinenLogs Lockfile bei Commit `44078f4`. SerienLog besitzt weiterhin
 eigene Abhängigkeiten, ein eigenes Lockfile und ein eigenes natives Projekt.
 React bleibt bei 19.2.3 und React Native bei 0.86.3.
@@ -25,6 +25,13 @@ React bleibt bei 19.2.3 und React Native bei 0.86.3.
 und Änderungen zusätzlich im app-eigenen Expo-Plugin gepflegt werden.
 
 ## Audit
+
+Vor dem ersten Store-Build meldete der erneute Audit zusätzlich Vite 8.3.0.
+Vite wurde innerhalb der von Vitest unterstützten Version 8 auf 8.3.5
+aktualisiert. Die drei `launch-editor`-Hinweise sind damit behoben.
+Das gezielte Update aktualisiert auch seine kompatiblen Hilfspakete im Lockfile.
+Die vollständige Anwendungstestsuite mit 82 Tests besteht auch mit diesem Stand.
+[Sicherheitshinweis des Maintainers](https://github.com/vitejs/launch-editor/security/advisories/GHSA-587h-7wmj-h5pm).
 
 Vorher meldete `npm audit` einen kritischen und 20 hohe Paketeinträge. Nach der
 Aktualisierung melden sowohl `npm audit` als auch `npm audit --omit=dev` keine

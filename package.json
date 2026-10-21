@@ -7,6 +7,8 @@
     "start": "expo start --dev-client --port 8085",
     "prebuild": "expo prebuild --platform android --no-install",
     "build:dev": "bash scripts/build-dev.sh",
+    "build:store": "bash scripts/build_store_aab.sh",
+    "check:store": "python3 -m unittest discover -s scripts -p test_store_aab.py",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "lint": "eslint src tests app.config.ts",

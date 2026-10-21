@@ -182,7 +182,9 @@ und übersteht `expo prebuild`. Er bleibt außerhalb von Git. Store-Debug ist
 abgeschaltet. Store-Releases verwenden eine eigene private Upload-Signatur
 außerhalb des Repositorys. Ohne gültigen Schlüssel bricht die Auslieferung ab.
 Einrichtung und Prüfung stehen in [Android-Releases](docs/ANDROID_RELEASES.md).
-Die Release-Vorbereitung erstellt keine Store-APK oder AAB.
+`npm run build:store` baut nach ausdrücklichem Auftrag die signierte Store-AAB,
+prüft die konkrete Datei und legt sie versioniert unter `build/releases/production/`
+ab. Der Ablauf und die erforderlichen Prüfungen stehen in der Release-Anleitung.
 
 Automatische Android-Cloud-Backups und Geräteübertragungen sind für sämtliche
 App-Speicherbereiche ausgeschlossen. Die Regeln bleiben durch das Expo-Plugin

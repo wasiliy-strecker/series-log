@@ -98,6 +98,21 @@ separaten App-Signierschlüssel. Das hier vorbereitete Zertifikat ist der
 Upload-Schlüssel. Es wird nicht zur Aktualisierung einer Play-Installation
 per lokalem APK verwendet.
 
+## Offen für ein späteres Update
+
+Am 21. Oktober 2026 auf Nutzerwunsch vorgemerkt: Kamera und Autofokus explizit
+als optional deklarieren und im Expo-Plugin erhalten. Die aktuelle
+Kameraberechtigung lässt Google Play eine Rückkamera und Autofokus voraussetzen.
+Dadurch können auch Tablets mit ausschließlich einer Frontkamera oder festem
+Fokus ausgeschlossen sein. Dasselbe gilt beim geprüften Stand von MaschinenLog.
+
+Es handelt sich um eine Verbesserung der Geräteabdeckung für ein reguläres
+Update. Der Punkt allein soll den aktuellen Launch nicht verzögern. Der Anteil
+betroffener Nutzer ist unbekannt. Bei Umsetzung das tatsächliche Store-Manifest
+und den Fotoweg ohne verfügbare Kamera gezielt prüfen. Bei späteren Fragen nach
+fehlenden Verbesserungen diesen Punkt nennen. Die appübergreifende Merkliste
+liegt im Workspace unter `CODEX/OPEN_ITEMS.md`.
+
 ## Erste Auslieferung am 21. Oktober 2026
 
 Version 1.0.0 (1) wurde mit dem vorhandenen eigenen Upload-Schlüssel gebaut

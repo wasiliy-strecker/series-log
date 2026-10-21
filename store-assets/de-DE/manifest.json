@@ -1,0 +1,269 @@
+{
+  "locale": "de-DE",
+  "source": {
+    "gitCommit": "7a11906bc93f91fea3a51249d7fbabc51fe8cb73",
+    "apkSha256": "9889f6f576edc4ca464824c93a7315b8b13bf95cd9b7662355601f4cb7c40a5d",
+    "package": "com.appfactory.series_log.dev",
+    "versionName": "1.0.0",
+    "versionCode": 1,
+    "variant": "devRelease",
+    "architecture": "x86_64",
+    "androidApi": 35
+  },
+  "images": [
+    {
+      "file": "icon/serienlog-icon-512.png",
+      "playConsoleField": "App-Symbol",
+      "altText": "SerienLog-Symbol mit rotem Bildschirm, weißem Wiedergabezeichen und dunklem Hintergrund.",
+      "width": 512,
+      "height": 512,
+      "mode": "RGBA",
+      "bytes": 9037,
+      "sha256": "5919345b3fbd3b1ee21b7ce14e47edf1ea2bf3ca9e222ccea10d731d2f968e28"
+    },
+    {
+      "file": "feature/serienlog-feature-1024x500.png",
+      "playConsoleField": "Vorstellungsgrafik",
+      "altText": "SerienLog: Wissen, wo du aufgehört hast. Staffel, Folge und Erinnerungen mit einer echten App-Ansicht.",
+      "width": 1024,
+      "height": 500,
+      "mode": "RGB",
+      "bytes": 227129,
+      "sha256": "473917e19c51eb0f4b43d12a0cf5f964f90140d6b6d63344700dd6e06ddd3d83"
+    },
+    {
+      "file": "phone/01-uebersicht.png",
+      "playConsoleField": "Smartphone-Screenshots",
+      "altText": "Serienübersicht mit Serientiteln, Foto und zuletzt gespeicherten Staffeln und Folgen.",
+      "width": 1080,
+      "height": 1920,
+      "mode": "RGB",
+      "bytes": 508218,
+      "sha256": "d2a0a75f2590caddf9226201babaded5ae026d4b456f5dfde35527c5f984f567",
+      "capture": {
+        "serial": "emulator-5588",
+        "avd": "sl_store_assets_phone_1792571398",
+        "size": "Physical size: 1080x1920",
+        "density": "Physical density: 360",
+        "package": "com.appfactory.series_log.dev",
+        "rawSha256": "89cf8436ec1693884be635f74c864561c849d4b3e321c9b1aed8e83fb50d5eae"
+      }
+    },
+    {
+      "file": "phone/02-seriendetails.png",
+      "playConsoleField": "Smartphone-Screenshots",
+      "altText": "Seriendetails von Nordlichter mit eigenem Beispielfoto, Notiz und dem letzten Folgenstand.",
+      "width": 1080,
+      "height": 1920,
+      "mode": "RGB",
+      "bytes": 595809,
+      "sha256": "a3c9ea9bbde7d67b6ca22d46ce0f64620aa8c52f5b976bb6a13d44d9b0b4f0b7",
+      "capture": {
+        "serial": "emulator-5588",
+        "avd": "sl_store_assets_phone_1792571398",
+        "size": "Physical size: 1080x1920",
+        "density": "Physical density: 360",
+        "package": "com.appfactory.series_log.dev",
+        "rawSha256": "d85559a6bfb8ff8dc44fb9676b6a6851057c83747a3b9e21e11a0c9f4468b2bc"
+      }
+    },
+    {
+      "file": "phone/03-folgenstand.png",
+      "playConsoleField": "Smartphone-Screenshots",
+      "altText": "Manuelle Eingabe von Staffel und zuletzt gesehener Folge mit Datum und optionaler Notiz.",
+      "width": 1080,
+      "height": 1920,
+      "mode": "RGB",
+      "bytes": 241161,
+      "sha256": "7d1708deac7f23a21be2f403533592cb0f4d907524dc258efa8ca0df6c936cd7",
+      "capture": {
+        "serial": "emulator-5588",
+        "avd": "sl_store_assets_phone_1792571398",
+        "size": "Physical size: 1080x1920",
+        "density": "Physical density: 360",
+        "package": "com.appfactory.series_log.dev",
+        "rawSha256": "f5265558faabc5ce8537e6b30c0abf949b21e6420d9194c6e80065811c141f15"
+      }
+    },
+    {
+      "file": "phone/04-verlauf.png",
+      "playConsoleField": "Smartphone-Screenshots",
+      "altText": "Gespeicherte Folgenstände von Nordlichter mit Datum, Notizen und Fotovorschau im Serienverlauf.",
+      "width": 1080,
+      "height": 1920,
+      "mode": "RGB",
+      "bytes": 279967,
+      "sha256": "52034e443835495212eec63db4178e5be429051e9a8326a4100b7324e1189624",
+      "capture": {
+        "serial": "emulator-5588",
+        "avd": "sl_store_assets_phone_1792571398",
+        "size": "Physical size: 1080x1920",
+        "density": "Physical density: 360",
+        "package": "com.appfactory.series_log.dev",
+        "rawSha256": "4f364dc451c8bb8fd04e59229fa475b8a40ea73b67b6dc996ef27a8fbeb82f47"
+      }
+    },
+    {
+      "file": "phone/05-erinnerungen.png",
+      "playConsoleField": "Smartphone-Screenshots",
+      "altText": "Persönliche lokale Erinnerung ans Weiterschauen mit wöchentlichem Intervall und eigener Uhrzeit.",
+      "width": 1080,
+      "height": 1920,
+      "mode": "RGB",
+      "bytes": 268309,
+      "sha256": "8f736c5b07cf7079c54b8fff12a4ebe53fcdf6dadc7fb906e387684c940b52e0",
+      "capture": {
+        "serial": "emulator-5588",
+        "avd": "sl_store_assets_phone_1792571398",
+        "size": "Physical size: 1080x1920",
+        "density": "Physical density: 360",
+        "package": "com.appfactory.series_log.dev",
+        "rawSha256": "b723b9ff8a73084ce5740fb8c25da4277cbf812e4debfa66facba1683cfeda2b"
+      }
+    },
+    {
+      "file": "tablet7/01-uebersicht.png",
+      "playConsoleField": "7-Zoll-Tablet-Screenshots",
+      "altText": "Serienübersicht mit Serientiteln, Foto und zuletzt gespeicherten Staffeln und Folgen.",
+      "width": 1080,
+      "height": 1920,
+      "mode": "RGB",
+      "bytes": 578752,
+      "sha256": "046b428949e52f6b193813a26ddaebe2d7ac75bd52b848059e25a1e462b40609",
+      "capture": {
+        "serial": "emulator-5590",
+        "avd": "sl_store_assets_tablet7_1792571511",
+        "size": "Physical size: 1080x1920",
+        "density": "Physical density: 240",
+        "package": "com.appfactory.series_log.dev",
+        "rawSha256": "046b428949e52f6b193813a26ddaebe2d7ac75bd52b848059e25a1e462b40609"
+      }
+    },
+    {
+      "file": "tablet7/02-verlauf.png",
+      "playConsoleField": "7-Zoll-Tablet-Screenshots",
+      "altText": "Gespeicherte Folgenstände von Nordlichter mit Datum, Notizen und Fotovorschau im Serienverlauf.",
+      "width": 1080,
+      "height": 1920,
+      "mode": "RGB",
+      "bytes": 167038,
+      "sha256": "cc67ee19d5b770294c9f11bdf3e8d2b045af1f1f4db7f637814271108dd18a8c",
+      "capture": {
+        "serial": "emulator-5590",
+        "avd": "sl_store_assets_tablet7_1792571511",
+        "size": "Physical size: 1080x1920",
+        "density": "Physical density: 240",
+        "package": "com.appfactory.series_log.dev",
+        "rawSha256": "cc67ee19d5b770294c9f11bdf3e8d2b045af1f1f4db7f637814271108dd18a8c"
+      }
+    },
+    {
+      "file": "tablet7/03-folgenstand.png",
+      "playConsoleField": "7-Zoll-Tablet-Screenshots",
+      "altText": "Manuelle Eingabe von Staffel und zuletzt gesehener Folge mit Datum und optionaler Notiz.",
+      "width": 1080,
+      "height": 1920,
+      "mode": "RGB",
+      "bytes": 101779,
+      "sha256": "6f6ffcf2f2503115afad9224c0fbdde0271119fc65ea63e09a11ad61827458fe",
+      "capture": {
+        "serial": "emulator-5590",
+        "avd": "sl_store_assets_tablet7_1792571511",
+        "size": "Physical size: 1080x1920",
+        "density": "Physical density: 240",
+        "package": "com.appfactory.series_log.dev",
+        "rawSha256": "6f6ffcf2f2503115afad9224c0fbdde0271119fc65ea63e09a11ad61827458fe"
+      }
+    },
+    {
+      "file": "tablet7/04-erinnerungen.png",
+      "playConsoleField": "7-Zoll-Tablet-Screenshots",
+      "altText": "Persönliche lokale Erinnerung ans Weiterschauen mit wöchentlichem Intervall und eigener Uhrzeit.",
+      "width": 1080,
+      "height": 1920,
+      "mode": "RGB",
+      "bytes": 151141,
+      "sha256": "13e09623dba1cdbf359bd99be8fe2f4a85d598a3e48a0f4a454cd202ea98870d",
+      "capture": {
+        "serial": "emulator-5590",
+        "avd": "sl_store_assets_tablet7_1792571511",
+        "size": "Physical size: 1080x1920",
+        "density": "Physical density: 240",
+        "package": "com.appfactory.series_log.dev",
+        "rawSha256": "13e09623dba1cdbf359bd99be8fe2f4a85d598a3e48a0f4a454cd202ea98870d"
+      }
+    },
+    {
+      "file": "tablet10/01-uebersicht.png",
+      "playConsoleField": "10-Zoll-Tablet-Screenshots",
+      "altText": "Serienübersicht mit Serientiteln, Foto und zuletzt gespeicherten Staffeln und Folgen.",
+      "width": 1440,
+      "height": 2560,
+      "mode": "RGB",
+      "bytes": 674910,
+      "sha256": "066898923dba55ff9f955fbb3a5025770361cea2a4d84d7d5401192871e49910",
+      "capture": {
+        "serial": "emulator-5592",
+        "avd": "sl_store_assets_tablet10_1792571512",
+        "size": "Physical size: 1440x2560",
+        "density": "Physical density: 240",
+        "package": "com.appfactory.series_log.dev",
+        "rawSha256": "066898923dba55ff9f955fbb3a5025770361cea2a4d84d7d5401192871e49910"
+      }
+    },
+    {
+      "file": "tablet10/02-verlauf.png",
+      "playConsoleField": "10-Zoll-Tablet-Screenshots",
+      "altText": "Gespeicherte Folgenstände von Nordlichter mit Datum, Notizen und Fotovorschau im Serienverlauf.",
+      "width": 1440,
+      "height": 2560,
+      "mode": "RGB",
+      "bytes": 589786,
+      "sha256": "f29bedbfdc2238adfcd0d4653db3a890c67dba9bd503b529a05afb94b0cb06fe",
+      "capture": {
+        "serial": "emulator-5592",
+        "avd": "sl_store_assets_tablet10_1792571512",
+        "size": "Physical size: 1440x2560",
+        "density": "Physical density: 240",
+        "package": "com.appfactory.series_log.dev",
+        "rawSha256": "f29bedbfdc2238adfcd0d4653db3a890c67dba9bd503b529a05afb94b0cb06fe"
+      }
+    },
+    {
+      "file": "tablet10/03-folgenstand.png",
+      "playConsoleField": "10-Zoll-Tablet-Screenshots",
+      "altText": "Manuelle Eingabe von Staffel und zuletzt gesehener Folge mit Datum und optionaler Notiz.",
+      "width": 1440,
+      "height": 2560,
+      "mode": "RGB",
+      "bytes": 109096,
+      "sha256": "2cd9588711699ea1106946f1b98f4afd946a0ec92371574b42cc880dd9df793f",
+      "capture": {
+        "serial": "emulator-5592",
+        "avd": "sl_store_assets_tablet10_1792571512",
+        "size": "Physical size: 1440x2560",
+        "density": "Physical density: 240",
+        "package": "com.appfactory.series_log.dev",
+        "rawSha256": "2cd9588711699ea1106946f1b98f4afd946a0ec92371574b42cc880dd9df793f"
+      }
+    },
+    {
+      "file": "tablet10/04-erinnerungen.png",
+      "playConsoleField": "10-Zoll-Tablet-Screenshots",
+      "altText": "Persönliche lokale Erinnerung ans Weiterschauen mit wöchentlichem Intervall und eigener Uhrzeit.",
+      "width": 1440,
+      "height": 2560,
+      "mode": "RGB",
+      "bytes": 158852,
+      "sha256": "07ccdec3d4988a1f3ba64b2590707eb89724f1ea8dff57242416316a95e19f09",
+      "capture": {
+        "serial": "emulator-5592",
+        "avd": "sl_store_assets_tablet10_1792571512",
+        "size": "Physical size: 1440x2560",
+        "density": "Physical density: 240",
+        "package": "com.appfactory.series_log.dev",
+        "rawSha256": "07ccdec3d4988a1f3ba64b2590707eb89724f1ea8dff57242416316a95e19f09"
+      }
+    }
+  ]
+}

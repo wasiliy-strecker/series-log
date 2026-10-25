@@ -1,6 +1,6 @@
+import { t } from '../i18n/runtime';
 import { z } from 'zod';
 import { MAX_FILE_BYTES, MAX_PDF_PAGES } from '../files/limits';
-
 const id = z.string().uuid();
 const short = z.string().max(500);
 const note = z.string().max(20000);
@@ -30,7 +30,7 @@ export const reminderSchema = z
   })
   .strict()
   .refine((r) => r.interval !== 'weekly' || r.day <= 7, {
-    message: 'Wochentag muss zwischen 1 und 7 liegen.',
+    error: () => t('Wochentag muss zwischen 1 und 7 liegen.'),
   });
 export const recordSchema = z.preprocess(
   (input) => {
@@ -45,8 +45,12 @@ export const recordSchema = z.preprocess(
   z
     .object({
       id,
-      name: short.trim().min(1, 'Bitte einen Serientitel eingeben.'),
-      category: short.trim().min(1, 'Bitte ein Genre eingeben.'),
+      name: short
+        .trim()
+        .min(1, { error: () => t('Bitte einen Serientitel eingeben.') }),
+      category: short
+        .trim()
+        .min(1, { error: () => t('Bitte ein Genre eingeben.') }),
       note,
       reminder: reminderSchema.nullable(),
       createdAt: timestamp,
@@ -133,7 +137,7 @@ export function validateSnapshot(input: unknown): Snapshot {
   const data = snapshotSchema.parse(input);
   for (const rows of [data.records, data.entries, data.reports]) {
     if (new Set(rows.map((r) => r.id)).size !== rows.length)
-      throw new Error('Doppelte IDs im Backup.');
+      throw new Error(t('Doppelte IDs im Backup.'));
   }
   const records = new Set(data.records.map((r) => r.id));
   const entries = new Map(data.entries.map((e) => [e.id, e.recordId]));
@@ -142,10 +146,10 @@ export function validateSnapshot(input: unknown): Snapshot {
       !records.has(e.recordId) ||
       new Set(e.attachments.map((a) => a.id)).size !== e.attachments.length
     )
-      throw new Error('Ungültige Zuordnung im Backup.');
+      throw new Error(t('Ungültige Zuordnung im Backup.'));
     for (const a of e.attachments)
       if ((a.kind === 'pdf') !== a.file.endsWith('.pdf'))
-        throw new Error('Ungültiger Anhangstyp.');
+        throw new Error(t('Ungültiger Anhangstyp.'));
   }
   for (const r of data.reports) {
     if (
@@ -153,12 +157,12 @@ export function validateSnapshot(input: unknown): Snapshot {
       (r.entryId && entries.get(r.entryId) !== r.recordId) ||
       !r.file.endsWith('.pdf')
     )
-      throw new Error('Ungültiges Protokoll im Backup.');
+      throw new Error(t('Ungültiges Protokoll im Backup.'));
     if (
       (r.groupId || r.partIndex || r.partCount) &&
       (!r.groupId || !r.partIndex || !r.partCount || r.partIndex > r.partCount)
     )
-      throw new Error('Ungültige Protokollteile.');
+      throw new Error(t('Ungültige Protokollteile.'));
   }
   const groups = new Map<string, SavedReport[]>();
   for (const report of data.reports)
@@ -180,7 +184,7 @@ export function validateSnapshot(input: unknown): Snapshot {
           r.partCount !== first.partCount,
       )
     )
-      throw new Error('Widersprüchliche Protokollteile.');
+      throw new Error(t('Widersprüchliche Protokollteile.'));
   }
   return data;
 }

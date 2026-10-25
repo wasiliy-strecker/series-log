@@ -1,3 +1,5 @@
+import { t } from './i18n/runtime';
+import { useLocalization } from './i18n/react';
 import { positionText } from './domain/episode-position';
 import { StartupError, StartupPending } from './startup/startup';
 import { PdfViewerService } from './pdf/viewer-service';
@@ -26,7 +28,6 @@ import {
 } from './links/external-links';
 import { seriesNative, type SeriesNative } from './native/series-native';
 import type { Environment } from './ports';
-
 export type Services = {
   series: SeriesService;
   backup: BackupService;
@@ -34,9 +35,14 @@ export type Services = {
   links: ExternalLinks;
   native: SeriesNative;
   viewer: PdfViewerService;
+  relocalize(): Promise<void>;
 };
 const Context = createContext<
-  (Services & { revision: number; refresh(): void }) | null
+  | (Services & {
+      revision: number;
+      refresh(): void;
+    })
+  | null
 >(null);
 let boot: Promise<Services> | undefined;
 async function createServices(): Promise<Services> {
@@ -51,6 +57,7 @@ async function createServices(): Promise<Services> {
   };
   await migrate(db);
   const repository = new SqlRepository(db);
+  await repository.reindexSearch();
   const vault = new ExpoVault();
   const env: Environment = {
     id: Crypto.randomUUID,
@@ -87,9 +94,11 @@ async function createServices(): Promise<Services> {
                 recordId: r.id,
                 label: r.name,
                 category: 'series',
-                categoryLabel: r.category || 'Serie',
+                categoryLabel: r.category || t('Serie'),
                 latestValue: latest ? positionText(latest) : null,
                 latestUnit: null,
+                latestSeason: latest?.season ?? null,
+                latestEpisode: latest?.episode ?? null,
               };
             }),
         ),
@@ -116,6 +125,11 @@ async function createServices(): Promise<Services> {
   await series.syncReminders();
   return {
     series,
+    relocalize: () =>
+      series.queue.run(async () => {
+        await repository.reindexSearch();
+        await series.syncReminders();
+      }),
     backup: new BackupService(
       series,
       new BackupCodec(env, androidPasswordKey, expoBackupCrypto),
@@ -127,6 +141,7 @@ async function createServices(): Promise<Services> {
   };
 }
 export function ServicesProvider({ children }: { children: ReactNode }) {
+  const locale = useLocalization();
   const [services, setServices] = useState<Services>();
   const [error, setError] = useState('');
   const [revision, setRevision] = useState(0);
@@ -138,10 +153,25 @@ export function ServicesProvider({ children }: { children: ReactNode }) {
       setError(
         e instanceof Error
           ? e.message
-          : 'Lokale Daten konnten nicht geladen werden.',
+          : t('Lokale Daten konnten nicht geladen werden.'),
       );
     });
   }, [attempt]);
+  useEffect(() => {
+    if (!services) return;
+    let active = true;
+    void services
+      .relocalize()
+      .then(() => {
+        if (active) setRevision((n) => n + 1);
+      })
+      .catch(() => {
+        if (active) setError(t('Lokale Daten konnten nicht geladen werden.'));
+      });
+    return () => {
+      active = false;
+    };
+  }, [services, locale.language, locale.formatLocale]);
   if (!services)
     return error ? (
       <StartupError
@@ -167,6 +197,7 @@ export function ServicesProvider({ children }: { children: ReactNode }) {
   );
 }
 export function useServices() {
+  useLocalization();
   const value = useContext(Context);
   if (!value) throw new Error('Composition Root fehlt.');
   return value;

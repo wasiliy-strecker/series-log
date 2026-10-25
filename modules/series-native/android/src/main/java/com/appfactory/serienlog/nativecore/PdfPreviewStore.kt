@@ -13,12 +13,12 @@ import kotlin.math.roundToInt
 
 internal fun privateDocument(context: Context, uri: String): File {
     val parsed = Uri.parse(uri)
-    require(parsed.scheme == "file") { "Nur lokale App-Dateien können geöffnet werden." }
+    require(parsed.scheme == "file") { NativeLanguage.text(context, R.string.sl_184cbf9a0550) }
     val file = File(requireNotNull(parsed.path)).canonicalFile
     require(listOf(context.filesDir, context.cacheDir).any {
         file.path.startsWith(it.canonicalPath + File.separator)
-    }) { "Die Datei liegt außerhalb des privaten App-Speichers." }
-    require(file.isFile && file.length() in 1..(128L * 1024 * 1024)) { "Die Datei fehlt oder ist zu groß." }
+    }) { NativeLanguage.text(context, R.string.sl_67f49d027bbd) }
+    require(file.isFile && file.length() in 1..(128L * 1024 * 1024)) { NativeLanguage.text(context, R.string.sl_44c727ba4e8a) }
     return file
 }
 
@@ -30,8 +30,8 @@ class PdfPreviewStore(private val context: Context) {
     fun open(uri: String): Map<String, Any> {
         val file = privateDocument(context, uri)
         val pages = withRenderer(file) { renderer ->
-            require(renderer.pageCount > 0) { "Die PDF enthält keine Seiten." }
-            require(renderer.pageCount <= 2000) { "Die PDF überschreitet die Grenze von 2000 Seiten." }
+            require(renderer.pageCount > 0) { NativeLanguage.text(context, R.string.sl_cb0550ae9ec2) }
+            require(renderer.pageCount <= 2000) { NativeLanguage.text(context, R.string.sl_c8af38bf33c9) }
             (0 until renderer.pageCount).map { index ->
                 renderer.openPage(index).use { page -> mapOf("width" to page.width, "height" to page.height) }
             }
@@ -44,7 +44,7 @@ class PdfPreviewStore(private val context: Context) {
 
     @Synchronized
     fun dimensions(id: String): List<Pair<Int, Int>> {
-        val source = requireNotNull(sessions[id]) { "Die PDF-Vorschau wurde geschlossen." }
+        val source = requireNotNull(sessions[id]) { NativeLanguage.text(context, R.string.sl_f027280aa3ce) }
         return withRenderer(source) { renderer ->
             (0 until renderer.pageCount).map { index -> renderer.openPage(index).use { it.width to it.height } }
         }
@@ -52,13 +52,13 @@ class PdfPreviewStore(private val context: Context) {
 
     @Synchronized
     fun render(id: String, index: Int, requestedWidth: Int): String {
-        val source = requireNotNull(sessions[id]) { "Die PDF-Vorschau wurde geschlossen." }
+        val source = requireNotNull(sessions[id]) { NativeLanguage.text(context, R.string.sl_f027280aa3ce) }
         val width = requestedWidth.coerceIn(256, 2048)
         val directory = File(root, id)
         val output = File(directory, "$index-$width.png")
         if (output.exists()) return Uri.fromFile(output).toString()
         withRenderer(source) { renderer ->
-            require(index in 0 until renderer.pageCount) { "Ungültige PDF-Seite." }
+            require(index in 0 until renderer.pageCount) { NativeLanguage.text(context, R.string.sl_926eda10b05c) }
             renderer.openPage(index).use { page ->
                 val scale = min(width.toDouble() / page.width, 2048.0 / maxOf(page.width, page.height))
                 val bitmap = Bitmap.createBitmap(maxOf(1, (page.width * scale).roundToInt()), maxOf(1, (page.height * scale).roundToInt()), Bitmap.Config.ARGB_8888)
@@ -68,7 +68,7 @@ class PdfPreviewStore(private val context: Context) {
                     val pending = File(directory, "$index-$width.tmp")
                     try {
                         pending.outputStream().use { require(bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)) }
-                        check(pending.renameTo(output)) { "Die Vorschauseite konnte nicht gespeichert werden." }
+                        check(pending.renameTo(output)) { NativeLanguage.text(context, R.string.sl_71ccd3f79640) }
                     } finally { pending.delete() }
                 } finally { bitmap.recycle() }
             }

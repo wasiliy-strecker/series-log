@@ -28,6 +28,8 @@ internal data class StoredReminder(
     val minute: Int,
     val deliveryMode: String,
     val startsAtMillis: Long? = null,
+    val latestSeason: Int? = null,
+    val latestEpisode: Int? = null,
 ) {
     val isPunctual: Boolean
         get() = deliveryMode == "punctualWithSound"
@@ -39,6 +41,8 @@ internal data class StoredReminder(
         .put("categoryLabel", categoryLabel)
         .put("latestValue", latestValue)
         .put("latestUnit", latestUnit)
+        .put("latestSeason", latestSeason)
+        .put("latestEpisode", latestEpisode)
         .put("interval", interval)
         .put("day", day)
         .put("month", month)
@@ -179,6 +183,8 @@ internal data class StoredReminder(
         fun fromJson(value: String): StoredReminder? = try {
             val json = JSONObject(value)
             StoredReminder(
+                latestSeason = if (json.has("latestSeason") && !json.isNull("latestSeason")) json.getInt("latestSeason") else null,
+                latestEpisode = if (json.has("latestEpisode") && !json.isNull("latestEpisode")) json.getInt("latestEpisode") else null,
                 recordId = json.getString("recordId"),
                 label = json.getString("label"),
                 category = json.optString("category", "other"),

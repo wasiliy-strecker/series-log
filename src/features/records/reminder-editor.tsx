@@ -1,3 +1,5 @@
+import { localization, t } from '../../core/i18n/runtime';
+import { useLocalization } from '../../core/i18n/react';
 import { Platform, View } from 'react-native';
 import {
   Body,
@@ -21,8 +23,7 @@ import {
   nextHourlyTrigger,
   testReminderHint,
 } from './reminder-model';
-import { dateTime } from './presentation-model';
-
+import { dateTime, reminderTime } from './presentation-model';
 export function ReminderEditor(props: {
   reminder: Reminder | null;
   busy: boolean;
@@ -33,6 +34,7 @@ export function ReminderEditor(props: {
   label: string;
   categoryLabel: string;
 }) {
+  useLocalization();
   const { reminder, status } = props;
   const c = useTheme(),
     picker = useMaterialDateTime(),
@@ -42,7 +44,7 @@ export function ReminderEditor(props: {
     : 'unknown';
   const start = new Date(reminder?.startsAtMillis ?? 0);
   const timeText = (date: Date) =>
-    date.toLocaleTimeString('de-DE', {
+    date.toLocaleTimeString(localization().formatLocale, {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false,
@@ -67,11 +69,13 @@ export function ReminderEditor(props: {
       <Card>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
           <View style={{ flex: 1, gap: 4 }}>
-            <Body style={{ fontSize: 16 }}>Ans Weiterschauen erinnern</Body>
-            <Body muted>Optional und nur lokal auf diesem Gerät</Body>
+            <Body style={{ fontSize: 16 }}>
+              {t('Ans Weiterschauen erinnern')}
+            </Body>
+            <Body muted>{t('Optional und nur lokal auf diesem Gerät')}</Body>
           </View>
           <MaterialSwitch
-            label="Erinnerung aktivieren"
+            label={t('Erinnerung aktivieren')}
             value={!!reminder}
             disabled={vm.disabled}
             onValueChange={vm.toggle}
@@ -81,17 +85,17 @@ export function ReminderEditor(props: {
           <View style={{ gap: 16 }}>
             <View style={{ height: 1, backgroundColor: c.border }} />
             <SelectField
-              label="Intervall"
+              label={t('Intervall')}
               value={reminder.interval}
               disabled={vm.disabled}
-              options={Object.entries(reminderIntervals).map(
+              options={Object.entries(reminderIntervals()).map(
                 ([value, label]) => ({ value, label }),
               )}
               onChange={(value) => vm.interval(value as Reminder['interval'])}
             />
             {reminder.interval === 'yearly' && (
               <SelectField
-                label="Monat"
+                label={t('Monat')}
                 value={String(reminder.month)}
                 disabled={vm.disabled}
                 options={Array.from({ length: 12 }, (_, i) => String(i + 1))}
@@ -100,10 +104,10 @@ export function ReminderEditor(props: {
             )}
             {reminder.interval === 'weekly' && (
               <SelectField
-                label="Wochentag"
+                label={t('Wochentag')}
                 value={String(reminder.day)}
                 disabled={vm.disabled}
-                options={weekdays.map((label, i) => ({
+                options={weekdays().map((label, i) => ({
                   label,
                   value: String(i + 1),
                 }))}
@@ -113,7 +117,7 @@ export function ReminderEditor(props: {
             {(reminder.interval === 'monthly' ||
               reminder.interval === 'yearly') && (
               <SelectField
-                label="Tag"
+                label={t('Tag')}
                 value={String(reminder.day)}
                 disabled={vm.disabled}
                 options={[
@@ -126,53 +130,53 @@ export function ReminderEditor(props: {
             {reminder.interval === 'hourly' ? (
               <>
                 <View style={{ gap: 4 }}>
-                  <Body strong>Startdatum</Body>
-                  <Body>{start.toLocaleDateString('de-DE')}</Body>
+                  <Body strong>{t('Startdatum')}</Body>
+                  <Body>
+                    {start.toLocaleDateString(localization().formatLocale)}
+                  </Body>
                 </View>
                 <Button
                   secondary
                   icon="calendar_month_outlined"
-                  title="Datum ändern"
+                  title={t('Datum ändern')}
                   disabled={vm.disabled}
                   onPress={() => void pickDate()}
                 />
                 <View style={{ gap: 4 }}>
-                  <Body strong>Startzeit</Body>
+                  <Body strong>{t('Startzeit')}</Body>
                   <Body>{timeText(start)}</Body>
                 </View>
                 <Button
                   secondary
                   icon="schedule"
-                  title="Uhrzeit ändern"
+                  title={t('Uhrzeit ändern')}
                   disabled={vm.disabled}
                   onPress={() => void pickTime()}
                 />
                 <Body muted>
-                  {'Ab dem gewählten Start alle 60 Minuten. Nächste Erinnerung: ' +
+                  {t(
+                    'Ab dem gewählten Start alle 60 Minuten. Nächste Erinnerung: ',
+                  ) +
                     dateTime(nextHourlyTrigger(reminder.startsAtMillis)) +
-                    ' Uhr.'}
+                    t(' Uhr.')}
                 </Body>
               </>
             ) : (
               <>
                 <View style={{ gap: 4 }}>
-                  <Body strong>Uhrzeit</Body>
-                  <Body>
-                    {String(reminder.hour).padStart(2, '0') +
-                      ':' +
-                      String(reminder.minute).padStart(2, '0')}
-                  </Body>
+                  <Body strong>{t('Uhrzeit')}</Body>
+                  <Body>{reminderTime(reminder)}</Body>
                 </View>
                 <Button
                   secondary
                   icon="schedule"
-                  title="Uhrzeit ändern"
+                  title={t('Uhrzeit ändern')}
                   disabled={vm.disabled}
                   onPress={() => void pickTime()}
                 />
               </>
             )}
-            <Body strong>Art der Erinnerung</Body>
+            <Body strong>{t('Art der Erinnerung')}</Body>
             {(['normal', 'punctualWithSound'] as const).map((mode) => (
               <Card
                 key={mode}
@@ -191,10 +195,10 @@ export function ReminderEditor(props: {
                     alignItems: 'center',
                   }}
                 >
-                  <Icon name={reminderModes[mode].icon} color={c.primary} />
+                  <Icon name={reminderModes()[mode].icon} color={c.primary} />
                   <View style={{ flex: 1, gap: 4 }}>
-                    <Body strong>{reminderModes[mode].title}</Body>
-                    <Body muted>{reminderModes[mode].description}</Body>
+                    <Body strong>{reminderModes()[mode].title}</Body>
+                    <Body muted>{reminderModes()[mode].description}</Body>
                   </View>
                   <Icon
                     name={
@@ -211,14 +215,14 @@ export function ReminderEditor(props: {
               status?.exact === false && (
                 <Card style={{ backgroundColor: c.errorContainer }}>
                   <Body>
-                    Für pünktliche Erinnerungen muss Android „Alarme &
-                    Erinnerungen“ erlauben. Aktiviere die Freigabe, damit die
-                    Erinnerung zuverlässig zur gewählten Zeit mit Ton erscheint.
+                    {t(
+                      'Für pünktliche Erinnerungen muss Android „Alarme & Erinnerungen“ erlauben. Aktiviere die Freigabe, damit die Erinnerung zuverlässig zur gewählten Zeit mit Ton erscheint.',
+                    )}
                   </Body>
                   <Button
                     secondary
                     icon="settings_outlined"
-                    title="Alarme & Erinnerungen erlauben"
+                    title={t('Alarme & Erinnerungen erlauben')}
                     disabled={vm.disabled}
                     onPress={() => void vm.selectMode('punctualWithSound')}
                   />
@@ -228,7 +232,7 @@ export function ReminderEditor(props: {
               <Button
                 secondary
                 icon="open_in_new"
-                title="„Alarme & Erinnerungen“ öffnen"
+                title={t('„Alarme & Erinnerungen“ öffnen')}
                 disabled={vm.disabled}
                 onPress={() => void vm.open('exact')}
               />
@@ -238,20 +242,22 @@ export function ReminderEditor(props: {
               <Card style={{ backgroundColor: c.errorContainer }}>
                 <Body strong>
                   {availability === 'appBlocked'
-                    ? 'Benachrichtigungen sind ausgeschaltet'
-                    : 'Diese Erinnerungsart ist ausgeschaltet'}
+                    ? t('Benachrichtigungen sind ausgeschaltet')
+                    : t('Diese Erinnerungsart ist ausgeschaltet')}
                 </Body>
                 <Body>
                   {availability === 'appBlocked'
-                    ? 'Erlaube Benachrichtigungen für SerienLog in den Android-Einstellungen, damit Erinnerungen angezeigt werden können.'
-                    : 'Aktiviere die Benachrichtigungskategorie für „' +
-                      reminderModes[reminder.deliveryMode].title +
-                      '“ in den Android-Einstellungen.'}
+                    ? t(
+                        'Erlaube Benachrichtigungen für SerienLog in den Android-Einstellungen, damit Erinnerungen angezeigt werden können.',
+                      )
+                    : t('Aktiviere die Benachrichtigungskategorie für „') +
+                      reminderModes()[reminder.deliveryMode].title +
+                      t('“ in den Android-Einstellungen.')}
                 </Body>
                 <Button
                   secondary
                   icon="settings_outlined"
-                  title="Einstellungen öffnen"
+                  title={t('Einstellungen öffnen')}
                   disabled={vm.disabled}
                   onPress={() =>
                     void vm.open(
@@ -265,16 +271,20 @@ export function ReminderEditor(props: {
             ) : (
               status?.doNotDisturb === true && (
                 <Card>
-                  <Body strong>„Nicht stören“ ist aktiv</Body>
+                  <Body strong>{t('„Nicht stören“ ist aktiv')}</Body>
                   <Body>
                     {reminder.deliveryMode === 'normal'
-                      ? 'Normale Erinnerungen können ohne Ton oder eingeblendetes Banner erscheinen.'
-                      : 'Ob ein Alarmton oder Banner erscheint, hängt von deinen „Nicht stören“-Einstellungen und der Alarmlautstärke ab.'}
+                      ? t(
+                          'Normale Erinnerungen können ohne Ton oder eingeblendetes Banner erscheinen.',
+                        )
+                      : t(
+                          'Ob ein Alarmton oder Banner erscheint, hängt von deinen „Nicht stören“-Einstellungen und der Alarmlautstärke ab.',
+                        )}
                   </Body>
                   <Button
                     secondary
                     icon="settings_outlined"
-                    title="Einstellungen öffnen"
+                    title={t('Einstellungen öffnen')}
                     disabled={vm.disabled}
                     onPress={() => void vm.open('doNotDisturb')}
                   />
@@ -282,20 +292,24 @@ export function ReminderEditor(props: {
               )
             )}
             {availability === 'unknown' && (
-              <Notice text="Der Erinnerungsstatus konnte nicht bestätigt werden. Du kannst die Daten trotzdem speichern." />
+              <Notice
+                text={t(
+                  'Der Erinnerungsstatus konnte nicht bestätigt werden. Du kannst die Daten trotzdem speichern.',
+                )}
+              />
             )}
             <Button
               secondary
               icon="notifications_active_outlined"
               title={
                 vm.action === 'test'
-                  ? 'Test-Erinnerung wird gesendet …'
-                  : 'Erinnerung jetzt testen'
+                  ? t('Test-Erinnerung wird gesendet …')
+                  : t('Erinnerung jetzt testen')
               }
               disabled={vm.disabled}
               onPress={() => void vm.test()}
             />
-            <Body>{testReminderHint}</Body>
+            <Body>{testReminderHint()}</Body>
           </View>
         )}
       </Card>

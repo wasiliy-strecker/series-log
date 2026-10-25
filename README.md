@@ -19,8 +19,15 @@ weiße Schrift und rote Akzente geben SerienLog ein eigenes Erscheinungsbild.
 - Einzel- und Verlaufsprotokolle als PDF speichern, drucken und teilen
 - Verschlüsselte `.slbackup`-Backups mit Fotos, PDFs und Erinnerungseinstellungen
 - Gesicherte Formularentwürfe bei unterbrochener Eingabe wieder aufnehmen
+- Deutsch, Englisch, Spanisch, Französisch, Italienisch und Portugiesisch (Brasilien)
+- Gespeicherte Sprachwahl mit System-Fallback und unabhängiger Geräteformatierung
 
 Kein Konto, kein Server, keine Streaming-Anbindung, keine eigene Telemetrie.
+
+Auch App-Name, native Dialoge, Erinnerungen und neue PDFs sind übersetzt.
+Eigene Inhalte und vorhandene Backups behalten ihre bisherigen Daten.
+Namen, Übersetzungsquellen und der Ablauf für die sechs Store-Pakete stehen im
+[internationalen Release-Ablauf](docs/INTERNATIONAL_RELEASE.md).
 
 Beim Start erscheint das eigene SerienLog-Icon auf dunklem Hintergrund. Sobald
 die erste Ansicht bereit ist, blendet sie in 180 Millisekunden ein. Es gibt keine

@@ -1,3 +1,5 @@
+import { t } from '../../core/i18n/runtime';
+import { useLocalization } from '../../core/i18n/react';
 import { useCallback, useState } from 'react';
 import { router, useFocusEffect } from 'expo-router';
 import { useServices } from '../../core/composition';
@@ -6,6 +8,7 @@ import { useFeedback } from '../../core/ui/feedback';
 import { errorText } from '../../core/ui/components';
 import type { EpisodeEntry, SeriesRecord } from '../../core/domain/models';
 export function useEntryDetail(id: string) {
+  useLocalization();
   const { series, revision, refresh } = useServices();
   const [entry, setEntry] = useState<EpisodeEntry>(),
     [record, setRecord] = useState<SeriesRecord>(),
@@ -46,9 +49,11 @@ export function useEntryDetail(id: string) {
       if (!entry) return;
       if (
         !(await feedback.confirm(
-          'Eintrag löschen?',
-          'Der Eintrag und seine Einzelprotokolle werden gelöscht. Gespeicherte Gesamtprotokolle bleiben erhalten.',
-          'Löschen',
+          t('Eintrag löschen?'),
+          t(
+            'Der Eintrag und seine Einzelprotokolle werden gelöscht. Gespeicherte Gesamtprotokolle bleiben erhalten.',
+          ),
+          t('Löschen'),
           true,
         ))
       )
@@ -60,7 +65,7 @@ export function useEntryDetail(id: string) {
           pathname: '/record/[id]',
           params: { id: entry.recordId },
         });
-        feedback.notify(warnings.join('\n') || 'Eintrag gelöscht.');
+        feedback.notify(warnings.join('\n') || t('Eintrag gelöscht.'));
       });
     },
   };

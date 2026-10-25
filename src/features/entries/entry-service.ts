@@ -1,3 +1,4 @@
+import { t, localization } from '../../core/i18n/runtime';
 import { wholeNumber } from '../../core/domain/episode-position';
 import { messages } from '../../core/i18n';
 import {
@@ -25,7 +26,6 @@ import {
   MAX_FILE_BYTES,
   type PdfService,
 } from '../../core/pdf/pdf-service';
-
 export class SeriesService {
   readonly queue = new SerialQueue();
   constructor(
@@ -54,7 +54,9 @@ export class SeriesService {
       return await this.reminders.sync(data.records, data.entries);
     } catch {
       return [
-        'Gespeichert. Erinnerungen konnten nicht aktualisiert werden. Bitte die Berechtigungen in den Einstellungen prüfen.',
+        t(
+          'Gespeichert. Erinnerungen konnten nicht aktualisiert werden. Bitte die Berechtigungen in den Einstellungen prüfen.',
+        ),
       ];
     }
   }
@@ -110,7 +112,7 @@ export class SeriesService {
     source?: Attachment['source'],
   ): Promise<Attachment> {
     if (!bytes.length || bytes.length > MAX_FILE_BYTES)
-      throw new Error('Die Datei ist leer oder größer als 50 MB.');
+      throw new Error(t('Die Datei ist leer oder größer als 50 MB.'));
     const pages =
       kind === 'pdf' ? (await inspectPdf(bytes)).getPageCount() : undefined;
     const file = await this.vault.put(bytes, kind === 'pdf' ? 'pdf' : 'jpg');
@@ -125,16 +127,17 @@ export class SeriesService {
       ...(pages ? { pages, ...(source ? { source } : {}) } : {}),
     };
   }
-  saveEntry(
-    draft: EntryDraft,
-  ): Promise<{ entry: EpisodeEntry; warnings: string[] }> {
+  saveEntry(draft: EntryDraft): Promise<{
+    entry: EpisodeEntry;
+    warnings: string[];
+  }> {
     return this.queue.run(async () => {
       const f = draft.form;
       const entry = entrySchema.parse({
         id: draft.entryId ?? this.env.id(),
         recordId: draft.recordId,
-        season: wholeNumber(f.season, 'Staffel'),
-        episode: wholeNumber(f.episode, 'Folge'),
+        season: wholeNumber(f.season, t('Staffel')),
+        episode: wholeNumber(f.episode, t('Folge')),
         occurredAt: new Date(f.occurredAt).toISOString(),
         note: f.note,
         attachments: f.attachments,
@@ -143,7 +146,7 @@ export class SeriesService {
       });
       const before = await this.repository.snapshot();
       if (!before.records.some((r) => r.id === entry.recordId))
-        throw new Error('Serie nicht gefunden.');
+        throw new Error(t('Serie nicht gefunden.'));
       await this.repository.saveEntry(entry, draft.id);
       await this.cleanup(
         before.entries
@@ -181,16 +184,18 @@ export class SeriesService {
     return this.queue.run(async () => {
       const data = await this.repository.snapshot();
       const record = data.records.find((r) => r.id === recordId);
-      if (!record) throw new Error('Die Serie wurde nicht gefunden.');
+      if (!record) throw new Error(t('Die Serie wurde nicht gefunden.'));
       const entries = data.entries.filter(
         (e) => e.recordId === recordId && (!entryId || e.id === entryId),
       );
       if (entryId && !entries.length)
-        throw new Error('Der Eintrag wurde nicht gefunden.');
+        throw new Error(t('Der Eintrag wurde nicht gefunden.'));
       const createdAt = this.env.now();
+      const locale = localization();
       const bytes = await this.pdf.create(record, entries, full, {
         kind: entryId ? 'single' : 'history',
         createdAt,
+        locale,
       });
       const source = await inspectPdf(bytes);
       // A multipart file reserves one of its 100 pages for its own cover.
@@ -216,6 +221,7 @@ export class SeriesService {
               index + 1,
               partCount,
               createdAt,
+              locale,
             );
             const indices = source
               .getPageIndices()
@@ -226,7 +232,7 @@ export class SeriesService {
           }
           if (part.length > MAX_FILE_BYTES)
             throw new Error(
-              'Der Protokollteil überschreitet die Grenze von 50 MB.',
+              t('Der Protokollteil überschreitet die Grenze von 50 MB.'),
             );
           const file = await this.vault.put(part, 'pdf');
           files.push(file);
@@ -234,7 +240,7 @@ export class SeriesService {
             id: this.env.id(),
             recordId,
             entryId,
-            name: `${record.name.slice(0, 200)} · ${entryId ? 'Einzelprotokoll' : 'Gesamtprotokoll'} · ${full ? messages.reportContent.withPhotoLabel : messages.reportContent.withoutPhotoLabel}${partCount > 1 ? ` · Teil ${index + 1} von ${partCount}` : ''}`,
+            name: `${record.name.slice(0, 200)} · ${entryId ? t('Einzelprotokoll') : t('Gesamtprotokoll')} · ${full ? messages.reportContent.withPhotoLabel : messages.reportContent.withoutPhotoLabel}${partCount > 1 ? t(' · Teil {p0} von {p1}', { p0: index + 1, p1: partCount }) : ''}`,
             file,
             sha256: digest(part),
             createdAt,

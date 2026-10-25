@@ -1,3 +1,4 @@
+import { t } from '../i18n/runtime';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
 import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
@@ -8,10 +9,19 @@ import type { SeriesService } from '../../features/entries/entry-service';
 import { seriesNative } from '../native/series-native';
 import { verifiedFile } from '../files/integrity';
 import { MAX_BACKUP_BYTES } from '../backup/backup-service';
-
-export type PreparedBackup = { uri: string; name: string };
-export type PickResult = { attachments: Attachment[]; failures: string[] };
-type ShareItem = { file: string; sha256: string; name?: string };
+export type PreparedBackup = {
+  uri: string;
+  name: string;
+};
+export type PickResult = {
+  attachments: Attachment[];
+  failures: string[];
+};
+type ShareItem = {
+  file: string;
+  sha256: string;
+  name?: string;
+};
 export interface MediaPort {
   pick(
     source: NonNullable<EntryDraft['external']>,
@@ -62,7 +72,7 @@ export class ExpoMedia implements MediaPort {
     if ('code' in result) {
       output.failures.push(
         result.message ||
-          'Die Fotoauswahl konnte nicht wiederhergestellt werden.',
+          t('Die Fotoauswahl konnte nicht wiederhergestellt werden.'),
       );
       return output;
     }
@@ -72,7 +82,9 @@ export class ExpoMedia implements MediaPort {
         output.attachments.push(await this.importPhoto(asset));
       } catch {
         output.failures.push(
-          `${asset.fileName || 'Foto'} konnte nicht übernommen werden.`,
+          t('{p0} konnte nicht übernommen werden.', {
+            p0: asset.fileName || t('Foto'),
+          }),
         );
       }
     }
@@ -85,7 +97,9 @@ export class ExpoMedia implements MediaPort {
     if (source === 'camera') {
       if (!(await ImagePicker.requestCameraPermissionsAsync()).granted)
         throw new Error(
-          'Die Kamera ist nicht freigegeben. Du kannst Fotos aus der Galerie wählen.',
+          t(
+            'Die Kamera ist nicht freigegeben. Du kannst Fotos aus der Galerie wählen.',
+          ),
         );
       return this.photos(
         await ImagePicker.launchCameraAsync({
@@ -104,7 +118,7 @@ export class ExpoMedia implements MediaPort {
           exif: false,
         }),
       );
-    throw new Error('Unbekannte Bildquelle.');
+    throw new Error(t('Unbekannte Bildquelle.'));
   }
   async recoverPhotos() {
     return this.photos(await ImagePicker.getPendingResultAsync());
@@ -115,7 +129,9 @@ export class ExpoMedia implements MediaPort {
       await seriesNative.openPdf(this.series.vault.uri(item.file));
     } catch {
       throw new Error(
-        'Keine App zum Öffnen von PDFs verfügbar. Bitte eine PDF-App installieren oder „Teilen“ verwenden.',
+        t(
+          'Keine App zum Öffnen von PDFs verfügbar. Bitte eine PDF-App installieren oder „Teilen“ verwenden.',
+        ),
       );
     }
   }
@@ -136,7 +152,7 @@ export class ExpoMedia implements MediaPort {
   async share(item: ShareItem) {
     await verifiedFile(this.series.vault, item);
     if (!(await Sharing.isAvailableAsync()))
-      throw new Error('Teilen ist auf diesem Gerät nicht verfügbar.');
+      throw new Error(t('Teilen ist auf diesem Gerät nicht verfügbar.'));
     let uri = this.series.vault.uri(item.file);
     if (item.file.endsWith('.pdf') && item.name) {
       const directory = new Directory(
@@ -145,14 +161,14 @@ export class ExpoMedia implements MediaPort {
         `share-${this.series.env.id()}`,
       );
       directory.create({ intermediates: true, idempotent: true });
-      uri = await this.sharedCopy(item, directory, 'Serienprotokoll');
+      uri = await this.sharedCopy(item, directory, t('Serienprotokoll'));
     }
     await Sharing.shareAsync(uri, {
       mimeType: item.file.endsWith('.pdf') ? 'application/pdf' : 'image/jpeg',
     });
   }
   async shareMany(items: ShareItem[]) {
-    if (!items.length) throw new Error('Keine Protokollteile vorhanden.');
+    if (!items.length) throw new Error(t('Keine Protokollteile vorhanden.'));
     for (const item of items) await verifiedFile(this.series.vault, item);
     const directory = new Directory(
       Paths.cache,
@@ -167,10 +183,13 @@ export class ExpoMedia implements MediaPort {
           await this.sharedCopy(
             {
               ...item,
-              name: `Serienprotokoll_Teil_${String(i + 1).padStart(2, '0')}_von_${items.length}`,
+              name: t('Serienprotokoll_Teil_{p0}_von_{p1}', {
+                p0: String(i + 1).padStart(2, '0'),
+                p1: items.length,
+              }),
             },
             directory,
-            'Serienprotokoll',
+            t('Serienprotokoll'),
           ),
         );
       await seriesNative.sharePdfs(uris);
@@ -204,7 +223,7 @@ export class ExpoMedia implements MediaPort {
     await new File(file.uri).copy(copy);
     await Sharing.shareAsync(copy.uri, {
       mimeType: 'application/octet-stream',
-      dialogTitle: 'SerienLog-Backup teilen',
+      dialogTitle: t('SerienLog-Backup teilen'),
     });
   }
   async discardBackup(file: PreparedBackup) {
@@ -213,7 +232,7 @@ export class ExpoMedia implements MediaPort {
       !file.uri.startsWith(directory.uri.replace(/\/$/, '') + '/') ||
       file.uri.slice(directory.uri.replace(/\/$/, '').length + 1).includes('/')
     )
-      throw new Error('Ungültige Backup-Referenz.');
+      throw new Error(t('Ungültige Backup-Referenz.'));
     const stored = new File(file.uri);
     if (stored.exists) stored.delete();
   }
@@ -228,10 +247,10 @@ export class ExpoMedia implements MediaPort {
     if (result.canceled) return null;
     const asset = result.assets[0];
     if (!asset?.name.toLowerCase().endsWith('.slbackup'))
-      throw new Error('Bitte eine .slbackup-Datei auswählen.');
+      throw new Error(t('Bitte eine .slbackup-Datei auswählen.'));
     const file = new File(asset.uri);
     if (file.size > MAX_BACKUP_BYTES)
-      throw new Error('Das Backup ist größer als 128 MB.');
+      throw new Error(t('Das Backup ist größer als 128 MB.'));
     return file.bytes();
   }
 }

@@ -1,0 +1,23 @@
+{
+  "locale": "fr-FR",
+  "language": "fr",
+  "name": "Journal de séries",
+  "shortDescription": "Notez saisons et épisodes avec photos, rappels et rapports PDF.",
+  "fullDescription": "Vos séries. À votre rythme. Journal de séries vous aide à reprendre exactement où vous en étiez.\n\nAjoutez vos séries avec un titre, un genre et une note personnelle. Enregistrez la saison et le dernier épisode vu, la date et l’heure. Ajoutez une photo facultative et vos impressions. Vous saisissez vous-même la saison et l’épisode.\n\nRetrouvez vos soirées séries dans l’historique. Recherchez par date, saison, épisode ou note et programmez des rappels locaux pour continuer. Créez des rapports PDF pour une entrée ou tout l’historique, avec ou sans photos. Ouvrez, imprimez et partagez vos rapports depuis l’application.\n\nVos données restent sur votre appareil. Exportez et restaurez des sauvegardes chiffrées protégées par mot de passe. Les brouillons de formulaires ne sont pas inclus. Aucun compte, aucune publicité ni télémétrie propre à l’application.\n\nChoisissez l’allemand, l’anglais, l’espagnol, le français, l’italien ou le portugais du Brésil. Les nombres et les dates suivent indépendamment la région de votre appareil.\n\nJournal de séries est un journal personnel. L’application ne propose ni films, ni streaming, ni catalogue d’épisodes, ni reconnaissance automatique des saisons et épisodes.",
+  "releaseNotes": "Désormais en six langues : allemand, anglais, espagnol, français, italien et portugais du Brésil. Langue mémorisée, noms de l’application, rappels et PDF traduits. Les nombres et les dates suivent la région de l’appareil. Vos données et sauvegardes restent compatibles.",
+  "feature": "Retrouvez où\nvous en étiez.",
+  "strap": "Saisons · Épisodes · Rappels",
+  "frames": [
+    "Vos séries\nen un coup d’œil",
+    "Gardez vos\nsoirées en mémoire",
+    "Retrouvez où\nvous en étiez",
+    "Consultez votre\nhistorique",
+    "Pensez à\ncontinuer",
+    "Votre journal\nen PDF"
+  ],
+  "series": ["Lueurs du Nord", "La dernière gare", "Petites aventures"],
+  "genres": ["Drame", "Policier", "Comédie"],
+  "seriesNote": "Mes séries pour des soirées tranquilles.",
+  "note": "Une soirée séries tranquille. Je reprendrai ici la prochaine fois.",
+  "privacyUrl": "https://wasiliy-strecker.github.io/series-log/privacy/"
+}

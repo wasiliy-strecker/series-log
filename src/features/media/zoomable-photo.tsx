@@ -1,3 +1,5 @@
+import { t } from '../../core/i18n/runtime';
+import { useLocalization } from '../../core/i18n/react';
 import { useState } from 'react';
 import { Image, View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -18,6 +20,7 @@ export function ZoomablePhoto({
   height: number;
   onZoom(zoomed: boolean): void;
 }) {
+  useLocalization();
   const [size, setSize] = useState({ width, height }),
     [failed, setFailed] = useState(false);
   const fit = Math.min(width / size.width, height / size.height),
@@ -90,7 +93,7 @@ export function ZoomablePhoto({
         }}
       >
         {failed ? (
-          <Body>Foto nicht verfügbar</Body>
+          <Body>{t('Foto nicht verfügbar')}</Body>
         ) : (
           <Animated.View style={[{ width: fw, height: fh }, style]}>
             <Image

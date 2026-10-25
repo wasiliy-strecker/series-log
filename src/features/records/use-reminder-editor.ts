@@ -1,3 +1,5 @@
+import { t } from '../../core/i18n/runtime';
+import { useLocalization } from '../../core/i18n/react';
 import { useEffect, useRef, useState } from 'react';
 import type { Reminder } from '../../core/domain/models';
 import type {
@@ -14,7 +16,6 @@ import {
   reminderTestMessage,
   hourlyStart,
 } from './reminder-model';
-
 export function useReminderEditor({
   reminder,
   busy,
@@ -34,6 +35,7 @@ export function useReminderEditor({
   label: string;
   categoryLabel: string;
 }) {
+  useLocalization();
   const { native, series } = useServices();
   const feedback = useFeedback();
   const [defaults] = useState(defaultReminder);
@@ -109,7 +111,7 @@ export function useReminderEditor({
       feedback.notify(
         error instanceof Error
           ? error.message
-          : 'Bitte eine andere Uhrzeit wählen.',
+          : t('Bitte eine andere Uhrzeit wählen.'),
       );
     }
   }
@@ -139,7 +141,7 @@ export function useReminderEditor({
     setAction('settings');
     const settingsFailure =
       reminderSettingsFailure('exact') +
-      ' „Pünktlich mit Ton“ bleibt ausgewählt.';
+      t(' „Pünktlich mit Ton“ bleibt ausgewählt.');
     try {
       const current = await refreshStatus();
       if (mode === 'punctualWithSound' && current?.exact !== true) {
@@ -154,7 +156,7 @@ export function useReminderEditor({
         feedback.notify(
           mode === 'punctualWithSound'
             ? settingsFailure
-            : 'Der Erinnerungsstatus konnte nicht bestätigt werden.',
+            : t('Der Erinnerungsstatus konnte nicht bestätigt werden.'),
         );
     } finally {
       operation.current = false;
@@ -175,8 +177,8 @@ export function useReminderEditor({
       const latest = page?.rows[0];
       result = await native.testReminder({
         recordId,
-        label: label.trim().slice(0, 500) || 'Serie',
-        categoryLabel: categoryLabel.trim().slice(0, 500) || 'Serie',
+        label: label.trim().slice(0, 500) || t('Serie'),
+        categoryLabel: categoryLabel.trim().slice(0, 500) || t('Serie'),
         latestValue: latest ? positionText(latest) : null,
         deliveryMode: reminder.deliveryMode,
       });

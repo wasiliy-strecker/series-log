@@ -1,0 +1,23 @@
+{
+  "locale": "de-DE",
+  "language": "de",
+  "name": "SerienLog",
+  "shortDescription": "Serien, Staffel und Folge festhalten. Mit Fotos, Erinnerungen und PDF-Export.",
+  "fullDescription": "Deine Serien. Dein Tempo. SerienLog hilft dir, nach einer Pause genau dort weiterzuschauen, wo du aufgehört hast.\n\nLege deine Serien mit Titel, Genre und einer eigenen Notiz an. Speichere Staffel und zuletzt gesehene Folge, Datum und Uhrzeit. Ergänze auf Wunsch ein Foto und persönliche Gedanken. Staffel und Folge trägst du selbst ein.\n\nFinde frühere Serienabende im Verlauf wieder. Suche nach Datum, Staffel, Folge oder Notiz und richte lokale Erinnerungen zum Weiterschauen ein. Erstelle PDF-Protokolle für einzelne Einträge oder den gesamten Serienverlauf, mit oder ohne Foto. Öffnen, Drucken und Teilen sind direkt aus der App möglich.\n\nDeine Daten bleiben auf deinem Gerät. Verschlüsselte Backups lassen sich mit einem Passwort exportieren und wiederherstellen. Formularentwürfe gehören nicht zum Backup. Die App benötigt kein Konto und enthält keine Werbung oder eigene Telemetrie.\n\nWähle Deutsch, Englisch, Spanisch, Französisch, Italienisch oder Portugiesisch (Brasilien). Zahlen und Datumsangaben folgen unabhängig davon der Region deines Geräts.\n\nSerienLog ist ein persönliches Serientagebuch. Die App bietet keine Filme, Serienstreams, Episodendatenbank oder automatische Erkennung von Staffel und Folge.",
+  "releaseNotes": "Jetzt in sechs Sprachen: Deutsch, Englisch, Spanisch, Französisch, Italienisch und Portugiesisch (Brasilien). Mit gespeicherter Sprachwahl, lokalisierten App-Namen, Erinnerungen und PDFs. Zahlen und Datumsangaben folgen der Geräteregion. Bestehende Daten und Backups bleiben erhalten.",
+  "feature": "Wissen, wo du\naufgehört hast.",
+  "strap": "Staffel · Folge · Erinnerungen",
+  "frames": [
+    "Deine Serien\nim Blick",
+    "Deinen Serienabend\nfesthalten",
+    "Wissen, wo du\naufgehört hast",
+    "Deinen Verlauf\nwiederfinden",
+    "Ans Weiterschauen\ndenken",
+    "Deine Serienabende\nals PDF"
+  ],
+  "series": ["Nordlichter", "Die letzte Station", "Kleine Abenteuer"],
+  "genres": ["Drama", "Krimi", "Komödie"],
+  "seriesNote": "Meine Serien für gemütliche Abende.",
+  "note": "Ein ruhiger Serienabend. Hier schaue ich nächstes Mal weiter.",
+  "privacyUrl": "https://wasiliy-strecker.github.io/series-log/datenschutz/"
+}

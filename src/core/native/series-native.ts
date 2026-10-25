@@ -1,3 +1,4 @@
+import type { LanguagePreference, Localization } from '../i18n/runtime';
 import { requireNativeModule } from 'expo';
 import type { Reminder } from '../domain/models';
 export type ReminderAvailability =
@@ -34,6 +35,13 @@ export type PdfSession = {
   pages: { width: number; height: number }[];
 };
 export interface SeriesNative {
+  getLocalization(): Localization;
+  setLanguage(language: LanguagePreference): Promise<Localization>;
+  addListener(
+    event: 'localizationChanged',
+    listener: () => void,
+  ): { remove(): void };
+
   openPdfPreview(uri: string): Promise<PdfSession>;
   renderPdfPage(session: string, index: number, width: number): Promise<string>;
   closePdfPreview(session: string): Promise<void>;

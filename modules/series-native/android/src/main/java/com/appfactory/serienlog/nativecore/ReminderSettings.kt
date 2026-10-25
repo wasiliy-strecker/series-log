@@ -30,7 +30,7 @@ internal fun reminderSettingsIntents(context: Context, target: String, mode: Str
             options.add(details)
             options
         }
-        else -> throw IllegalArgumentException("Unbekanntes Einstellungsziel.")
+        else -> throw IllegalArgumentException(NativeLanguage.text(context, R.string.sl_c9b3837575b2))
     }
     return intents.map { it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) }
 }

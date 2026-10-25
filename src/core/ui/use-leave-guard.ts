@@ -1,3 +1,5 @@
+import { t } from '../i18n/runtime';
+import { useLocalization } from '../i18n/react';
 import { useRef } from 'react';
 import { useNavigation, usePreventRemove } from 'expo-router/react-navigation';
 import { useFeedback } from './feedback';
@@ -6,13 +8,14 @@ export function useLeaveGuard({
   dirty,
   busy,
   discard,
-  title = 'Änderungen verwerfen?',
+  title = t('Änderungen verwerfen?'),
 }: {
   dirty: boolean;
   busy: boolean;
   discard: () => Promise<void>;
   title?: string;
 }) {
+  useLocalization();
   const navigation = useNavigation();
   const feedback = useFeedback();
   const bypass = useRef(false),
@@ -29,10 +32,12 @@ export function useLeaveGuard({
         if (
           await feedback.confirm(
             title,
-            'Nicht gespeicherte Eingaben und neu hinzugefügte Anhänge werden verworfen.',
+            t(
+              'Nicht gespeicherte Eingaben und neu hinzugefügte Anhänge werden verworfen.',
+            ),
             title.replace(/\?$/, ''),
             true,
-            'Weiter bearbeiten',
+            t('Weiter bearbeiten'),
           )
         ) {
           await discard();

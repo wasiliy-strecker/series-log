@@ -1,0 +1,23 @@
+{
+  "locale": "pt-BR",
+  "language": "pt",
+  "name": "Diário de séries",
+  "shortDescription": "Registre temporadas e episódios com fotos, lembretes e relatórios PDF.",
+  "fullDescription": "Suas séries. No seu ritmo. Diário de séries ajuda você a continuar exatamente de onde parou.\n\nAdicione suas séries com título, gênero e uma nota pessoal. Salve a temporada e o último episódio visto, a data e a hora. Inclua uma foto opcional e seus comentários. Você informa a temporada e o episódio manualmente.\n\nRelembre suas noites de séries no histórico. Busque por data, temporada, episódio ou nota e configure lembretes locais para continuar assistindo. Crie relatórios PDF de um registro ou de todo o histórico, com ou sem fotos. Abra, imprima e compartilhe diretamente pelo app.\n\nSeus dados ficam no seu dispositivo. Exporte e restaure backups criptografados e protegidos por senha. Os rascunhos dos formulários não entram no backup. Sem conta, anúncios ou telemetria própria.\n\nEscolha alemão, inglês, espanhol, francês, italiano ou português do Brasil. Números e datas seguem a região do dispositivo de forma independente.\n\nDiário de séries é um diário pessoal. Não oferece filmes, streaming, catálogo de episódios nem reconhecimento automático de temporadas e episódios.",
+  "releaseNotes": "Agora em seis idiomas: alemão, inglês, espanhol, francês, italiano e português do Brasil. Inclui idioma salvo, nomes do app, lembretes e PDFs traduzidos. Números e datas seguem a região do dispositivo. Seus dados e backups existentes continuam compatíveis.",
+  "feature": "Lembre onde\nvocê parou.",
+  "strap": "Temporadas · Episódios · Lembretes",
+  "frames": [
+    "Suas séries\nem um só lugar",
+    "Lembre suas\nnoites de séries",
+    "Lembre onde\nvocê parou",
+    "Reveja seu\nhistórico",
+    "Lembre de\ncontinuar",
+    "Seu diário\nem PDF"
+  ],
+  "series": ["Luzes do Norte", "A última estação", "Pequenas aventuras"],
+  "genres": ["Drama", "Policial", "Comédia"],
+  "seriesNote": "Minhas séries para noites tranquilas.",
+  "note": "Uma noite tranquila de séries. Vou continuar daqui na próxima vez.",
+  "privacyUrl": "https://wasiliy-strecker.github.io/series-log/privacy/"
+}

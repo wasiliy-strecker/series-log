@@ -7,7 +7,7 @@ from unittest.mock import patch
 from PIL import Image
 
 from device import Device
-from package import specifications, validate_image
+from package import NAMES, validate
 
 
 class DeviceIsolationTest(unittest.TestCase):
@@ -24,27 +24,26 @@ class DeviceIsolationTest(unittest.TestCase):
 
 
 class UploadValidationTest(unittest.TestCase):
-    def test_expected_delivery_has_fifteen_unique_images(self):
-        specs = list(specifications())
-        self.assertEqual(15, len(specs))
-        self.assertEqual(15, len({s[0] for s in specs}))
-        self.assertTrue(all(len(s[-1]) <= 140 for s in specs))
+    def test_expected_delivery_has_six_phone_and_four_tablet_images(self):
+        self.assertEqual(6, len(NAMES))
+        self.assertEqual(6, len(set(NAMES)))
+        self.assertEqual(16, 2 + len(NAMES) + 4 + 4)
 
     def test_rejects_wrong_dimensions_alpha_size_and_corruption(self):
         with tempfile.TemporaryDirectory() as folder:
             path = Path(folder) / "image.png"
             Image.new("RGB", (24, 32), "black").save(path)
-            validate_image(path, (24, 32), "RGB", 10_000)
+            validate(path, (24, 32), "RGB", 10_000)
             for size, mode, limit in [((32, 24), "RGB", 10_000), ((24, 32), "RGBA", 10_000),
                                       ((24, 32), "RGB", 1)]:
                 with self.assertRaises(ValueError):
-                    validate_image(path, size, mode, limit)
+                    validate(path, size, mode, limit)
             Image.new("RGBA", (24, 32), (0, 0, 0, 0)).save(path)
             with self.assertRaises(ValueError):
-                validate_image(path, (24, 32), "RGBA", 10_000)
+                validate(path, (24, 32), "RGBA", 10_000)
             path.write_bytes(b"not a PNG")
             with self.assertRaises(OSError):
-                validate_image(path, (24, 32), "RGB", 10_000)
+                validate(path, (24, 32), "RGB", 10_000)
 
 
 if __name__ == "__main__":

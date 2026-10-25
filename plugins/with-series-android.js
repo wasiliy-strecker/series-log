@@ -7,6 +7,7 @@ const {
   withAndroidStyles,
 } = require('expo/config-plugins');
 const fs = require('node:fs/promises');
+const { execFileSync } = require('node:child_process');
 const path = require('node:path');
 const os = require('node:os');
 
@@ -183,6 +184,14 @@ ${startup}`,
 `,
         );
       }
+      execFileSync('python3', [
+        path.join(
+          mod.modRequest.projectRoot,
+          'scripts/generate_localizations.py',
+        ),
+        '--android-dir',
+        androidRoot,
+      ]);
       return mod;
     },
   ]);
@@ -211,11 +220,9 @@ android {
         dev {
             dimension "distribution"
             applicationIdSuffix ".dev"
-            resValue "string", "app_name", "SerienLog Dev"
         }
         store {
             dimension "distribution"
-            resValue "string", "app_name", "SerienLog"
         }
     }
 `,
@@ -287,6 +294,15 @@ android.signingConfigs.debug.storeFile = rootProject.file("../.local/dev.keystor
         'android.permission.SYSTEM_ALERT_WINDOW',
     );
     const app = manifest.application[0];
+    app.$['android:localeConfig'] = '@xml/locale_config';
+    for (const activity of app.activity ?? []) {
+      const changes = new Set(
+        (activity.$['android:configChanges'] ?? '').split('|').filter(Boolean),
+      );
+      changes.add('locale');
+      changes.add('layoutDirection');
+      activity.$['android:configChanges'] = [...changes].join('|');
+    }
     app.$['android:allowBackup'] = 'false';
     app.$['android:fullBackupContent'] = 'false';
     app.$['android:dataExtractionRules'] =

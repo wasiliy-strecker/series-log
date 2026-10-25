@@ -1,3 +1,4 @@
+import { t } from '../i18n/runtime';
 import { pbkdf2Async } from '@noble/hashes/pbkdf2.js';
 import { sha256 } from '@noble/hashes/sha2.js';
 import { concatBytes } from '@noble/hashes/utils.js';
@@ -19,7 +20,6 @@ import { inspectPdf } from '../pdf/pdf-service';
 import { ContentLimitError, MAX_FILE_BYTES } from '../files/limits';
 import type { Environment } from '../ports';
 import type { SeriesService } from '../../features/entries/entry-service';
-
 const encoder = new TextEncoder();
 const decoder = new TextDecoder('utf-8', { fatal: true });
 const MAGIC = encoder.encode('SLBACK01');
@@ -35,11 +35,13 @@ export function checkBackupSize(
 ): void {
   if (manifestBytes > MAX_MANIFEST_BYTES)
     throw new ContentLimitError(
-      'Die Textdaten und das Dateiverzeichnis des Backups überschreiten die Grenze von 16 MiB. Es wurde keine Sicherung erstellt oder übernommen.',
+      t(
+        'Die Textdaten und das Dateiverzeichnis des Backups überschreiten die Grenze von 16 MiB. Es wurde keine Sicherung erstellt oder übernommen.',
+      ),
     );
   if (manifestBytes + fileBytes + CONTAINER_OVERHEAD > MAX_BACKUP_BYTES)
     throw new ContentLimitError(
-      'Das Backup überschreitet die Grenze von 128 MB.',
+      t('Das Backup überschreitet die Grenze von 128 MB.'),
     );
 }
 export type PasswordKey = (
@@ -83,7 +85,7 @@ async function validateContents(
 ): Promise<Descriptor[]> {
   if (files.size > MAX_BACKUP_FILES)
     throw new ContentLimitError(
-      'Das Backup überschreitet die Grenze von 30000 Dateien.',
+      t('Das Backup überschreitet die Grenze von 30000 Dateien.'),
     );
   const items = [
     ...data.entries.flatMap((e) => e.attachments),
@@ -92,21 +94,25 @@ async function validateContents(
   const labels = new Map(
     items.map((item) => [
       item.file,
-      `${'full' in item ? 'Protokoll' : 'Anhang'} „${item.name}“`,
+      `${'full' in item ? t('Protokoll') : t('Anhang')} „${item.name}“`,
     ]),
   );
   if (
     files.size !== snapshotFiles(data).length ||
     (expectedDescriptors && files.size !== expectedDescriptors.length)
   )
-    throw new Error('Unvollständiges Inhaltsverzeichnis.');
+    throw new Error(t('Unvollständiges Inhaltsverzeichnis.'));
   const expected = new Map(expectedDescriptors?.map((d) => [d.file, d]));
   if (expectedDescriptors && expected.size !== expectedDescriptors.length)
-    throw new Error('Doppelte Datei im Inhaltsverzeichnis.');
+    throw new Error(t('Doppelte Datei im Inhaltsverzeichnis.'));
   const descriptors: Descriptor[] = [];
   const verified = new Map<
     string,
-    { sha256: string; size: number; pages?: number }
+    {
+      sha256: string;
+      size: number;
+      pages?: number;
+    }
   >();
   await report({
     phase: 'checking',
@@ -117,7 +123,7 @@ async function validateContents(
     try {
       if (bytes.length > MAX_FILE_BYTES)
         throw new ContentLimitError(
-          'Die Datei überschreitet die Grenze von 50 MB.',
+          t('Die Datei überschreitet die Grenze von 50 MB.'),
         );
       const descriptor = descriptorsSchema.element.parse({
         file,
@@ -131,7 +137,7 @@ async function validateContents(
           original.size !== descriptor.size ||
           original.sha256 !== descriptor.sha256)
       )
-        throw new Error('Die Datei fehlt oder ihre Prüfsumme ist ungültig.');
+        throw new Error(t('Die Datei fehlt oder ihre Prüfsumme ist ungültig.'));
       let pages: number | undefined;
       if (file.endsWith('.pdf'))
         pages = (await inspectPdf(bytes)).getPageCount();
@@ -146,7 +152,7 @@ async function validateContents(
       });
       descriptors.push(descriptor);
     } catch (error) {
-      const message = `${labels.get(file) ?? 'Backup-Datei'}: ${error instanceof Error ? error.message : 'Datei nicht lesbar.'}`;
+      const message = `${labels.get(file) ?? t('Backup-Datei')}: ${error instanceof Error ? error.message : t('Datei nicht lesbar.')}`;
       if (error instanceof ContentLimitError)
         throw new ContentLimitError(message);
       throw new Error(message);
@@ -165,10 +171,14 @@ async function validateContents(
       ('size' in item && file.size !== item.size)
     )
       throw new Error(
-        `${labels.get(item.file)}: Eine Anhangsreferenz ist beschädigt.`,
+        t('{p0}: Eine Anhangsreferenz ist beschädigt.', {
+          p0: labels.get(item.file),
+        }),
       );
     if ('kind' in item && item.kind === 'pdf' && item.pages !== file.pages)
-      throw new Error(`${labels.get(item.file)}: Ungültige Seitenzahl.`);
+      throw new Error(
+        t('{p0}: Ungültige Seitenzahl.', { p0: labels.get(item.file) }),
+      );
   }
   return descriptors;
 }
@@ -202,10 +212,12 @@ export class BackupCodec {
     onProgress?: OnBackupProgress,
   ): Promise<Uint8Array> {
     if (password.length < 6 || password.length > 1024)
-      throw new Error('Bitte ein Passwort mit 6 bis 1024 Zeichen verwenden.');
+      throw new Error(
+        t('Bitte ein Passwort mit 6 bis 1024 Zeichen verwenden.'),
+      );
     if (files.size > MAX_BACKUP_FILES)
       throw new ContentLimitError(
-        'Das Backup überschreitet die Grenze von 30000 Dateien.',
+        t('Das Backup überschreitet die Grenze von 30000 Dateien.'),
       );
     const validated = validateSnapshot(data);
     const fileBytes = [...files.values()].reduce((sum, b) => sum + b.length, 0);
@@ -253,16 +265,16 @@ export class BackupCodec {
   ): Promise<DecodedBackup> {
     if (bytes.length > MAX_BACKUP_BYTES)
       throw new ContentLimitError(
-        'Das Backup überschreitet die Grenze von 128 MB.',
+        t('Das Backup überschreitet die Grenze von 128 MB.'),
       );
     if (bytes.length < 60 || !MAGIC.every((b, i) => bytes[i] === b))
-      throw new Error('Keine unterstützte SerienLog-Sicherung (.slbackup).');
+      throw new Error(t('Keine unterstützte SerienLog-Sicherung (.slbackup).'));
     const iterations = integer(bytes, 8);
     if (iterations !== ITERATIONS)
       throw new Error(
-        'Die Backup-Version oder Schlüsselableitung wird nicht unterstützt.',
+        t('Die Backup-Version oder Schlüsselableitung wird nicht unterstützt.'),
       );
-    if (password.length > 1024) throw new Error('Das Passwort ist zu lang.');
+    if (password.length > 1024) throw new Error(t('Das Passwort ist zu lang.'));
     const report = progressReporter(onProgress);
     await report({ phase: 'decrypting' });
     const key = await this.passwordKey(
@@ -280,7 +292,7 @@ export class BackupCodec {
       );
     } catch {
       throw new Error(
-        'Das Passwort ist falsch oder das Backup wurde beschädigt.',
+        t('Das Passwort ist falsch oder das Backup wurde beschädigt.'),
       );
     } finally {
       key.fill(0);
@@ -288,7 +300,7 @@ export class BackupCodec {
     try {
       const length = integer(payload, 0);
       if (length > payload.length - 4)
-        throw new Error('Ungültiges Inhaltsverzeichnis.');
+        throw new Error(t('Ungültiges Inhaltsverzeichnis.'));
       checkBackupSize(length, payload.length - 4 - length);
       const raw: unknown = JSON.parse(
         decoder.decode(payload.subarray(4, 4 + length)),
@@ -301,7 +313,7 @@ export class BackupCodec {
         raw.files.length > MAX_BACKUP_FILES
       )
         throw new ContentLimitError(
-          'Das Backup überschreitet die Grenze von 30000 Dateien.',
+          t('Das Backup überschreitet die Grenze von 30000 Dateien.'),
         );
       const manifest = manifestSchema.parse(raw);
       const data = validateSnapshot(manifest.data);
@@ -312,7 +324,7 @@ export class BackupCodec {
           files.has(descriptor.file) ||
           offset + descriptor.size > payload.length
         )
-          throw new Error('Doppelte oder fehlende Datei.');
+          throw new Error(t('Doppelte oder fehlende Datei.'));
         const file = payload.slice(offset, offset + descriptor.size);
         offset += descriptor.size;
         files.set(descriptor.file, file);
@@ -321,13 +333,15 @@ export class BackupCodec {
         offset !== payload.length ||
         files.size !== snapshotFiles(data).length
       )
-        throw new Error('Unvollständiges Inhaltsverzeichnis.');
+        throw new Error(t('Unvollständiges Inhaltsverzeichnis.'));
       await validateContents(data, files, this.crypto, report, manifest.files);
       return { data, files, createdAt: manifest.createdAt };
     } catch (error) {
       if (error instanceof ContentLimitError) throw error;
       throw new Error(
-        'Das Backup enthält beschädigte oder unvollständige Daten. Es wurde nichts übernommen.',
+        t(
+          'Das Backup enthält beschädigte oder unvollständige Daten. Es wurde nichts übernommen.',
+        ),
       );
     } finally {
       payload.fill(0);
@@ -347,7 +361,7 @@ export class BackupService {
       const keys = snapshotFiles(data);
       if (keys.length > MAX_BACKUP_FILES)
         throw new ContentLimitError(
-          'Das Backup überschreitet die Grenze von 30000 Dateien.',
+          t('Das Backup überschreitet die Grenze von 30000 Dateien.'),
         );
       const files = new Map<string, Uint8Array>();
       let size = 0;
@@ -357,7 +371,9 @@ export class BackupService {
           bytes = await this.series.vault.read(file);
         } catch {
           throw new Error(
-            'Ein Anhang fehlt. Bitte die Datei ersetzen oder aus einem Backup wiederherstellen.',
+            t(
+              'Ein Anhang fehlt. Bitte die Datei ersetzen oder aus einem Backup wiederherstellen.',
+            ),
           );
         }
         size += bytes.length;
@@ -375,7 +391,9 @@ export class BackupService {
   restore(
     decoded: DecodedBackup,
     onProgress?: OnBackupProgress,
-  ): Promise<{ warnings: string[] }> {
+  ): Promise<{
+    warnings: string[];
+  }> {
     return this.series.queue.run(async () => {
       const report = progressReporter(onProgress);
       await report({
@@ -385,7 +403,10 @@ export class BackupService {
       });
       const old = await this.series.repository.snapshot();
       const staged: string[] = [];
-      type CheckedFile = { sha256: string; size: number };
+      type CheckedFile = {
+        sha256: string;
+        size: number;
+      };
       const checked = new Map<string, CheckedFile | null>();
       const inspectStored = async (file: string) => {
         if (checked.has(file)) return checked.get(file) ?? null;
@@ -406,7 +427,10 @@ export class BackupService {
       try {
         const references = new Map<
           string,
-          { sha256: string; size?: number }[]
+          {
+            sha256: string;
+            size?: number;
+          }[]
         >();
         for (const item of [
           ...decoded.data.entries.flatMap((e) => e.attachments),
@@ -417,9 +441,14 @@ export class BackupService {
           references.set(item.file, rows);
         }
         if (references.size !== decoded.files.size)
-          throw new Error('Unvollständiges Inhaltsverzeichnis.');
+          throw new Error(t('Unvollständiges Inhaltsverzeichnis.'));
         const mapping = new Map<string, string>();
-        const hashes = new Map<string, CheckedFile & { file: string }>();
+        const hashes = new Map<
+          string,
+          CheckedFile & {
+            file: string;
+          }
+        >();
         for (const [key, bytes] of decoded.files) {
           const sha256 = await this.codec.crypto.hash(bytes);
           const rows = references.get(key);
@@ -432,7 +461,9 @@ export class BackupService {
             )
           )
             throw new Error(
-              'Eine Anhangsreferenz des Backups ist beschädigt. Es wurde nichts übernommen.',
+              t(
+                'Eine Anhangsreferenz des Backups ist beschädigt. Es wurde nichts übernommen.',
+              ),
             );
           const file = await this.series.vault.put(
             bytes,
@@ -442,7 +473,9 @@ export class BackupService {
           const stored = await inspectStored(file);
           if (stored?.sha256 !== sha256 || stored.size !== bytes.length)
             throw new Error(
-              'Eine Backup-Datei konnte nicht unverändert gespeichert werden. Es wurde nichts übernommen.',
+              t(
+                'Eine Backup-Datei konnte nicht unverändert gespeichert werden. Es wurde nichts übernommen.',
+              ),
             );
           mapping.set(key, file);
           hashes.set(sha256, { ...stored, file });
@@ -479,7 +512,9 @@ export class BackupService {
             reports.get(report.id)!.sha256 !== report.sha256
           )
             throw new Error(
-              'Ein gleichnamiges gespeichertes Protokoll hat einen anderen Inhalt. Wiederherstellung abgebrochen.',
+              t(
+                'Ein gleichnamiges gespeichertes Protokoll hat einen anderen Inhalt. Wiederherstellung abgebrochen.',
+              ),
             );
           if (!reports.has(report.id)) reports.set(report.id, report);
         }

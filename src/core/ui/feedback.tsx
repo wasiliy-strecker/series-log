@@ -1,3 +1,5 @@
+import { t } from '../i18n/runtime';
+import { useLocalization } from '../i18n/react';
 import {
   createContext,
   useCallback,
@@ -64,6 +66,7 @@ type Feedback = {
 };
 const Context = createContext<Feedback | null>(null);
 export function FeedbackProvider({ children }: { children: ReactNode }) {
+  useLocalization();
   const c = useTheme();
   const safe = useSafeAreaInsets();
   const window = useWindowDimensions();
@@ -119,7 +122,7 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
       message: string,
       accept: string,
       danger = false,
-      cancelLabel = 'Abbrechen',
+      cancelLabel = t('Abbrechen'),
     ) =>
       (await choose({
         title,
@@ -132,7 +135,8 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
             label: accept,
             danger,
             filled: true,
-            icon: danger && accept === 'Löschen' ? 'delete_outline' : undefined,
+            icon:
+              danger && accept === t('Löschen') ? 'delete_outline' : undefined,
           },
           { value: 'cancel', label: cancelLabel, outlined: true },
         ],
@@ -174,7 +178,7 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
             }}
           >
             <Pressable
-              accessibilityLabel="Abbrechen"
+              accessibilityLabel={t('Abbrechen')}
               onPress={() => finish(null)}
               style={{
                 position: 'absolute',
@@ -467,6 +471,7 @@ export function FeedbackProvider({ children }: { children: ReactNode }) {
   );
 }
 export function useFeedback() {
+  useLocalization();
   const value = useContext(Context);
   if (!value) throw new Error('FeedbackProvider fehlt.');
   return value;

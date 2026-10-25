@@ -3,7 +3,7 @@
 Dev verwendet `com.appfactory.series_log.dev`, Store verwendet
 `com.appfactory.series_log`. Beide besitzen getrennte Daten und Signaturen.
 Store-Debug ist deaktiviert. Die erste Store-Auslieferung verwendet Version
-1.0.0 (1). Vor dieser Auslieferung ist kein hochgeladener Versionscode bekannt.
+1.0.0 (1). Der internationale Release erhöht den Versionscode auf 2.
 Ein Store-Build oder Play-Upload benötigt einen eigenen Auftrag.
 
 ## Private Upload-Signatur
@@ -83,7 +83,7 @@ Die Source Map wird auf die dokumentierten Build-Werkzeug-Pakete geprüft.
 Erst nach erfolgreicher Prüfung wird die benannte Datei angelegt:
 
 ```text
-build/releases/production/serienlog-1.0.0-build-1-production.aab
+build/releases/production/serienlog-1.0.0-build-2-production.aab
 ```
 
 Daneben liegt eine JSON-Prüfdatei mit Kennung, Version, Zertifikatsfingerabdruck,
@@ -97,6 +97,28 @@ Die Dev-Installation bleibt erhalten. Play App Signing verwendet einen
 separaten App-Signierschlüssel. Das hier vorbereitete Zertifikat ist der
 Upload-Schlüssel. Es wird nicht zur Aktualisierung einer Play-Installation
 per lokalem APK verwendet.
+
+## Internationaler Release am 25. Oktober 2026
+
+Version 1.0.0 (2) verwendet dieselbe Store-Kennung und Upload-Signatur.
+Die Marketingversion bleibt erhalten. App-Namen und Bedienung sind in sechs
+Sprachen verfügbar. Das [internationale Release-Dokument](INTERNATIONAL_RELEASE.md)
+beschreibt Sprachwahl, Regionen, Datenkompatibilität und die Store-Pakete.
+
+Die AAB besteht die Signatur-, Manifest-, Source-Map- und 16-KB-Prüfungen.
+Alle 44 nativen Bibliotheken erfüllen die geprüfte ELF-Ausrichtung.
+Die 2118 Source-Map-Einträge enthalten keine betroffenen Audit-Werkzeuge.
+Nur der ausdrücklich geprüfte Metro-Laufzeitlader aus der Expo-CLI ist zugelassen.
+Das ist eine Artefaktprüfung, kein Lauf auf einem Gerät mit 16-KB-Speicherseiten.
+
+SHA-256 der AAB:
+`dfe279b70d67cb35b7233714393e2bec450ad96e1b9eb03f23b700650dcc322f`.
+
+Die bisherigen Dateien für Code 1 bleiben erhalten. Die aktuelle Auslieferung
+liegt zusätzlich unter `releases/international/build-2/`. Der dokumentierte
+Dependency-Audit enthält noch fünf hohe Einträge in der Expo-Build-Werkzeugkette.
+Die tatsächliche App verwendet die korrigierte Zod-Version 4.6.6.
+Es erfolgen weder Push noch Play-Upload oder Veröffentlichung.
 
 ## Offen für ein späteres Update
 

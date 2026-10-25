@@ -1,0 +1,23 @@
+{
+  "locale": "it-IT",
+  "language": "it",
+  "name": "Diario delle serie",
+  "shortDescription": "Annota stagioni ed episodi con foto, promemoria e resoconti PDF.",
+  "fullDescription": "Le tue serie. Al tuo ritmo. Diario delle serie ti aiuta a riprendere esattamente da dove eri rimasto.\n\nAggiungi le serie con titolo, genere e una nota personale. Registra stagione e ultimo episodio visto, data e ora. Aggiungi una foto facoltativa e i tuoi pensieri. Stagione ed episodio vengono inseriti manualmente.\n\nRitrova le tue serate nella cronologia. Cerca per data, stagione, episodio o nota e imposta promemoria locali per continuare. Crea resoconti PDF di una singola voce o dell’intera cronologia, con o senza foto. Apri, stampa e condividi direttamente dall’app.\n\nI dati restano sul tuo dispositivo. Esporta e ripristina backup cifrati protetti da password. Le bozze dei moduli non sono incluse nei backup. Nessun account, pubblicità o telemetria dell’app.\n\nScegli tedesco, inglese, spagnolo, francese, italiano o portoghese del Brasile. Numeri e date seguono in modo indipendente la regione del dispositivo.\n\nDiario delle serie è un diario personale. Non offre film, streaming, un catalogo di episodi o riconoscimento automatico di stagioni ed episodi.",
+  "releaseNotes": "Ora in sei lingue: tedesco, inglese, spagnolo, francese, italiano e portoghese del Brasile. Scelta della lingua salvata, nomi dell’app, promemoria e PDF tradotti. Numeri e date seguono la regione del dispositivo. Dati e backup esistenti restano compatibili.",
+  "feature": "Ricorda dove\neri rimasto.",
+  "strap": "Stagioni · Episodi · Promemoria",
+  "frames": [
+    "Le tue serie\na colpo d’occhio",
+    "Ricorda le tue\nserate di serie",
+    "Ricorda dove\neri rimasto",
+    "Ritrova la tua\ncronologia",
+    "Ricordati di\ncontinuare",
+    "Il tuo diario\nin PDF"
+  ],
+  "series": ["Luci del Nord", "L’ultima stazione", "Piccole avventure"],
+  "genres": ["Drammatico", "Poliziesco", "Commedia"],
+  "seriesNote": "Le mie serie per serate tranquille.",
+  "note": "Una tranquilla serata di serie. Riprenderò da qui la prossima volta.",
+  "privacyUrl": "https://wasiliy-strecker.github.io/series-log/privacy/"
+}

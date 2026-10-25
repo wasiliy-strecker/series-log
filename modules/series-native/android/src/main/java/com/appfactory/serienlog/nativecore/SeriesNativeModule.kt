@@ -1,6 +1,8 @@
 package com.appfactory.serienlog.nativecore
 
 import android.content.Intent
+import android.content.ComponentCallbacks
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.pdf.PdfRenderer
 import android.net.Uri
@@ -18,8 +20,24 @@ class SeriesNativeModule : Module() {
     private var previews: PdfPreviewStore? = null
     @Synchronized private fun previewStore(): PdfPreviewStore = previews ?: PdfPreviewStore(context).also { previews = it }
     private val context get() = requireNotNull(appContext.reactContext)
+    private val configurationCallback = object : ComponentCallbacks {
+        override fun onConfigurationChanged(config: Configuration) {
+            NativeLanguage.refreshNotifications(context)
+            sendEvent("localizationChanged", NativeLanguage.state(context))
+        }
+        override fun onLowMemory() = Unit
+    }
     override fun definition() = ModuleDefinition {
         Name("SeriesNative")
+        Events("localizationChanged")
+        Function("getLocalization") { NativeLanguage.state(context) }
+        AsyncFunction("setLanguage") { language: String? ->
+            NativeLanguage.select(context, language)
+            val state = NativeLanguage.state(context)
+            sendEvent("localizationChanged", state)
+            state
+        }.runOnQueue(Queues.MAIN)
+        OnCreate { NativeLanguage.restore(context); context.registerComponentCallbacks(configurationCallback) }
         View(SeriesPdfView::class) {
             Prop("session") { view: SeriesPdfView, id: String -> view.open(previewStore(), id) }
         }
@@ -33,7 +51,7 @@ class SeriesNativeModule : Module() {
             val file = privateDocument(context, uri)
             val activity = requireNotNull(appContext.currentActivity)
             val manager = activity.getSystemService(android.content.Context.PRINT_SERVICE) as android.print.PrintManager
-            manager.print(name, OriginalPdfPrintAdapter(file, name), null)
+            manager.print(name, OriginalPdfPrintAdapter(context, file, name), null)
             Unit
         }.runOnQueue(Queues.MAIN)
         AsyncFunction("saveBackupFile") { uri: String, name: String, promise: Promise ->
@@ -41,22 +59,22 @@ class SeriesNativeModule : Module() {
                 val file = privateDocument(context, uri)
                 val token = UUID.randomUUID().toString()
                 if (!SaveDocumentActivity.begin(token, SaveDocumentActivity.Pending(file, name, promise))) {
-                    promise.reject("SAVE_BUSY", "Eine Speicherortauswahl ist bereits geöffnet.", null)
+                    promise.reject("SAVE_BUSY", NativeLanguage.text(context, R.string.sl_199242f6e91a), null)
                 } else {
                     try { requireNotNull(appContext.currentActivity).startActivity(Intent(context, SaveDocumentActivity::class.java).putExtra("save_token", token)) }
-                    catch (_: Exception) { SaveDocumentActivity.finish(token, false, "Die Speicherortauswahl konnte nicht geöffnet werden.") }
+                    catch (_: Exception) { SaveDocumentActivity.finish(token, false, NativeLanguage.text(context, R.string.sl_bb39b613bf4d)) }
                 }
-            } catch (_: Exception) { promise.reject("SAVE_SOURCE", "Die vorbereitete Backup-Datei ist nicht verfügbar.", null) }
+            } catch (_: Exception) { promise.reject("SAVE_SOURCE", NativeLanguage.text(context, R.string.sl_c3699fba6697), null) }
         }.runOnQueue(Queues.MAIN)
         AsyncFunction("deriveBackupKey") { password: String, salt: String, iterations: Int ->
             PasswordKey.derive(password, salt, iterations)
         }
-        OnDestroy { previews?.closeAll() }
+        OnDestroy { previews?.closeAll(); context.unregisterComponentCallbacks(configurationCallback) }
         AsyncFunction("validatePdf") { uri: String ->
             val file = File(requireNotNull(Uri.parse(uri).path))
             ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY).use { descriptor ->
                 PdfRenderer(descriptor).use { renderer ->
-                    require(renderer.pageCount in 1..2000) { "Leere oder zu umfangreiche PDF." }
+                    require(renderer.pageCount in 1..2000) { NativeLanguage.text(context, R.string.sl_4d966e21158d) }
                     for (index in 0 until renderer.pageCount) {
                         renderer.openPage(index).use { page ->
                             val bitmap = Bitmap.createBitmap(32, 32, Bitmap.Config.ARGB_8888)
@@ -82,12 +100,12 @@ class SeriesNativeModule : Module() {
             for (index in 0 until desired.length()) {
                 val reminder = requireNotNull(StoredReminder.fromJson(desired.getJSONObject(index).toString()))
                 ids.add(reminder.recordId)
-                if (!ReminderScheduler.update(context, reminder)) warnings.add("${reminder.label}: Erinnerung konnte nicht geplant werden.")
-                if (ReminderNotifier.availability(context, reminder.isPunctual) != ReminderAvailability.AVAILABLE) warnings.add("${reminder.label}: Benachrichtigungen sind nicht freigegeben.")
-                if (reminder.isPunctual && !ReminderScheduler.canScheduleExact(context)) warnings.add("${reminder.label}: Ohne Freigabe für genaue Alarme erinnert Android möglicherweise später.")
+                if (!ReminderScheduler.update(context, reminder)) warnings.add(NativeLanguage.text(context, R.string.sl_c2702a5ab382 ,reminder.label))
+                if (ReminderNotifier.availability(context, reminder.isPunctual) != ReminderAvailability.AVAILABLE) warnings.add(NativeLanguage.text(context, R.string.sl_ca16c1578abe ,reminder.label))
+                if (reminder.isPunctual && !ReminderScheduler.canScheduleExact(context)) warnings.add(NativeLanguage.text(context, R.string.sl_6edb1719211b ,reminder.label))
             }
             ReminderStore.statusIds(context).filter { !ids.contains(it) }.forEach {
-                if (!ReminderScheduler.cancel(context, it)) warnings.add("Eine alte Erinnerung konnte nicht vollständig entfernt werden.")
+                if (!ReminderScheduler.cancel(context, it)) warnings.add(NativeLanguage.text(context, R.string.sl_8963d8b431e3))
             }
             warnings
         }

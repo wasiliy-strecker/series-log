@@ -6,10 +6,10 @@ import android.content.Intent
 import androidx.core.content.FileProvider
 
 internal fun pdfShareIntent(context: Context, uris: List<String>): Intent {
-    require(uris.size in 1..20) { "Keine oder zu viele Protokollteile." }
+    require(uris.size in 1..20) { NativeLanguage.text(context, R.string.sl_7f046abf8dc9) }
     val shared = ArrayList(uris.map { uri ->
         val file = privateDocument(context, uri)
-        require(file.extension.equals("pdf", ignoreCase = true)) { "Nur PDFs können als Protokoll geteilt werden." }
+        require(file.extension.equals("pdf", ignoreCase = true)) { NativeLanguage.text(context, R.string.sl_733738002aef) }
         FileProvider.getUriForFile(context, context.packageName + ".series.files", file)
     })
     val clips = ClipData.newUri(context.contentResolver, "Serienprotokoll", shared.first())
@@ -18,6 +18,6 @@ internal fun pdfShareIntent(context: Context, uris: List<String>): Intent {
         .putParcelableArrayListExtra(Intent.EXTRA_STREAM, shared)
         .addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
     intent.clipData = clips
-    return Intent.createChooser(intent, "Alle Protokollteile teilen")
+    return Intent.createChooser(intent, NativeLanguage.text(context, R.string.sl_76dc2fb8fb39))
         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_GRANT_READ_URI_PERMISSION)
 }

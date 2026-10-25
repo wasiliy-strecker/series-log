@@ -12,14 +12,14 @@ import java.io.File
 import java.io.FileOutputStream
 import java.util.concurrent.Executors
 
-class OriginalPdfPrintAdapter(private val file: File, private val name: String) : PrintDocumentAdapter() {
+class OriginalPdfPrintAdapter(private val context: android.content.Context, private val file: File, private val name: String) : PrintDocumentAdapter() {
     private val executor = Executors.newSingleThreadExecutor()
     override fun onLayout(oldAttributes: PrintAttributes?, newAttributes: PrintAttributes?, cancellation: CancellationSignal, callback: LayoutResultCallback, extras: Bundle?) {
         if (cancellation.isCanceled) { callback.onLayoutCancelled(); return }
         try {
             val count = ParcelFileDescriptor.open(file, ParcelFileDescriptor.MODE_READ_ONLY).use { descriptor -> PdfRenderer(descriptor).use { it.pageCount } }
             callback.onLayoutFinished(PrintDocumentInfo.Builder(name).setContentType(PrintDocumentInfo.CONTENT_TYPE_DOCUMENT).setPageCount(count).build(), true)
-        } catch (_: Exception) { callback.onLayoutFailed("Die PDF konnte nicht zum Drucken geöffnet werden.") }
+        } catch (_: Exception) { callback.onLayoutFailed(NativeLanguage.text(context, R.string.sl_75005365f521)) }
     }
     override fun onWrite(pages: Array<out PageRange>, destination: ParcelFileDescriptor, cancellation: CancellationSignal, callback: WriteResultCallback) {
         executor.execute {
@@ -36,7 +36,7 @@ class OriginalPdfPrintAdapter(private val file: File, private val name: String) 
                 }
                 if (cancellation.isCanceled) callback.onWriteCancelled()
                 else callback.onWriteFinished(arrayOf(PageRange.ALL_PAGES))
-            } catch (_: Exception) { callback.onWriteFailed("Die PDF konnte nicht gedruckt werden.") }
+            } catch (_: Exception) { callback.onWriteFailed(NativeLanguage.text(context, R.string.sl_502c036f1654)) }
         }
     }
     override fun onFinish() { executor.shutdown() }

@@ -1,0 +1,23 @@
+{
+  "locale": "en-US",
+  "language": "en",
+  "name": "Series Log",
+  "shortDescription": "Track seasons and episodes with photos, reminders and PDF reports.",
+  "fullDescription": "Your series. Your pace. Series Log helps you pick up exactly where you left off.\n\nAdd your series with a title, genre and personal note. Record the season and last episode watched, date and time. Add an optional photo and your thoughts. You enter the season and episode yourself.\n\nRevisit past viewing sessions in your history. Search by date, season, episode or note and set local reminders to keep watching. Create PDF reports for a single entry or your entire viewing history, with or without photos. Open, print and share them directly from the app.\n\nYour data stays on your device. Export and restore encrypted, password-protected backups. Form drafts are not included in backups. No account, ads or app telemetry.\n\nChoose German, English, Spanish, French, Italian or Portuguese (Brazil). Numbers and dates independently follow your device’s region.\n\nSeries Log is a personal viewing diary. It does not offer films, streaming, an episode database or automatic season and episode recognition.",
+  "releaseNotes": "Now in six languages: German, English, Spanish, French, Italian and Portuguese (Brazil). Includes a saved language preference, localized app names, reminders and PDFs. Numbers and dates follow your device’s region. Existing data and backups remain compatible.",
+  "feature": "Know where\nyou left off.",
+  "strap": "Seasons · Episodes · Reminders",
+  "frames": [
+    "Your series\nat a glance",
+    "Remember your\nviewing nights",
+    "Know where\nyou left off",
+    "Revisit your\nviewing history",
+    "Remember to\nkeep watching",
+    "Your viewing diary\nas a PDF"
+  ],
+  "series": ["Northern Lights", "The Last Station", "Little Adventures"],
+  "genres": ["Drama", "Crime", "Comedy"],
+  "seriesNote": "My series for cozy evenings.",
+  "note": "A quiet viewing night. This is where I will continue next time.",
+  "privacyUrl": "https://wasiliy-strecker.github.io/series-log/privacy/"
+}

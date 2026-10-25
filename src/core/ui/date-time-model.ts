@@ -1,3 +1,5 @@
+import { latinDigits } from '../i18n/numbers';
+import { localization } from '../i18n/runtime';
 export function localDate(value: string): Date {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
   return match
@@ -9,11 +11,27 @@ export function parseDateInput(
   first: Date,
   last: Date,
 ): Date | null {
-  const match = /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/.exec(value.trim());
-  if (!match) return null;
-  const day = Number(match[1]),
-    month = Number(match[2]) - 1,
-    year = Number(match[3]);
+  const parts = new Intl.DateTimeFormat(localization().formatLocale, {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  }).formatToParts(new Date(2006, 10, 22));
+  const fields = parts
+    .filter((p) => ['day', 'month', 'year'].includes(p.type))
+    .map((p) => p.type);
+  const digits = latinDigits(value)
+    .trim()
+    .split(/[^0-9]+/)
+    .filter(Boolean);
+  if (digits.length !== 3) return null;
+  const values = Object.fromEntries(
+    fields.map((field, index) => [field, Number(digits[index])]),
+  );
+  const day = values.day,
+    month = (values.month ?? 0) - 1,
+    year = values.year;
+  if (!day || !year || digits[fields.indexOf('year')]?.length !== 4)
+    return null;
   const result = new Date(year, month, day);
   return result.getDate() === day &&
     result.getMonth() === month &&

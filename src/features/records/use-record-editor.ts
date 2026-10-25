@@ -1,3 +1,5 @@
+import { t } from '../../core/i18n/runtime';
+import { useLocalization } from '../../core/i18n/react';
 import { useEffect, useState } from 'react';
 import { router } from 'expo-router';
 import { PermissionsAndroid, Platform } from 'react-native';
@@ -18,6 +20,7 @@ import {
 import { useFormErrors } from '../../core/ui/use-form-errors';
 import { recordFieldOrder, validateRecordForm } from './record-form-validation';
 export function useRecordEditor(id?: string) {
+  useLocalization();
   const { series, refresh, native } = useServices();
   const reminderState = useReminderStatusSnapshot();
   const feedback = useFeedback();
@@ -47,7 +50,7 @@ export function useRecordEditor(id?: string) {
         if (!active) return;
         if (id) {
           const found = records.find((r) => r.id === id);
-          if (!found) throw new Error('Die Serie wurde nicht gefunden.');
+          if (!found) throw new Error(t('Die Serie wurde nicht gefunden.'));
           setRecord(found);
           setInitial(JSON.stringify(found));
           setReady(true);
@@ -72,7 +75,7 @@ export function useRecordEditor(id?: string) {
     dirty,
     busy: task.busy,
     discard: async () => {},
-    title: id ? 'Änderungen verwerfen?' : 'Eingaben verwerfen?',
+    title: id ? t('Änderungen verwerfen?') : t('Eingaben verwerfen?'),
   });
   function change<K extends keyof SeriesRecord>(
     key: K,
@@ -90,7 +93,7 @@ export function useRecordEditor(id?: string) {
     refreshReminderStatus: reminderState.refresh,
     reminderNeedsRepair,
     change,
-    categorySuggestions: genreSuggestions,
+    categorySuggestions: genreSuggestions(),
     ...task,
     save: () => {
       if (!record) return Promise.resolve(undefined);
@@ -131,12 +134,15 @@ export function useRecordEditor(id?: string) {
           !reminderWarning &&
           warnings.some((warning) =>
             warning.startsWith(
-              'Gespeichert. Erinnerungen konnten nicht aktualisiert',
+              t(
+                'Gespeichert. Erinnerungen konnten nicht aktualisiert werden. Bitte die Berechtigungen in den Einstellungen prüfen.',
+              ),
             ),
           )
         )
-          reminderWarning =
-            'Daten gespeichert. Die Erinnerung konnte nicht bestätigt werden. Öffne die Erinnerung und speichere erneut.';
+          reminderWarning = t(
+            'Daten gespeichert. Die Erinnerung konnte nicht bestätigt werden. Öffne die Erinnerung und speichere erneut.',
+          );
         leave(() => {
           if (id)
             router.dismissTo({
@@ -153,8 +159,10 @@ export function useRecordEditor(id?: string) {
           reminderWarning ||
             warnings.join('\n') ||
             (id
-              ? 'Änderungen an der Serie gespeichert.'
-              : 'Serie gespeichert. Als Nächstes kannst du den ersten Folgenstand erfassen.'),
+              ? t('Änderungen an der Serie gespeichert.')
+              : t(
+                  'Serie gespeichert. Als Nächstes kannst du den ersten Folgenstand erfassen.',
+                )),
         );
       });
     },

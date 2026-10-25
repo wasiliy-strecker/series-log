@@ -8,7 +8,7 @@ import time
 
 from device import Device
 
-PACKAGE = "com.appfactory.series_log.dev"
+PACKAGE = "com.appfactory.series_log"
 
 
 class Capture(Device):

@@ -17,7 +17,7 @@ import zipfile
 
 ANDROID = "{http://schemas.android.com/apk/res/android}"
 PACKAGE = "com.appfactory.series_log"
-TOOL_PACKAGES = ("shell-quote", "source-map-js", "node-forge", "braces", "vite")
+TOOL_PACKAGES = ("shell-quote", "source-map-js", "node-forge", "braces", "vite", "@expo/cli", "@expo/code-signing-certificates", "expo/node_modules/zod")
 
 
 def require(condition, message):
@@ -114,7 +114,7 @@ def verify(bundle, version_name, version_code, certificate):
     if label.startswith("@"):
         values = bt("dump", "resources", f"--resource={label[1:]}", "--values")
         require(
-            '"SerienLog"' in values and '"SerienLog Dev"' not in values,
+            all(name in values for name in ['SerienLog', 'Series Log', 'Diario de series', 'Journal de séries', 'Diario delle serie', 'Diário de séries']) and ' Dev' not in values,
             "Wrong Store label",
         )
     else:
@@ -180,9 +180,12 @@ def verify(bundle, version_name, version_code, certificate):
         "index.android.bundle.packager.map"
     )
     sources = json.loads(source_map.read_text())["sources"]
+    allowed_expo_loader = "/node_modules/expo/node_modules/@expo/cli/build/metro-require/require.js"
     for package in TOOL_PACKAGES:
         require(
-            not any(f"node_modules/{package}/" in source for source in sources),
+            not any(f"node_modules/{package}/" in source and not (
+                package == "@expo/cli" and source == allowed_expo_loader
+            ) for source in sources),
             f"Build tool bundled: {package}",
         )
     return {
@@ -201,7 +204,8 @@ def verify(bundle, version_name, version_code, certificate):
         "abis": ["arm64-v8a", "x86_64"],
         "nativeLibraries16KbAligned": len(native_libraries),
         "sourceMapSources": len(sources),
-        "excludedBuildToolPackages": list(TOOL_PACKAGES),
+        "excludedBuildToolPackages": [p for p in TOOL_PACKAGES if p != "@expo/cli"],
+        "allowedExpoRuntimeLoader": allowed_expo_loader if allowed_expo_loader in sources else None,
         "embeddedJavaScript": True,
     }
 

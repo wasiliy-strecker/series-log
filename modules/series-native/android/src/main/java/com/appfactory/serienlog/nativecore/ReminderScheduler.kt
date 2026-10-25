@@ -214,6 +214,15 @@ internal object ReminderNotifier {
             manager.areNotificationsEnabled()
     }
 
+    private fun localizedPosition(context: Context, reminder: StoredReminder): String {
+        val old = Regex("Staffel (\\d+) · Folge (\\d+)").matchEntire(reminder.latestValue.orEmpty())
+        val season = reminder.latestSeason ?: old?.groupValues?.get(1)?.toIntOrNull()
+        val episode = reminder.latestEpisode ?: old?.groupValues?.get(2)?.toIntOrNull()
+        if (season == null || episode == null) return reminder.latestValue.orEmpty()
+        val format = java.text.NumberFormat.getIntegerInstance(NativeLanguage.systemLocales(context).first()).apply { isGroupingUsed = false }
+        return NativeLanguage.text(context, R.string.sl_f5d8ce33e943, format.format(season), format.format(episode))
+    }
+
     fun showRecord(
         context: Context,
         reminder: StoredReminder,
@@ -229,9 +238,9 @@ internal object ReminderNotifier {
         val latestReading = if (
             !reminder.latestValue.isNullOrBlank()
         ) {
-            "Letzter Folgenstand: ${reminder.latestValue}"
+            NativeLanguage.text(context, R.string.sl_65231c0cf4a6 ,localizedPosition(context, reminder))
         } else {
-            "Noch kein Folgenstand"
+            NativeLanguage.text(context, R.string.sl_98b45e0f34e5)
         }
         val summary = "${reminder.categoryLabel} · $latestReading"
         val notification = NotificationCompat.Builder(context, channelId)
@@ -241,12 +250,13 @@ internal object ReminderNotifier {
             .setContentText(summary)
             .setStyle(
                 NotificationCompat.BigTextStyle().bigText(
-                    "$latestReading\nZeit zum Weiterschauen. Halte deinen nächsten Folgenstand in SerienLog fest.",
+                    NativeLanguage.text(context, R.string.sl_f1a8abb94a79 ,latestReading),
                 ),
             )
             .apply { configureLegacySound(this, reminder.isPunctual) }
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setCategory(category)
+            .setOnlyAlertOnce(true)
             .setAutoCancel(true)
             .setWhen(postedAt)
             .setShowWhen(true)
@@ -290,22 +300,22 @@ internal object ReminderNotifier {
         val availability = availability(context, punctual)
         if (availability != ReminderAvailability.AVAILABLE) return availability.wireValue
         val latestReading = if (!latestValue.isNullOrBlank()) {
-            "Letzter Folgenstand: $latestValue"
+            NativeLanguage.text(context, R.string.sl_65231c0cf4a6 ,latestValue)
         } else {
-            "Noch kein Folgenstand"
+            NativeLanguage.text(context, R.string.sl_98b45e0f34e5)
         }
-        val target = if (recordId.isNullOrBlank()) "die App" else "die Serie"
+        val target = if (recordId.isNullOrBlank()) NativeLanguage.text(context, R.string.sl_16a71dc3a160) else NativeLanguage.text(context, R.string.sl_959fd8787b8c)
         val notification = NotificationCompat.Builder(
             context,
             channelId(punctual),
         )
             .setSmallIcon(R.drawable.ic_stat_series)
             .setColor(notificationColor)
-            .setContentTitle("Test: $categoryLabel · $label")
+            .setContentTitle(NativeLanguage.text(context, R.string.sl_a39b91fa6d6a, categoryLabel, label))
             .setContentText(latestReading)
             .setStyle(
                 NotificationCompat.BigTextStyle().bigText(
-                    "$latestReading\nDas ist eine Test-Erinnerung. Tippen öffnet $target.",
+                    NativeLanguage.text(context, R.string.sl_f5c720ab4d8a ,latestReading, target),
                 ),
             )
             .apply { configureLegacySound(this, punctual) }
@@ -317,6 +327,7 @@ internal object ReminderNotifier {
                     NotificationCompat.CATEGORY_REMINDER
                 },
             )
+            .setOnlyAlertOnce(true)
             .setAutoCancel(true)
             .setTimeoutAfter(60_000L)
             .setContentIntent(
@@ -343,6 +354,12 @@ internal object ReminderNotifier {
     fun acknowledge(context: Context, recordId: String) {
         context.getSystemService(NotificationManager::class.java)
             .cancel(recordTag(recordId), recordNotificationId)
+    }
+
+    fun refreshTranslation(context: Context, reminder: StoredReminder) {
+        val manager = context.getSystemService(NotificationManager::class.java)
+        val active = manager.activeNotifications.firstOrNull { it.tag == recordTag(reminder.recordId) && it.id == recordNotificationId } ?: return
+        showRecord(context, reminder, active.notification.`when`)
     }
 
     fun activeRecordIds(context: Context): Set<String> {
@@ -384,15 +401,15 @@ internal object ReminderNotifier {
         context.getSystemService(NotificationManager::class.java).cancel(testTag, testNotificationId)
     }
 
-    private fun ensureChannels(context: Context) {
+    fun ensureChannels(context: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
         val manager = context.getSystemService(NotificationManager::class.java)
         val normal = NotificationChannel(
             normalChannelId,
-            "Normale Erinnerung",
+            NativeLanguage.text(context, R.string.sl_bb7021560f58),
             NotificationManager.IMPORTANCE_HIGH,
         ).apply {
-            description = "Optionale Erinnerungen zum Weiterschauen."
+            description = NativeLanguage.text(context, R.string.sl_e29a20f9758b)
             enableVibration(true)
             setSound(
                 RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION),
@@ -406,10 +423,10 @@ internal object ReminderNotifier {
             ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
         val alarm = NotificationChannel(
             alarmChannelId,
-            "Pünktlich mit Ton",
+            NativeLanguage.text(context, R.string.sl_15b9d51adaea),
             NotificationManager.IMPORTANCE_HIGH,
         ).apply {
-            description = "Pünktliche Erinnerungen zum Weiterschauen mit Alarmton."
+            description = NativeLanguage.text(context, R.string.sl_ceb6237adf5e)
             enableVibration(true)
             setSound(
                 alarmSound,

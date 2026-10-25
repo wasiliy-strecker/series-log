@@ -1,3 +1,5 @@
+import { t } from '../../core/i18n/runtime';
+import { useLocalization } from '../../core/i18n/react';
 import { useState } from 'react';
 import { useServices } from '../../core/composition';
 import { useTask } from '../../core/ui/use-task';
@@ -7,14 +9,13 @@ import { errorText } from '../../core/ui/components';
 import type { PreparedBackup } from '../../core/media/media-service';
 import { privacyUrl } from './project-links';
 import type { BackupProgress } from '../../core/backup/backup-progress';
-
 function progressLabel(progress: BackupProgress): string {
   const label = {
-    preparing: 'Backup wird vorbereitet',
-    checking: 'Dateien werden geprüft',
-    encrypting: 'Backup wird verschlüsselt',
-    decrypting: 'Backup wird entschlüsselt',
-    restoring: 'Backup wird wiederhergestellt',
+    preparing: t('Backup wird vorbereitet'),
+    checking: t('Dateien werden geprüft'),
+    encrypting: t('Backup wird verschlüsselt'),
+    decrypting: t('Backup wird entschlüsselt'),
+    restoring: t('Backup wird wiederhergestellt'),
   }[progress.phase];
   return progress.totalFiles && progress.completedFiles !== undefined
     ? `${label} · ${progress.completedFiles} von ${progress.totalFiles}`
@@ -23,6 +24,7 @@ function progressLabel(progress: BackupProgress): string {
 export function useSettings(
   askPassword: (confirm: boolean) => Promise<string | null>,
 ) {
+  useLocalization();
   const { backup, media, links, refresh } = useServices();
   const task = useTask(),
     feedback = useFeedback();
@@ -35,10 +37,12 @@ export function useSettings(
     phase,
     openPrivacy: async () => {
       try {
-        await links.open(privacyUrl);
+        await links.open(privacyUrl());
       } catch {
         feedback.notify(
-          'Die Datenschutzerklärung konnte nicht geöffnet werden. Bitte versuche es erneut.',
+          t(
+            'Die Datenschutzerklärung konnte nicht geöffnet werden. Bitte versuche es erneut.',
+          ),
         );
       }
     },
@@ -48,9 +52,9 @@ export function useSettings(
         if (password === null) return;
         let prepared: PreparedBackup | undefined;
         try {
-          setPhase('Backup wird vorbereitet …');
+          setPhase(t('Backup wird vorbereitet …'));
           const bytes = await backup.create(password, onProgress);
-          setPhase('Speicherort wird vorbereitet …');
+          setPhase(t('Speicherort wird vorbereitet …'));
           await new Promise<void>((resolve) => setTimeout(resolve, 0));
           prepared = await media.prepareBackup(bytes);
           setPhase('');
@@ -65,20 +69,23 @@ export function useSettings(
             }
             if (saved) {
               const action = await feedback.choose({
-                title: 'Backup gespeichert',
-                message: `${prepared.name} wurde im gewählten Speicherort abgelegt. Bewahre die Datei und dein Passwort sicher auf.`,
+                title: t('Backup gespeichert'),
+                message: t(
+                  '{p0} wurde im gewählten Speicherort abgelegt. Bewahre die Datei und dein Passwort sicher auf.',
+                  { p0: prepared.name },
+                ),
                 dialog: true,
                 stackedActions: true,
                 options: [
                   {
                     value: 'done',
-                    label: 'Fertig',
+                    label: t('Fertig'),
                     filled: true,
                     icon: 'check',
                   },
                   {
                     value: 'share',
-                    label: 'Teilen',
+                    label: t('Teilen'),
                     icon: 'ios_share_outlined',
                     outlined: true,
                   },
@@ -88,23 +95,25 @@ export function useSettings(
               finished = true;
             } else {
               const action = await feedback.choose({
-                title: 'Backup noch nicht gespeichert',
+                title: t('Backup noch nicht gespeichert'),
                 message:
                   failure ||
-                  'Die Speicherortauswahl wurde abgebrochen. Du kannst erneut einen Speicherort wählen.',
+                  t(
+                    'Die Speicherortauswahl wurde abgebrochen. Du kannst erneut einen Speicherort wählen.',
+                  ),
                 dialog: true,
                 stackedActions: true,
                 options: [
                   {
                     value: 'discard',
-                    label: 'Backup verwerfen',
+                    label: t('Backup verwerfen'),
                     danger: true,
                     filled: true,
                     icon: 'delete_outline',
                   },
                   {
                     value: 'retry',
-                    label: 'Speicherort wählen',
+                    label: t('Speicherort wählen'),
                     outlined: true,
                     icon: 'folder_open_outlined',
                   },
@@ -125,7 +134,7 @@ export function useSettings(
         const password = await askPassword(false);
         if (password === null) return;
         try {
-          setPhase('Backup wird geprüft …');
+          setPhase(t('Backup wird geprüft …'));
           const decoded = await backup.codec.decode(
             bytes,
             password,
@@ -134,19 +143,28 @@ export function useSettings(
           setPhase('');
           if (
             !(await feedback.confirm(
-              'Backup wiederherstellen?',
-              `${decoded.data.records.length} Serien, ${decoded.data.entries.length} Einträge und ${decoded.data.reports.length} Serienprotokolle werden importiert. Neuere lokale Einträge werden nicht überschrieben.`,
-              'Wiederherstellen',
+              t('Backup wiederherstellen?'),
+              t(
+                '{p0} Serien, {p1} Einträge und {p2} Serienprotokolle werden importiert. Neuere lokale Einträge werden nicht überschrieben.',
+                {
+                  p0: decoded.data.records.length,
+                  p1: decoded.data.entries.length,
+                  p2: decoded.data.reports.length,
+                },
+              ),
+              t('Wiederherstellen'),
               false,
             ))
           )
             return;
-          setPhase('Backup wird wiederhergestellt …');
+          setPhase(t('Backup wird wiederhergestellt …'));
           const result = await backup.restore(decoded, onProgress);
           refresh();
           feedback.notify(
             [
-              'Backup wiederhergestellt. Die Daten sind sofort in deinen Serien sichtbar.',
+              t(
+                'Backup wiederhergestellt. Die Daten sind sofort in deinen Serien sichtbar.',
+              ),
               ...result.warnings,
             ].join('\n'),
           );

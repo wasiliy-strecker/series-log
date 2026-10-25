@@ -1,3 +1,5 @@
+import { t } from '../../core/i18n/runtime';
+import { useLocalization } from '../../core/i18n/react';
 import { useCallback, useState } from 'react';
 import { router, useFocusEffect } from 'expo-router';
 import { useIsFocused } from 'expo-router/react-navigation';
@@ -8,12 +10,12 @@ import { errorText } from '../../core/ui/components';
 import { useTask } from '../../core/ui/use-task';
 import { useFeedback } from '../../core/ui/feedback';
 import { messages } from '../../core/i18n';
-
 export function useReports(
   recordId: string,
   entryId: string | null,
   hasAttachments: boolean,
 ) {
+  useLocalization();
   const focused = useIsFocused();
   const [loading, setLoading] = useState(true);
   const { series, revision, refresh } = useServices();
@@ -113,10 +115,12 @@ export function useReports(
       if (
         await feedback.confirm(
           report.entryId
-            ? 'Einzelprotokoll löschen?'
-            : 'Serienverlaufsprotokoll löschen?',
-          'Die gespeicherte PDF wird entfernt. Bereits exportierte Kopien bleiben erhalten.',
-          'Löschen',
+            ? t('Einzelprotokoll löschen?')
+            : t('Serienverlaufsprotokoll löschen?'),
+          t(
+            'Die gespeicherte PDF wird entfernt. Bereits exportierte Kopien bleiben erhalten.',
+          ),
+          t('Löschen'),
           true,
         )
       )
@@ -127,8 +131,8 @@ export function useReports(
             refresh();
             feedback.notify(
               report.entryId
-                ? 'Einzelprotokoll gelöscht.'
-                : 'Serienverlaufsprotokoll gelöscht.',
+                ? t('Einzelprotokoll gelöscht.')
+                : t('Serienverlaufsprotokoll gelöscht.'),
             );
           } finally {
             setDeletingId(undefined);

@@ -1,3 +1,5 @@
+import { t } from '../../core/i18n/runtime';
+import { useLocalization } from '../../core/i18n/react';
 // Adapted from ZählerstandLog's read-only example gallery (MPL-2.0).
 import { useCallback, useRef, useState } from 'react';
 import {
@@ -18,18 +20,18 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Body, Button, IconButton, useTheme } from '../../core/ui/components';
 import { useSheetDrag } from '../../core/ui/use-sheet-drag';
 import { photoExamples, type PhotoExample } from './photo-examples';
-
 export function PhotoExamplesButton({
   disabled = false,
 }: {
   disabled?: boolean;
 }) {
+  useLocalization();
   const [visible, setVisible] = useState(false);
   const close = useCallback(() => setVisible(false), []);
   return (
     <View style={{ alignItems: 'center', paddingVertical: 8 }}>
       <Button
-        title="Beispiele ansehen"
+        title={t('Beispiele ansehen')}
         icon="photo_library_outlined"
         textOnly
         disabled={disabled}
@@ -42,7 +44,6 @@ export function PhotoExamplesButton({
     </View>
   );
 }
-
 function ExampleImage({
   example,
   width,
@@ -52,6 +53,7 @@ function ExampleImage({
   width: number;
   height: number;
 }) {
+  useLocalization();
   const c = useTheme();
   const [failed, setFailed] = useState(false);
   return (
@@ -67,13 +69,13 @@ function ExampleImage({
       >
         {failed ? (
           <Body style={{ padding: 16, textAlign: 'center' }}>
-            Beispiel konnte nicht geladen werden.
+            {t('Beispiel konnte nicht geladen werden.')}
           </Body>
         ) : (
           <Image
             source={example.source()}
             resizeMode="contain"
-            accessibilityLabel={`Beispielfoto: ${example.label}`}
+            accessibilityLabel={t('Beispielfoto: {p0}', { p0: example.label })}
             onError={() => setFailed(true)}
             style={{ width: '100%', height: '100%' }}
           />
@@ -82,8 +84,8 @@ function ExampleImage({
     </View>
   );
 }
-
 function PhotoExamplesGallery({ close }: { close(): void }) {
+  useLocalization();
   const c = useTheme(),
     safe = useSafeAreaInsets(),
     window = useWindowDimensions();
@@ -93,7 +95,7 @@ function PhotoExamplesGallery({ close }: { close(): void }) {
   const sheet = useSheetDrag(true, true, close);
   const imageHeight = Math.max(180, (window.height - safe.top) * 0.9 * 0.58);
   function goTo(next: number) {
-    if (next < 0 || next >= photoExamples.length) return;
+    if (next < 0 || next >= photoExamples().length) return;
     list.current?.scrollToIndex({ index: next, animated: true });
     setIndex(next);
   }
@@ -116,7 +118,7 @@ function PhotoExamplesGallery({ close }: { close(): void }) {
           }}
         >
           <Pressable
-            accessibilityLabel="Beispiele schließen"
+            accessibilityLabel={t('Beispiele schließen')}
             onPress={close}
             style={{
               position: 'absolute',
@@ -162,9 +164,13 @@ function PhotoExamplesGallery({ close }: { close(): void }) {
                 style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}
               >
                 <Body strong style={{ fontSize: 22, lineHeight: 28, flex: 1 }}>
-                  Beispielfotos
+                  {t('Beispielfotos')}
                 </Body>
-                <IconButton icon="close" label="Schließen" onPress={close} />
+                <IconButton
+                  icon="close"
+                  label={t('Schließen')}
+                  onPress={close}
+                />
               </View>
               <GestureDetector gesture={sheet.nativeScroll}>
                 <Animated.ScrollView
@@ -174,8 +180,9 @@ function PhotoExamplesGallery({ close }: { close(): void }) {
                   contentContainerStyle={{ gap: 12, paddingBottom: 4 }}
                 >
                   <Body>
-                    Staffel und Folge gut lesbar aufnehmen. Trage danach die
-                    zuletzt vollständig gesehene Folge selbst ein.
+                    {t(
+                      'Staffel und Folge gut lesbar aufnehmen. Trage danach die zuletzt vollständig gesehene Folge selbst ein.',
+                    )}
                   </Body>
                   <View
                     onLayout={(event) =>
@@ -186,7 +193,7 @@ function PhotoExamplesGallery({ close }: { close(): void }) {
                       <FlatList
                         key={width}
                         ref={list}
-                        data={photoExamples}
+                        data={photoExamples()}
                         horizontal
                         pagingEnabled
                         nestedScrollEnabled
@@ -206,7 +213,7 @@ function PhotoExamplesGallery({ close }: { close(): void }) {
                             Math.max(
                               0,
                               Math.min(
-                                photoExamples.length - 1,
+                                photoExamples().length - 1,
                                 Math.round(
                                   event.nativeEvent.contentOffset.x / width,
                                 ),
@@ -225,7 +232,7 @@ function PhotoExamplesGallery({ close }: { close(): void }) {
                     )}
                   </View>
                   <Body strong style={{ textAlign: 'center', fontSize: 16 }}>
-                    {photoExamples[index]!.label}
+                    {photoExamples()[index]!.label}
                   </Body>
                   <View
                     style={{
@@ -237,24 +244,27 @@ function PhotoExamplesGallery({ close }: { close(): void }) {
                   >
                     <IconButton
                       icon="chevron_left"
-                      label="Vorheriges Beispiel"
+                      label={t('Vorheriges Beispiel')}
                       disabled={index === 0}
                       onPress={() => goTo(index - 1)}
                     />
                     <View accessibilityLiveRegion="polite">
                       <Body>
-                        {index + 1} von {photoExamples.length}
+                        {t('Foto {p0} von {p1}', {
+                          p0: index + 1,
+                          p1: photoExamples().length,
+                        })}
                       </Body>
                     </View>
                     <IconButton
                       icon="chevron_right"
-                      label="Nächstes Beispiel"
-                      disabled={index === photoExamples.length - 1}
+                      label={t('Nächstes Beispiel')}
+                      disabled={index === photoExamples().length - 1}
                       onPress={() => goTo(index + 1)}
                     />
                   </View>
                   <Body muted style={{ textAlign: 'center', fontSize: 12 }}>
-                    KI-generierte Beispiele · nur zur Ansicht
+                    {t('KI-generierte Beispiele · nur zur Ansicht')}
                   </Body>
                 </Animated.ScrollView>
               </GestureDetector>

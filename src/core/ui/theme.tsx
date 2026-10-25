@@ -1,3 +1,5 @@
+import { t } from '../i18n/runtime';
+import { useLocalization } from '../i18n/react';
 import { createContext, useContext, useState, type ReactNode } from 'react';
 import { useFonts } from 'expo-font';
 import { StartupError, StartupPending } from '../startup/startup';
@@ -27,6 +29,7 @@ export const dark = {
 export const light = dark;
 const ThemeContext = createContext(light);
 export function ThemeProvider({ children }: { children: ReactNode }) {
+  useLocalization();
   const [attempt, setAttempt] = useState(0);
   return (
     <FontThemeProvider key={attempt} retry={() => setAttempt((n) => n + 1)}>
@@ -41,6 +44,7 @@ function FontThemeProvider({
   children: ReactNode;
   retry(): void;
 }) {
+  useLocalization();
   const [loaded, error] = useFonts({
     Roboto: require('../../../assets/ui/Roboto-Regular.ttf'),
     RobotoMedium: require('../../../assets/ui/Roboto-Medium.ttf'),
@@ -51,7 +55,7 @@ function FontThemeProvider({
   if (error)
     return (
       <StartupError
-        message="Die Schriftarten konnten nicht geladen werden."
+        message={t('Die Schriftarten konnten nicht geladen werden.')}
         retry={retry}
       />
     );

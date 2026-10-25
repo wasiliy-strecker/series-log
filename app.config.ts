@@ -12,7 +12,7 @@ const config: ExpoConfig = {
   icon: './assets/icon.png',
   android: {
     package: 'com.appfactory.series_log',
-    versionCode: 1,
+    versionCode: 2,
     allowBackup: false,
     adaptiveIcon: {
       foregroundImage: './assets/icon-foreground.png',

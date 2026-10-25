@@ -1,3 +1,5 @@
+import { t, formatNumber } from '../../core/i18n/runtime';
+import { useLocalization } from '../../core/i18n/react';
 import { useEffect, useRef } from 'react';
 import {
   ActivityIndicator,
@@ -23,7 +25,6 @@ import { dateTime } from './presentation-model';
 import { useReports } from './use-reports';
 import { useScrollHost } from '../../core/ui/scroll-host';
 import { messages } from '../../core/i18n';
-
 function ReportCard({
   report,
   summary,
@@ -41,6 +42,7 @@ function ReportCard({
   onOpen(): void;
   onDelete(): void;
 }) {
+  useLocalization();
   const c = useTheme();
   const backgroundColor = available ? c.soft : c.errorContainer;
   const color = available ? c.onSoft : c.onErrorContainer;
@@ -57,13 +59,16 @@ function ReportCard({
       </View>
       <View style={s.reportBody}>
         <Body style={[s.reportTitle, { color: c.onSecondaryContainer }]}>
-          {report.entryId ? 'Einzelprotokoll' : 'Serienverlauf'}
+          {report.entryId ? t('Einzelprotokoll') : t('Serienverlauf')}
           {report.partIndex
-            ? ` · Teil ${report.partIndex} von ${report.partCount}`
+            ? t(' · Teil {p0} von {p1}', {
+                p0: report.partIndex,
+                p1: report.partCount,
+              })
             : ''}
         </Body>
         <Body style={{ color: c.onSecondaryContainer, marginTop: 3 }}>
-          Erstellt am {dateTime(report.createdAt)} Uhr
+          {t('Erstellt am')} {dateTime(report.createdAt)}
         </Body>
         <Body strong style={{ color: c.onSecondaryContainer, marginTop: 4 }}>
           {summary}
@@ -79,14 +84,14 @@ function ReportCard({
             color={color}
           />
           <Text numberOfLines={1} style={[s.statusText, { color }]}>
-            {available ? 'Lokal gespeichert' : 'Datei fehlt'}
+            {available ? t('Lokal gespeichert') : t('Datei fehlt')}
           </Text>
         </View>
       </View>
       <View style={s.deleteAction}>
         {deleting ? (
           <ActivityIndicator
-            accessibilityLabel="Protokoll wird gelöscht"
+            accessibilityLabel={t('Protokoll wird gelöscht')}
             color={c.primary}
           />
         ) : (
@@ -94,8 +99,8 @@ function ReportCard({
             icon="delete_outline"
             label={
               report.entryId
-                ? 'Einzelprotokoll löschen'
-                : 'Serienverlaufsprotokoll löschen'
+                ? t('Einzelprotokoll löschen')
+                : t('Serienverlaufsprotokoll löschen')
             }
             color={c.danger}
             disabled={busy}
@@ -106,15 +111,14 @@ function ReportCard({
     </Card>
   );
 }
-
 type ReportsProps = {
   recordId: string;
   entryId?: string | null;
   hasAttachments: boolean;
   summary: string;
 };
-
 export function Reports(props: ReportsProps) {
+  useLocalization();
   return (
     <ReportSection
       key={`${props.recordId}/${props.entryId ?? ''}`}
@@ -122,13 +126,13 @@ export function Reports(props: ReportsProps) {
     />
   );
 }
-
 function ReportSection({
   recordId,
   entryId = null,
   hasAttachments,
   summary,
 }: ReportsProps) {
+  useLocalization();
   const vm = useReports(recordId, entryId, hasAttachments);
   const c = useTheme();
   const host = useScrollHost();
@@ -164,11 +168,11 @@ function ReportSection({
   const saved = (
     <View>
       {vm.loading || (!vm.availableFiles && !vm.loadError) ? (
-        <Busy label="PDF-Dateien werden geprüft …" />
+        <Busy label={t('PDF-Dateien werden geprüft …')} />
       ) : vm.loadError ? (
         <View style={s.loadError}>
           <Notice error text={vm.loadError} />
-          <Button textOnly title="Erneut versuchen" onPress={vm.retry} />
+          <Button textOnly title={t('Erneut versuchen')} onPress={vm.retry} />
         </View>
       ) : (
         <>
@@ -187,15 +191,16 @@ function ReportSection({
           {vm.total > PAGE_SIZE && (
             <View style={{ gap: 8 }}>
               <Body style={{ textAlign: 'center' }}>
-                Seite {Math.floor(vm.offset / PAGE_SIZE) + 1} von{' '}
-                {Math.ceil(vm.total / PAGE_SIZE)}
+                {t('Seite')}{' '}
+                {formatNumber(Math.floor(vm.offset / PAGE_SIZE) + 1)} {t('von')}{' '}
+                {formatNumber(Math.ceil(vm.total / PAGE_SIZE))}
               </Body>
               <ActionRow>
                 {[
                   <Button
                     key="previous"
                     secondary
-                    title="Zurück"
+                    title={t('Zurück')}
                     icon="chevron_left"
                     disabled={vm.offset === 0 || vm.busy}
                     onPress={() => vm.setOffset(vm.offset - PAGE_SIZE)}
@@ -203,7 +208,7 @@ function ReportSection({
                   <Button
                     key="next"
                     secondary
-                    title="Weiter"
+                    title={t('Weiter')}
                     icon="chevron_right"
                     disabled={vm.offset + PAGE_SIZE >= vm.total || vm.busy}
                     onPress={() => vm.setOffset(vm.offset + PAGE_SIZE)}
@@ -221,7 +226,7 @@ function ReportSection({
       {!!entryId && (
         <View ref={heading} collapsable={false}>
           <Body strong style={s.heading}>
-            Gespeicherte Einzelprotokolle
+            {t('Gespeicherte Einzelprotokolle')}
           </Body>
         </View>
       )}
@@ -259,14 +264,14 @@ function ReportSection({
               <Icon name="folder_copy_outlined" color={c.primary} />
               <View style={{ flex: 1 }}>
                 <Body strong style={s.sectionTitle}>
-                  Gespeicherte Serienverlaufsprotokolle
+                  {t('Gespeicherte Serienverlaufsprotokolle')}
                 </Body>
                 <Body>
                   {vm.loadError
-                    ? 'Serienverlaufsprotokolle konnten nicht geladen werden'
+                    ? t('Serienverlaufsprotokolle konnten nicht geladen werden')
                     : vm.loading
-                      ? 'Serienverlaufsprotokolle werden geladen …'
-                      : `${vm.total} ${vm.total === 1 ? 'Protokoll' : 'Protokolle'}`}
+                      ? t('Serienverlaufsprotokolle werden geladen …')
+                      : `${formatNumber(vm.total)} ${vm.total === 1 ? t('Protokoll') : t('Protokolle')}`}
                 </Body>
               </View>
               <Icon
@@ -280,12 +285,11 @@ function ReportSection({
       ) : null}
       <BusyOverlay
         visible={vm.busy && !vm.deletingId}
-        label="Serienprotokoll wird verarbeitet …"
+        label={t('Serienprotokoll wird verarbeitet …')}
       />
     </View>
   );
 }
-
 const s = StyleSheet.create({
   heading: {
     fontSize: 16,

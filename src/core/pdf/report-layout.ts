@@ -1,3 +1,4 @@
+import { localization, translator } from '../i18n/runtime';
 import {
   rgb,
   type PDFDocument,
@@ -7,7 +8,6 @@ import {
   type RGB,
 } from 'pdf-lib';
 import { checkPdfPages } from '../files/limits';
-
 const PAGE_WIDTH = 595.2756;
 const PAGE_HEIGHT = 841.8898;
 export const REPORT_ACCENT = rgb(170 / 255, 12 / 255, 23 / 255);
@@ -20,12 +20,18 @@ const BLACK = rgb(0, 0, 0);
 const ASCENT = 1900 / 2048;
 const LINE_HEIGHT = 2400 / 2048;
 const PHOTO_MAX_FRACTION = 0.7;
-
-export type ReportFonts = { regular: PDFFont; bold: PDFFont };
-type TextStyle = { size?: number; bold?: boolean; color?: RGB };
-
+export type ReportFonts = {
+  regular: PDFFont;
+  bold: PDFFont;
+};
+type TextStyle = {
+  size?: number;
+  bold?: boolean;
+  color?: RGB;
+};
 /** Paginates generated pages only. Imported PDF pages never receive decorations. */
 export class ReportLayout {
+  private readonly t: ReturnType<typeof translator>;
   private page!: PDFPage;
   private pages: PDFPage[] = [];
   private top = 0;
@@ -33,13 +39,14 @@ export class ReportLayout {
   readonly width: number;
   private readonly start: number;
   private readonly bottom: number;
-
   constructor(
     private pdf: PDFDocument,
     private fonts: ReportFonts,
     private entryNumber?: number,
     private separator = false,
+    locale = localization(),
   ) {
+    this.t = translator(locale);
     this.margin = separator ? 56.6929 : 40;
     this.width = PAGE_WIDTH - this.margin * 2;
     this.start = separator ? this.margin : 40 + 10 * LINE_HEIGHT + 10;
@@ -48,14 +55,12 @@ export class ReportLayout {
       : PAGE_HEIGHT - 40 - 8 * LINE_HEIGHT - 10;
     this.newPage();
   }
-
   private newPage() {
     checkPdfPages(this.pdf.getPageCount() + 1, true);
     this.page = this.pdf.addPage([PAGE_WIDTH, PAGE_HEIGHT]);
     this.pages.push(this.page);
     this.top = this.start;
   }
-
   ensure(height: number) {
     // Oversized text/table blocks are allowed to flow across pages below.
     if (
@@ -64,11 +69,9 @@ export class ReportLayout {
     )
       this.newPage();
   }
-
   gap(height: number) {
     this.top = Math.min(this.top + height, this.bottom);
   }
-
   private measure(text: string, font: PDFFont, size: number) {
     return text
       .split('→')
@@ -78,7 +81,6 @@ export class ReportLayout {
         0,
       );
   }
-
   private wrap(text: string, width: number, font: PDFFont, size: number) {
     const lines: string[] = [];
     for (const paragraph of text.replace(/\r\n?/g, '\n').split('\n')) {
@@ -104,7 +106,6 @@ export class ReportLayout {
     }
     return lines;
   }
-
   private drawLine(
     text: string,
     x: number,
@@ -130,7 +131,6 @@ export class ReportLayout {
       x += font.widthOfTextAtSize(part, size);
     }
   }
-
   text(
     text: string,
     { size = 12, bold = false, color = BLACK }: TextStyle = {},
@@ -142,7 +142,6 @@ export class ReportLayout {
       this.top += size * LINE_HEIGHT;
     }
   }
-
   textHeight(text: string, size = 12, bold = false) {
     return (
       this.wrap(
@@ -155,7 +154,6 @@ export class ReportLayout {
       LINE_HEIGHT
     );
   }
-
   private cells(
     row: string[],
     widths: number[],
@@ -171,7 +169,6 @@ export class ReportLayout {
       ),
     );
   }
-
   dataHeight(rows: string[][]) {
     const widths = [this.width / 2, this.width / 2];
     return rows.reduce((height, row, index) => {
@@ -183,7 +180,6 @@ export class ReportLayout {
       );
     }, 0);
   }
-
   private row(
     cells: string[][],
     widths: number[],
@@ -218,7 +214,6 @@ export class ReportLayout {
     }
     this.top += height;
   }
-
   private table(rows: string[][], widths: number[], history: boolean) {
     const padding = history ? 6 : 8;
     const header = this.cells(rows[0]!, widths, true, padding);
@@ -261,20 +256,25 @@ export class ReportLayout {
       }
     }
   }
-
   dataTable(rows: string[][]) {
     this.table(rows, [this.width / 2, this.width / 2], false);
   }
-
   historyTable(rows: string[][]) {
-    const flex = (this.width - 30) / 2;
+    const numberWidth = rows.reduce(
+      (width, row) =>
+        Math.max(
+          width,
+          this.fonts.regular.widthOfTextAtSize(row[0] ?? '', 12) + 14,
+        ),
+      Math.max(30, this.fonts.bold.widthOfTextAtSize(this.t('Nr.'), 12) + 14),
+    );
+    const flex = (this.width - numberWidth) / 2;
     this.table(
-      [['Nr.', 'Zeitpunkt', 'Folgenstand'], ...rows],
-      [30, flex, flex],
+      [[this.t('Nr.'), this.t('Zeitpunkt'), this.t('Folgenstand')], ...rows],
+      [numberWidth, flex, flex],
       true,
     );
   }
-
   photo(
     image: PDFImage,
     {
@@ -282,12 +282,20 @@ export class ReportLayout {
       name,
       number,
       total,
-    }: { title: string; name: string; number: number; total: number },
+    }: {
+      title: string;
+      name: string;
+      number: number;
+      total: number;
+    },
   ) {
     this.newPage();
     this.text(title, { size: 17, bold: true, color: REPORT_ACCENT });
     this.gap(6);
-    this.text(`Foto ${number} von ${total}`, { size: 11, bold: true });
+    this.text(this.t('Foto {p0} von {p1}', { p0: number, p1: total }), {
+      size: 11,
+      bold: true,
+    });
     this.gap(4);
     this.text(name, { size: 9 });
     this.gap(12);
@@ -309,12 +317,11 @@ export class ReportLayout {
     // Keep any following history entries on a separate page.
     this.top = this.bottom;
   }
-
   finish() {
     if (this.separator) return;
     this.pages.forEach((page, index) => {
       this.drawLine(
-        'SERIENLOG',
+        this.t('SERIENLOG'),
         40,
         40,
         10,
@@ -322,7 +329,14 @@ export class ReportLayout {
         REPORT_ACCENT,
         page,
       );
-      const label = `${this.entryNumber === undefined ? '' : `Eintrag ${this.entryNumber} · `}Protokollseite ${index + 1} von ${this.pages.length}`;
+      const label = this.t('{p0}Protokollseite {p1} von {p2}', {
+        p0:
+          this.entryNumber === undefined
+            ? ''
+            : this.t('Eintrag {p0} · ', { p0: this.entryNumber }),
+        p1: index + 1,
+        p2: this.pages.length,
+      });
       this.drawLine(
         label,
         PAGE_WIDTH - 40 - this.measure(label, this.fonts.regular, 9),
@@ -333,7 +347,7 @@ export class ReportLayout {
         page,
       );
       this.drawLine(
-        'Private Dokumentation deiner Serienabende.',
+        this.t('Private Dokumentation deiner Serienabende.'),
         40,
         PAGE_HEIGHT - 40 - 8 * LINE_HEIGHT,
         8,

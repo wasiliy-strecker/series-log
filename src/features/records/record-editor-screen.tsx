@@ -1,3 +1,5 @@
+import { t } from '../../core/i18n/runtime';
+import { useLocalization } from '../../core/i18n/react';
 import { useRef, useState } from 'react';
 import { Keyboard, View } from 'react-native';
 import { Stack, useLocalSearchParams } from 'expo-router';
@@ -15,6 +17,7 @@ import { ReminderEditor } from './reminder-editor';
 import { FormErrorScroll } from '../../core/ui/form-error-scroll';
 import { messages } from '../../core/i18n';
 export function RecordEditorScreen() {
+  useLocalization();
   const { id } = useLocalSearchParams<{
     id?: string;
   }>();
@@ -36,28 +39,30 @@ export function RecordEditorScreen() {
         <>
           {!id && (
             <Body muted style={{ fontSize: 12 }}>
-              Speichere zuerst die Serie. Anschließend kannst du deinen ersten
-              Folgenstand mit einem optionalen Foto festhalten.
+              {t(
+                'Speichere zuerst die Serie. Anschließend kannst du deinen ersten Folgenstand mit einem optionalen Foto festhalten.',
+              )}
             </Body>
           )}
           {repair && (
             <Body>
-              Die Erinnerung ist nicht bestätigt. Mit Speichern wird sie erneut
-              eingerichtet.
+              {t(
+                'Die Erinnerung ist nicht bestätigt. Mit Speichern wird sie erneut eingerichtet.',
+              )}
             </Body>
           )}
           <Button
             icon={id && !vm.dirty ? 'check_circle_outline' : 'save_outlined'}
             title={
               vm.busy
-                ? 'Wird gespeichert …'
+                ? t('Wird gespeichert …')
                 : repair && !vm.dirty
-                  ? 'Erinnerung erneut speichern'
+                  ? t('Erinnerung erneut speichern')
                   : id && !vm.dirty
-                    ? 'Alles gespeichert'
+                    ? t('Alles gespeichert')
                     : id
-                      ? 'Änderungen speichern'
-                      : 'Serie speichern'
+                      ? t('Änderungen speichern')
+                      : t('Serie speichern')
             }
             disabled={vm.busy || (!vm.dirty && !repair)}
             onPress={() => void vm.save()}
@@ -67,7 +72,7 @@ export function RecordEditorScreen() {
     >
       <FormErrorScroll target={vm.errorTarget} anchors={anchors} />
       <Stack.Screen
-        options={{ title: id ? 'Serie bearbeiten' : 'Serie anlegen' }}
+        options={{ title: id ? t('Serie bearbeiten') : t('Serie anlegen') }}
       />
       <View style={{ gap: 16 }}>
         <Notice error text={vm.error} />
@@ -109,7 +114,7 @@ export function RecordEditorScreen() {
             collapsable={false}
           >
             <Field
-              label="Serientitel *"
+              label={t('Serientitel *')}
               error={vm.fieldErrors.name}
               value={r.name}
               onChangeText={(v) => vm.change('name', v)}
@@ -133,7 +138,7 @@ export function RecordEditorScreen() {
             collapsable={false}
           >
             <Field
-              label="Notiz (optional)"
+              label={t('Notiz (optional)')}
               error={vm.fieldErrors.note}
               multiline
               value={r.note}

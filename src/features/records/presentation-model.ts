@@ -1,3 +1,4 @@
+import { localization, t, type Localization } from '../../core/i18n/runtime';
 import type {
   EpisodeEntry,
   SeriesRecord,
@@ -7,14 +8,13 @@ import type {
 } from '../../core/domain/models';
 import { messages } from '../../core/i18n';
 import { positionText } from '../../core/domain/episode-position';
-
 export type HistoryItem = {
   entry: EpisodeEntry;
   photoUri?: string;
   photoCount: number;
   positionLabel: string;
 };
-export const genreSuggestions = Object.values(messages.genres);
+export const genreSuggestions = () => Object.values(messages.genres);
 export type DashboardItem = {
   record: SeriesRecord;
   latest: EpisodeEntry | null;
@@ -22,13 +22,13 @@ export type DashboardItem = {
   photo: SeriesPhoto | null;
 };
 export type RecordSort = 'lastEdited' | 'name' | 'category';
-export const sortLabels: Record<RecordSort, string> = {
-  lastEdited: 'Zuletzt bearbeitet',
-  name: 'Titel',
-  category: 'Genre',
-};
+export const sortLabels = () => ({
+  lastEdited: t('Zuletzt bearbeitet'),
+  name: t('Titel'),
+  category: t('Genre'),
+});
 export const dateTime = (value: string | number) =>
-  new Date(value).toLocaleString('de-DE', {
+  new Date(value).toLocaleString(localization().formatLocale, {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
@@ -36,46 +36,67 @@ export const dateTime = (value: string | number) =>
     minute: '2-digit',
   });
 export function entrySummary(entry: EpisodeEntry | null) {
-  return entry ? positionText(entry) : 'Noch kein Folgenstand';
+  return entry ? positionText(entry) : t('Noch kein Folgenstand');
 }
 export function visibleRecords(
   items: DashboardItem[],
   search: string,
   sort: RecordSort,
+  locale: Localization = localization(),
 ) {
-  const q = search.trim().toLocaleLowerCase('de-DE');
+  const q = search.trim().toLocaleLowerCase(locale.language);
   return items
     .filter(({ record, latest }) =>
       [
         record.name,
         record.category,
         record.note,
-        latest ? entrySummary(latest) : '',
-      ].some((value) => value.toLocaleLowerCase('de-DE').includes(q)),
+        latest ? positionText(latest, locale) : '',
+      ].some((value) => value.toLocaleLowerCase(locale.language).includes(q)),
     )
     .sort(
       (a, b) =>
         (sort === 'lastEdited'
           ? b.lastEdited.localeCompare(a.lastEdited)
           : sort === 'name'
-            ? a.record.name.localeCompare(b.record.name, 'de-DE')
-            : a.record.category.localeCompare(b.record.category, 'de-DE')) ||
-        a.record.name.localeCompare(b.record.name, 'de-DE') ||
+            ? a.record.name.localeCompare(b.record.name, locale.language)
+            : a.record.category.localeCompare(
+                b.record.category,
+                locale.language,
+              )) ||
+        a.record.name.localeCompare(b.record.name, locale.language) ||
         a.record.id.localeCompare(b.record.id),
     );
 }
+export function reminderTime(r: Pick<Reminder, 'hour' | 'minute'>) {
+  return new Date(2026, 0, 1, r.hour, r.minute).toLocaleTimeString(
+    localization().formatLocale,
+    { hour: '2-digit', minute: '2-digit' },
+  );
+}
 export function reminderSummary(r: Reminder) {
-  const time = `${String(r.hour).padStart(2, '0')}:${String(r.minute).padStart(2, '0')} Uhr`;
+  const time = reminderTime(r);
   const labels = {
-    hourly: `stündlich ab ${dateTime(r.startsAtMillis)}`,
-    daily: `täglich um ${time}`,
-    weekly: `${['montags', 'dienstags', 'mittwochs', 'donnerstags', 'freitags', 'samstags', 'sonntags'][r.day - 1]} um ${time}`,
-    monthly: `monatlich am ${r.day}. um ${time}`,
-    yearly: `jährlich am ${r.day}.${r.month}. um ${time}`,
+    hourly: t('stündlich ab {p0}', { p0: dateTime(r.startsAtMillis) }),
+    daily: t('täglich um {p0}', { p0: time }),
+    weekly: t('{p0} um {p1}', {
+      p0: new Intl.DateTimeFormat(localization().language, {
+        weekday: 'long',
+      }).format(new Date(2026, 9, 18 + r.day)),
+      p1: time,
+    }),
+    monthly: t('monatlich am {p0}. um {p1}', { p0: r.day, p1: time }),
+    yearly: t('jährlich am {p0} um {p1}', {
+      p0: new Date(2024, r.month - 1, r.day).toLocaleDateString(
+        localization().formatLocale,
+        { day: 'numeric', month: 'numeric' },
+      ),
+      p1: time,
+    }),
   };
   return (
     labels[r.interval] +
-    (r.deliveryMode === 'punctualWithSound' ? ' · pünktlich mit Ton' : '')
+    (r.deliveryMode === 'punctualWithSound' ? t(' · pünktlich mit Ton') : '')
   );
 }
 export function capturePhase(draft: EntryDraft): 'choose' | 'form' {

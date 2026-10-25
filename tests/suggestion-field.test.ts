@@ -96,7 +96,7 @@ function Harness() {
         label: 'Genre *',
         helper: 'Vorschlag auswählen oder eigenes Genre eingeben.',
         value,
-        suggestions: genreSuggestions,
+        suggestions: genreSuggestions(),
         showAllOnFocus: true,
         onOpenChange: ports.opened,
         onChange: (next) => {

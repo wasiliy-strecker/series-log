@@ -1,3 +1,4 @@
+import { localization } from '../i18n/runtime';
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import {
   BackHandler,
@@ -63,9 +64,9 @@ export function SuggestionField({
   const query =
     showAllOnFocus && !editedSinceFocus
       ? ''
-      : value.trim().toLocaleLowerCase('de-DE');
+      : value.trim().toLocaleLowerCase(localization().language);
   const options = suggestions.filter((s) =>
-    s.toLocaleLowerCase('de-DE').includes(query),
+    s.toLocaleLowerCase(localization().language).includes(query),
   );
   const desiredHeight = Math.min(
     220,

@@ -1,21 +1,21 @@
 # Abhängigkeitsprüfung
 
-Stand: 21. Oktober 2026. Die Aktualisierung folgt den kompatiblen SDK-57-Patches
+Stand: 25. Oktober 2026. Die Aktualisierung folgt den kompatiblen SDK-57-Patches
 aus MaschinenLogs Lockfile bei Commit `44078f4`. SerienLog besitzt weiterhin
 eigene Abhängigkeiten, ein eigenes Lockfile und ein eigenes natives Projekt.
 React bleibt bei 19.2.3 und React Native bei 0.86.3.
 
 | Paket                  | Version |
 | ---------------------- | ------- |
-| expo                   | 57.0.30 |
+| expo                   | 57.0.31 |
 | expo-asset             | 57.0.20 |
 | expo-constants         | 57.0.22 |
 | expo-crypto            | 57.0.4  |
 | expo-dev-client        | 57.0.20 |
 | expo-image-manipulator | 57.0.21 |
 | expo-linking           | 57.0.13 |
-| expo-router            | 57.0.28 |
-| expo-sharing           | 57.0.23 |
+| expo-router            | 57.0.29 |
+| expo-sharing           | 57.0.24 |
 | expo-splash-screen     | 57.0.10 |
 | expo-sqlite            | 57.0.4  |
 
@@ -24,46 +24,38 @@ React bleibt bei 19.2.3 und React Native bei 0.86.3.
 `appConfigFieldsNotSyncedCheck` bleibt erhalten, weil Android versioniert ist
 und Änderungen zusätzlich im app-eigenen Expo-Plugin gepflegt werden.
 
-## Audit
+## Audit zum internationalen Release
 
-Vor dem ersten Store-Build meldete der erneute Audit zusätzlich Vite 8.3.0.
-Vite wurde innerhalb der von Vitest unterstützten Version 8 auf 8.3.5
-aktualisiert. Die drei `launch-editor`-Hinweise sind damit behoben.
-Das gezielte Update aktualisiert auch seine kompatiblen Hilfspakete im Lockfile.
-Die vollständige Anwendungstestsuite mit 82 Tests besteht auch mit diesem Stand.
-[Sicherheitshinweis des Maintainers](https://github.com/vitejs/launch-editor/security/advisories/GHSA-587h-7wmj-h5pm).
+Die App verwendet Zod 4.6.6. Damit ist der neue Hinweis zur Speicherbelegung bei
+übergroßen eingeschränkten Sammlungen in der tatsächlich verwendeten
+Laufzeitvalidierung behoben. Die Tests prüfen weiterhin die bestehenden
+Backup-Fixtures und unveränderte Datenformate. Vitest wurde auf 5.0.5 aktualisiert.
+Die beiden moderaten Paketeinträge zur Mock-Registrierung sind damit behoben.
 
-Vorher meldete `npm audit` einen kritischen und 20 hohe Paketeinträge. Nach der
-Aktualisierung melden sowohl `npm audit` als auch `npm audit --omit=dev` keine
-kritischen und 18 hohe Einträge. Beide Befehle enden deshalb weiterhin mit
-Exitcode 1. Die Anzahl enthält betroffene übergeordnete Pakete, keine 18
-unabhängigen Ursachen.
+`npm audit` und `npm audit --omit=dev` melden noch fünf hohe Paketeinträge,
+keine kritischen oder moderaten Einträge. Beide Befehle enden deshalb mit Status 1.
+Betroffen sind `node-forge` und die ältere Zod-3-Abhängigkeit der Expo-CLI sowie
+deren übergeordnete Pakete. Das ist nicht die von der App importierte Zod-Version.
+Ein von npm vorgeschlagener inkompatibler Expo-Downgrade wird nicht übernommen.
 
-- `shell-quote` wurde von 1.10.0 auf 1.12.0 aktualisiert. Damit entfällt
-  [GHSA-pqg4-j6r4-53mv](https://github.com/advisories/GHSA-pqg4-j6r4-53mv).
-- `source-map-js` wurde von 1.2.1 auf 1.2.2 aktualisiert. Damit entfällt
-  [GHSA-68fv-2mgg-jv7q](https://github.com/advisories/GHSA-68fv-2mgg-jv7q).
-- Offen bleibt `node-forge` 1.4.0 in der Expo-CLI und deren Zertifikatswerkzeugen.
-  Die Meldung betrifft RSA-Signaturprüfung mit präparierten Eingaben.
-  [GHSA-86w9-cpqp-85rv](https://github.com/advisories/GHSA-86w9-cpqp-85rv).
-- Offen bleibt `braces` 3.0.3 in den Musterverarbeitungs-Abhängigkeiten der
-  Entwicklungswerkzeuge. Die Meldung betrifft tief verschachtelte Muster.
-  [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm).
+Der Release-Prüfer kontrolliert anhand der tatsächlichen Store-Source-Map, dass
+Zertifikatswerkzeuge, `node-forge` und die verschachtelte CLI-Zod-Version
+nicht im App-JavaScript enthalten sind. Aus dem Expo-CLI-Paket ist ausschließlich
+der von Metro benötigte Laufzeitlader `build/metro-require/require.js` zugelassen.
+Weitere CLI-Dateien werden abgewiesen. Er prüft weiterhin die bisherigen
+Werkzeugpakete shell-quote, source-map-js, braces und vite. Der Audit ist keine
+pauschale Sicherheitsfreigabe. Vollständige JSON-Berichte liegen im ausgelieferten
+Verzeichnis `verification/`.
 
-Npm schlägt für die verbleibenden Ursachen einen inkompatiblen Wechsel auf
-Expo 44 vor. Dieser wird nicht angewendet. Es gibt keine neuen Overrides,
-keine Audit-Unterdrückung und keinen erzwungenen Downgrade. Die vorhandenen
-Overrides für uuid und decode-uri-component bleiben erhalten.
-
-`--omit=dev` ist keine Analyse des Android-Bundles. Expo enthält auch Werkzeuge
-innerhalb normaler Abhängigkeitsketten. Aus dieser Einordnung folgt keine
-pauschale Aussage über Unbedenklichkeit oder eine Store-Freigabe.
+[Zod-Audit-Hinweis](https://github.com/advisories/GHSA-mrhx-c7xc-m3w5),
+[Vitest-Korrektur](https://github.com/vitest-dev/vitest/security/advisories/GHSA-qxg6-89mg-rqv8),
+[node-forge-Hinweis](https://github.com/advisories/GHSA-86w9-cpqp-85rv).
 
 ## Native Android-Abhängigkeiten
 
 Die app-eigene `plugins/dependency-versions.gradle` ersetzt gezielt zwei
 transitive Android-Versionen. Das Expo-Plugin erhält diese Konfiguration bei
-Prebuild. Die JavaScript-Abhängigkeiten und das Lockfile bleiben unverändert.
+Prebuild. Diese nativen Festlegungen bestehen unabhängig vom JavaScript-Lockfile.
 
 | Bibliothek | Bisher    | Jetzt  |
 | ---------- | --------- | ------ |
@@ -93,3 +85,6 @@ Java-Plattformklassen auf einem echten Android-7-Gerät nicht ab. Deshalb wird
 zusätzlich im erzeugten Dev-DEX geprüft, dass die Dateiaufrufe auf die
 mitgelieferten `j$.nio.file`-Klassen umgeschrieben wurden.
 [Android-NIO-Desugaring](https://android-developers.googleblog.com/2023/02/api-desugaring-supporting-android-13-and-java-nio.html).
+
+Für die native Sprachverwaltung verwendet das eigene Android-Modul zusätzlich
+AndroidX AppCompat 1.7.0. Die Sprachtests prüfen API 24 und 35.

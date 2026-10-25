@@ -1,3 +1,6 @@
+import { t } from '../core/i18n/runtime';
+import { useLocalization } from '../core/i18n/react';
+import { LocalizationProvider } from '../core/i18n/provider';
 import { Stack, router } from 'expo-router';
 import {
   ThemeProvider as NavigationThemeProvider,
@@ -17,6 +20,7 @@ import { FeedbackProvider } from '../core/ui/feedback';
 import { IconButton } from '../core/ui/components';
 import { StartupProvider, useStartup } from '../core/startup/startup';
 function Routes() {
+  useLocalization();
   const { pending } = useStartup();
   const c = useTheme(),
     safe = useSafeAreaInsets();
@@ -58,7 +62,7 @@ function Routes() {
                 {!!back && (
                   <IconButton
                     icon="arrow_back"
-                    label="Zurück"
+                    label={t('Zurück')}
                     onPress={() => {
                       if (router.canGoBack()) router.back();
                       else router.replace('/');
@@ -75,13 +79,13 @@ function Routes() {
                     marginLeft: back ? 16 : 0,
                   }}
                 >
-                  {options.title ?? 'SerienLog'}
+                  {options.title ?? t('SerienLog')}
                 </Text>
                 {options.headerRight?.({ tintColor: c.ink, canGoBack: !!back })}
                 {route.name === 'index' && (
                   <IconButton
                     icon="settings_outlined"
-                    label="Einstellungen"
+                    label={t('Einstellungen')}
                     onPress={() => router.push('/settings')}
                   />
                 )}
@@ -90,37 +94,46 @@ function Routes() {
           ),
         }}
       >
-        <Stack.Screen name="index" options={{ title: 'SerienLog' }} />
-        <Stack.Screen name="record/[id]" options={{ title: 'Serie' }} />
-        <Stack.Screen name="record/edit" options={{ title: 'Serie anlegen' }} />
+        <Stack.Screen name="index" options={{ title: t('SerienLog') }} />
+        <Stack.Screen name="record/[id]" options={{ title: t('Serie') }} />
+        <Stack.Screen
+          name="record/edit"
+          options={{ title: t('Serie anlegen') }}
+        />
         <Stack.Screen
           name="record/history"
-          options={{ title: 'Serienverlauf' }}
+          options={{ title: t('Serienverlauf') }}
         />
         <Stack.Screen
           name="entry/edit"
-          options={{ title: 'Folgenstand erfassen' }}
+          options={{ title: t('Folgenstand erfassen') }}
         />
-        <Stack.Screen name="entry/[id]" options={{ title: 'Folgenstand' }} />
-        <Stack.Screen name="pdf/[id]" options={{ title: 'Serienprotokoll' }} />
-        <Stack.Screen name="settings" options={{ title: 'Einstellungen' }} />
+        <Stack.Screen name="entry/[id]" options={{ title: t('Folgenstand') }} />
+        <Stack.Screen
+          name="pdf/[id]"
+          options={{ title: t('Serienprotokoll') }}
+        />
+        <Stack.Screen name="settings" options={{ title: t('Einstellungen') }} />
       </Stack>
     </NavigationThemeProvider>
   );
 }
 export default function Layout() {
+  useLocalization();
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        <StartupProvider>
-          <ThemeProvider>
-            <FeedbackProvider>
-              <ServicesProvider>
-                <Routes />
-              </ServicesProvider>
-            </FeedbackProvider>
-          </ThemeProvider>
-        </StartupProvider>
+        <LocalizationProvider>
+          <StartupProvider>
+            <ThemeProvider>
+              <FeedbackProvider>
+                <ServicesProvider>
+                  <Routes />
+                </ServicesProvider>
+              </FeedbackProvider>
+            </ThemeProvider>
+          </StartupProvider>
+        </LocalizationProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

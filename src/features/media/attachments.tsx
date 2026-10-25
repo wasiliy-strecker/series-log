@@ -1,3 +1,5 @@
+import { t, formatNumber } from '../../core/i18n/runtime';
+import { useLocalization } from '../../core/i18n/react';
 import { useState } from 'react';
 import { Image, Pressable, View } from 'react-native';
 import { PhotoViewer } from './photo-viewer';
@@ -23,6 +25,7 @@ export type AttachmentActions = {
   reorder: (items: Attachment[]) => void;
 };
 function PhotoThumbnail(props: React.ComponentProps<typeof Image>) {
+  useLocalization();
   const [failed, setFailed] = useState(false),
     c = useTheme();
   return failed ? (
@@ -33,7 +36,7 @@ function PhotoThumbnail(props: React.ComponentProps<typeof Image>) {
       ]}
     >
       <Icon name="error_outline" color={c.danger} />
-      <Body>Foto nicht verfügbar</Body>
+      <Body>{t('Foto nicht verfügbar')}</Body>
     </View>
   ) : (
     <Image {...props} onError={() => setFailed(true)} />
@@ -46,6 +49,7 @@ export function PhotoGallery({
   photos: Attachment[];
   actions?: AttachmentActions;
 }) {
+  useLocalization();
   const { series } = useServices();
   const feedback = useFeedback();
   const [gallery, setGallery] = useState<number | null>(null);
@@ -119,7 +123,7 @@ export function PhotoGallery({
   return (
     <>
       {!photos.length ? (
-        <Body>Keine aktuellen Fotos</Body>
+        <Body>{t('Keine aktuellen Fotos')}</Body>
       ) : (
         <Sortable
           items={photos}
@@ -137,14 +141,17 @@ export function PhotoGallery({
             <View>
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel={`Foto ${index + 1} von ${photos.length} ansehen`}
+                accessibilityLabel={t('Foto {p0} von {p1} ansehen', {
+                  p0: index + 1,
+                  p1: photos.length,
+                })}
                 disabled={actions?.busy}
                 onPress={() => {
                   if (canTap()) show(index);
                 }}
               >
                 <PhotoThumbnail
-                  accessibilityLabel={`Foto ${index + 1}`}
+                  accessibilityLabel={t('Foto {p0}', { p0: index + 1 })}
                   source={{ uri: series.vault.uri(a.file) }}
                   resizeMethod="resize"
                   resizeMode="contain"
@@ -163,7 +170,7 @@ export function PhotoGallery({
                 }}
               >
                 <Body style={{ textAlign: 'center', flex: 1 }}>
-                  Foto {index + 1}
+                  {t('Foto')} {index + 1}
                 </Body>
                 {actions && (
                   <IconButton
@@ -198,17 +205,19 @@ export function PhotoEditor({
   photos: Attachment[];
   actions: AttachmentActions;
 }) {
+  useLocalization();
   return (
     <Card style={{ margin: 4, padding: 13, gap: 0, overflow: 'visible' }}>
       <Body
         strong
         style={{ fontSize: 16, lineHeight: 24, letterSpacing: 0.15 }}
       >
-        Aktuelle Fotos ({photos.length})
+        {t('Aktuelle Fotos (')}
+        {formatNumber(photos.length)})
       </Body>
       {photos.length > 1 && (
         <Body style={{ marginTop: 6 }}>
-          Zum Sortieren ein Foto länger gedrückt halten und verschieben.
+          {t('Zum Sortieren ein Foto länger gedrückt halten und verschieben.')}
         </Body>
       )}
       <View style={{ marginTop: 10 }}>
@@ -218,14 +227,16 @@ export function PhotoEditor({
         <Button
           secondary
           icon="add_a_photo_outlined"
-          title={photos.length ? 'Weiteres Foto aufnehmen' : 'Foto aufnehmen'}
+          title={
+            photos.length ? t('Weiteres Foto aufnehmen') : t('Foto aufnehmen')
+          }
           disabled={actions.busy}
           onPress={() => void actions.pick('camera')}
         />
         <Button
           secondary
           icon="photo_library_outlined"
-          title="Fotos aus Galerie hinzufügen"
+          title={t('Fotos aus Galerie hinzufügen')}
           disabled={actions.busy}
           onPress={() => void actions.pick('gallery')}
         />

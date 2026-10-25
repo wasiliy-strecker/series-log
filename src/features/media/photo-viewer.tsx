@@ -1,3 +1,5 @@
+import { t, formatNumber } from '../../core/i18n/runtime';
+import { useLocalization } from '../../core/i18n/react';
 import { useEffect, useRef, useState } from 'react';
 import {
   Animated,
@@ -12,23 +14,31 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Body, IconButton, useTheme } from '../../core/ui/components';
 import { ZoomablePhoto } from './zoomable-photo';
-
 export function PhotoViewer({
   images,
   initialIndex,
   close,
 }: {
-  images: { id: string; uri: string }[];
+  images: {
+    id: string;
+    uri: string;
+  }[];
   initialIndex: number;
   close(): void;
 }) {
+  useLocalization();
   const c = useTheme(),
     safe = useSafeAreaInsets(),
     { width } = useWindowDimensions();
   const [page, setPage] = useState(initialIndex),
     [height, setHeight] = useState(0),
     [zoomed, setZoomed] = useState(false);
-  const list = useRef<FlatList<{ id: string; uri: string }>>(null);
+  const list = useRef<
+    FlatList<{
+      id: string;
+      uri: string;
+    }>
+  >(null);
   const [position] = useState(() => new Animated.Value(initialIndex * width));
   const [entrance] = useState(() => new Animated.Value(1));
   const currentPage = useRef(initialIndex);
@@ -114,11 +124,11 @@ export function PhotoViewer({
           >
             <IconButton
               icon="arrow_back"
-              label="Fotogalerie schließen"
+              label={t('Fotogalerie schließen')}
               onPress={dismiss}
             />
             <Text style={{ fontFamily: 'Roboto', fontSize: 22, color: c.ink }}>
-              Foto {page + 1} von {images.length}
+              {t('Foto {p0} von {p1}', { p0: page + 1, p1: images.length })}
             </Text>
           </View>
           <View
@@ -180,16 +190,16 @@ export function PhotoViewer({
           >
             <IconButton
               icon="chevron_left"
-              label="Vorheriges Foto"
+              label={t('Vorheriges Foto')}
               disabled={page === 0}
               onPress={() => show(page - 1)}
             />
             <Body>
-              {page + 1} / {images.length}
+              {formatNumber(page + 1)} / {formatNumber(images.length)}
             </Body>
             <IconButton
               icon="chevron_right"
-              label="Nächstes Foto"
+              label={t('Nächstes Foto')}
               disabled={page + 1 === images.length}
               onPress={() => show(page + 1)}
             />

@@ -23,7 +23,7 @@ import org.robolectric.shadows.ShadowSystemClock
 import org.robolectric.shadows.ShadowNotificationManager
 
 @RunWith(RobolectricTestRunner::class)
-@Config(sdk = [24, 25, 35], application = Application::class)
+@Config(sdk = [24, 25, 35], application = Application::class, qualifiers = "de-rDE")
 class ReminderAndroidTest {
     private val context get() = RuntimeEnvironment.getApplication()
     private val notifications get() = context.getSystemService(NotificationManager::class.java)

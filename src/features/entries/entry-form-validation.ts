@@ -1,9 +1,8 @@
+import { t } from '../../core/i18n/runtime';
 import type { EntryForm } from '../../core/domain/models';
 import { wholeNumber, type Position } from '../../core/domain/episode-position';
 import type { FormErrors } from '../../core/ui/use-form-errors';
-
 export const entryFieldOrder = ['season', 'episode', 'occurredAt', 'note'];
-
 export function validateEntryForm(form: EntryForm): {
   position: Position | null;
   errors: FormErrors;
@@ -12,19 +11,21 @@ export function validateEntryForm(form: EntryForm): {
   let season: number | null = null;
   let episode: number | null = null;
   try {
-    season = wholeNumber(form.season, 'Staffel');
+    season = wholeNumber(form.season, t('Staffel'));
   } catch {
-    errors.season = 'Bitte eine ganze Staffelzahl größer als 0 eingeben.';
+    errors.season = t('Bitte eine ganze Staffelzahl größer als 0 eingeben.');
   }
   try {
-    episode = wholeNumber(form.episode, 'Folge');
+    episode = wholeNumber(form.episode, t('Folge'));
   } catch {
-    errors.episode = 'Bitte eine ganze Folgenzahl größer als 0 eingeben.';
+    errors.episode = t('Bitte eine ganze Folgenzahl größer als 0 eingeben.');
   }
   if (!form.occurredAt || !Number.isFinite(Date.parse(form.occurredAt)))
-    errors.occurredAt = 'Bitte ein gültiges Datum und eine Uhrzeit auswählen.';
+    errors.occurredAt = t(
+      'Bitte ein gültiges Datum und eine Uhrzeit auswählen.',
+    );
   if (form.note.length > 20000)
-    errors.note = 'Die Notiz darf höchstens 20.000 Zeichen enthalten.';
+    errors.note = t('Die Notiz darf höchstens 20.000 Zeichen enthalten.');
   return {
     position: Object.keys(errors).length
       ? null
@@ -32,10 +33,11 @@ export function validateEntryForm(form: EntryForm): {
     errors,
   };
 }
-
 export function entrySaveFieldErrors(error: unknown): FormErrors | null {
   if (!(error instanceof Error)) return null;
-  if (error.message.startsWith('Staffel:')) return { season: error.message };
-  if (error.message.startsWith('Folge:')) return { episode: error.message };
+  if (error.message.startsWith(t('Staffel') + ':'))
+    return { season: error.message };
+  if (error.message.startsWith(t('Folge') + ':'))
+    return { episode: error.message };
   return null;
 }

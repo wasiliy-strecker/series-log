@@ -1,3 +1,5 @@
+import { localization, t } from '../i18n/runtime';
+import { useLocalization } from '../i18n/react';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import {
   Keyboard,
@@ -16,7 +18,6 @@ import { useTheme } from './theme';
 import { Icon, type IconName } from './icon';
 import { calendarCells, parseDateInput } from './date-time-model';
 import { DialogActions } from './dialog-actions';
-
 type Request = {
   mode: 'date' | 'time';
   value: Date;
@@ -27,13 +28,14 @@ type Request = {
   title?: string;
 };
 const dateText = (date: Date) =>
-  date.toLocaleDateString('de-DE', {
+  date.toLocaleDateString(localization().formatLocale, {
     day: '2-digit',
     month: '2-digit',
     year: 'numeric',
   });
 const two = (n: number) => String(n).padStart(2, '0');
 export function useMaterialDateTime() {
+  useLocalization();
   const [request, setRequest] = useState<Request>();
   const resolve = useRef<((date: Date | null) => void) | undefined>(undefined);
   function close(date: Date | null) {
@@ -76,6 +78,7 @@ function Picker({
   request: Request;
   close(date: Date | null): void;
 }) {
+  useLocalization();
   const c = useTheme(),
     safe = useSafeAreaInsets(),
     window = useWindowDimensions();
@@ -138,7 +141,7 @@ function Picker({
     if (r.mode === 'date') {
       const result = input ? parseDateInput(dateInput, r.first, r.last) : date;
       if (!result) {
-        setError('Bitte ein gültiges Datum im erlaubten Zeitraum eingeben.');
+        setError(t('Bitte ein gültiges Datum im erlaubten Zeitraum eingeben.'));
         return;
       }
       close(result);
@@ -151,7 +154,7 @@ function Picker({
         h > 23 ||
         m > 59
       ) {
-        setError('Bitte eine gültige Uhrzeit eingeben.');
+        setError(t('Bitte eine gültige Uhrzeit eingeben.'));
         return;
       }
       const result = new Date(r.value);
@@ -215,11 +218,11 @@ function Picker({
           }}
         >
           <Text style={{ ...text, fontSize: 14 }}>
-            {r.title ?? 'Datum auswählen'}
+            {r.title ?? t('Datum auswählen')}
           </Text>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Text style={{ ...text, fontSize: 32, flex: 1 }}>
-              {date.toLocaleDateString('de-DE', {
+              {date.toLocaleDateString(localization().formatLocale, {
                 weekday: 'short',
                 day: 'numeric',
                 month: 'short',
@@ -228,7 +231,7 @@ function Picker({
             {!r.calendarOnly &&
               icon(
                 input ? 'calendar_today' : 'edit_outlined',
-                input ? 'Zum Kalender wechseln' : 'Datum eingeben',
+                input ? t('Zum Kalender wechseln') : t('Datum eingeben'),
                 toggleInput,
               )}
           </View>
@@ -236,7 +239,7 @@ function Picker({
         <View style={{ height: 1, backgroundColor: c.border }} />
         {input ? (
           <View style={{ padding: 24 }}>
-            {field(dateInput, setDateInput, 'Datum')}
+            {field(dateInput, setDateInput, t('Datum'))}
           </View>
         ) : (
           <View style={{ paddingHorizontal: 12 }}>
@@ -245,7 +248,7 @@ function Picker({
             >
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel="Jahr auswählen"
+                accessibilityLabel={t('Jahr auswählen')}
                 onPress={() => setYears(!years)}
                 style={{
                   flex: 1,
@@ -256,7 +259,7 @@ function Picker({
                 }}
               >
                 <Text style={{ ...text, fontSize: 14 }}>
-                  {month.toLocaleDateString('de-DE', {
+                  {month.toLocaleDateString(localization().formatLocale, {
                     month: 'long',
                     year: 'numeric',
                   })}
@@ -267,7 +270,7 @@ function Picker({
                 <>
                   {icon(
                     'chevron_left',
-                    'Vorheriger Monat',
+                    t('Vorheriger Monat'),
                     () =>
                       setMonth(
                         new Date(month.getFullYear(), month.getMonth() - 1, 1),
@@ -276,7 +279,7 @@ function Picker({
                   )}
                   {icon(
                     'chevron_right',
-                    'Nächster Monat',
+                    t('Nächster Monat'),
                     () =>
                       setMonth(
                         new Date(month.getFullYear(), month.getMonth() + 1, 1),
@@ -345,7 +348,11 @@ function Picker({
             ) : (
               <>
                 <View style={{ flexDirection: 'row' }}>
-                  {['M', 'D', 'M', 'D', 'F', 'S', 'S'].map((day, i) => (
+                  {Array.from({ length: 7 }, (_, index) =>
+                    new Intl.DateTimeFormat(localization().language, {
+                      weekday: 'narrow',
+                    }).format(new Date(2026, 9, 19 + index)),
+                  ).map((day, i) => (
                     <Text
                       key={i}
                       style={{
@@ -431,14 +438,14 @@ function Picker({
   } else {
     content = (
       <View style={{ padding: 24, gap: 24 }}>
-        <Text style={{ ...text, fontSize: 14 }}>Uhrzeit auswählen</Text>
+        <Text style={{ ...text, fontSize: 14 }}>{t('Uhrzeit auswählen')}</Text>
         {input ? (
           <View
             style={{ flexDirection: 'row', justifyContent: 'center', gap: 12 }}
           >
-            {field(hourInput, setHourInput, 'Stunde', 96)}
+            {field(hourInput, setHourInput, t('Stunde'), 96)}
             <Text style={{ ...text, fontSize: 48 }}>:</Text>
-            {field(minuteInput, setMinuteInput, 'Minute', 96)}
+            {field(minuteInput, setMinuteInput, t('Minute'), 96)}
           </View>
         ) : (
           <>
@@ -459,7 +466,9 @@ function Picker({
                   <Pressable
                     accessibilityRole="button"
                     accessibilityLabel={
-                      part === 'hour' ? 'Stunde auswählen' : 'Minute auswählen'
+                      part === 'hour'
+                        ? t('Stunde auswählen')
+                        : t('Minute auswählen')
                     }
                     onPress={() => setSelectHour(part === 'hour')}
                     style={{
@@ -518,7 +527,7 @@ function Picker({
         }}
       >
         <Pressable
-          accessibilityLabel="Abbrechen"
+          accessibilityLabel={t('Abbrechen')}
           onPress={() => close(null)}
           style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 }}
         />
@@ -567,15 +576,15 @@ function Picker({
             {r.mode === 'time' &&
               icon(
                 input ? 'schedule' : 'keyboard_outlined',
-                input ? 'Zur Uhr wechseln' : 'Uhrzeit eingeben',
+                input ? t('Zur Uhr wechseln') : t('Uhrzeit eingeben'),
                 toggleInput,
               )}
             <View style={{ flex: 1 }}>
               <DialogActions
                 actions={[
-                  { label: 'Abbrechen', onPress: () => close(null) },
+                  { label: t('Abbrechen'), onPress: () => close(null) },
                   {
-                    label: r.calendarOnly ? 'Übernehmen' : 'OK',
+                    label: r.calendarOnly ? t('Übernehmen') : t('OK'),
                     onPress: confirm,
                   },
                 ]}
@@ -600,6 +609,7 @@ function ClockDial({
   change(value: number): void;
   complete(): void;
 }) {
+  useLocalization();
   const c = useTheme(),
     { width } = useWindowDimensions();
   const size = Math.min(256, width - 96),
@@ -709,7 +719,7 @@ function ClockDial({
           <Pressable
             key={n}
             accessibilityRole="button"
-            accessibilityLabel={`${n} ${selectHour ? 'Uhr' : 'Minuten'}`}
+            accessibilityLabel={`${n} ${selectHour ? t('Uhr') : t('Minuten')}`}
             accessibilityState={{ selected: n === value }}
             onPress={() => {
               change(n);

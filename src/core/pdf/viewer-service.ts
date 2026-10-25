@@ -1,3 +1,4 @@
+import { t } from '../i18n/runtime';
 import type { SavedReport } from '../domain/models';
 import type { SeriesService } from '../../features/entries/entry-service';
 import type { SeriesNative, PdfSession } from '../native/series-native';
@@ -28,7 +29,7 @@ export class PdfViewerService {
       ...drafts.flatMap((d) => d.form.attachments),
     ].find((a) => a.id === id && a.kind === 'pdf');
     const item = report ?? attachment;
-    if (!item) throw new Error('Diese PDF ist nicht mehr vorhanden.');
+    if (!item) throw new Error(t('Diese PDF ist nicht mehr vorhanden.'));
     await verifiedFile(this.series.vault, item);
     const uri = this.series.vault.uri(item.file);
     return {

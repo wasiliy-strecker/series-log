@@ -87,7 +87,7 @@ class SeriesPdfView(context: Context, appContext: AppContext) : ExpoView(context
     init {
         setWillNotDraw(false)
         isFocusable = true
-        contentDescription = "PDF. Mit zwei Fingern vergrößern und zum Blättern wischen."
+        contentDescription = NativeLanguage.text(context, R.string.sl_d9c0ddaaadbc)
     }
     fun open(previews: PdfPreviewStore, id: String) {
         if (session == id && store === previews) return
@@ -196,7 +196,7 @@ class SeriesPdfView(context: Context, appContext: AppContext) : ExpoView(context
             paint.color = Color.GRAY
             paint.textSize = 14f * resources.displayMetrics.scaledDensity
             paint.textAlign = Paint.Align.CENTER
-            canvas.drawText(if (error) "PDF nicht darstellbar. Zum Wiederholen tippen." else "PDF wird geladen …", width / 2f, height / 2f, paint)
+            canvas.drawText(if (error) NativeLanguage.text(context, R.string.sl_e34db5eb9fca) else "PDF wird geladen …", width / 2f, height / 2f, paint)
             return
         }
         canvas.save()

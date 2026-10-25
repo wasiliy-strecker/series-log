@@ -1,3 +1,5 @@
+import { positionText } from '../domain/episode-position';
+import { localization, t } from '../i18n/runtime';
 import {
   SerialQueue,
   type Repository,
@@ -17,14 +19,12 @@ import {
   reportSchema,
   validateSnapshot,
 } from '../domain/models';
-
 function latestPhotoQuery(recordId: '?' | 'r.id') {
   return `SELECT json_object('attachment',json(a.value),'entryId',e.id,'occurredAt',e.occurred_at) body
     FROM entries e,json_each(e.body,'$.attachments') a
     WHERE e.record_id=${recordId} AND json_extract(a.value,'$.kind')='photo'
     ORDER BY e.occurred_at DESC,e.id DESC,CAST(a.key AS INTEGER) ASC LIMIT 1`;
 }
-
 export const schemaV1 = `
 CREATE TABLE records (id TEXT PRIMARY KEY, body TEXT NOT NULL CHECK(json_valid(body)));
 CREATE TABLE entries (id TEXT PRIMARY KEY, record_id TEXT NOT NULL REFERENCES records(id) ON DELETE CASCADE, occurred_at TEXT NOT NULL, search TEXT NOT NULL, body TEXT NOT NULL CHECK(json_valid(body)));
@@ -36,11 +36,14 @@ export async function migrate(db: SqlConnection): Promise<void> {
     'PRAGMA foreign_keys=ON; PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;',
   );
   const version =
-    (await db.all<{ user_version: number }>('PRAGMA user_version'))[0]
-      ?.user_version ?? 0;
+    (
+      await db.all<{
+        user_version: number;
+      }>('PRAGMA user_version')
+    )[0]?.user_version ?? 0;
   if (version > 2)
     throw new Error(
-      'Die Datenbank stammt aus einer neueren SerienLog-Version.',
+      t('Die Datenbank stammt aus einer neueren SerienLog-Version.'),
     );
   await db.exec('BEGIN IMMEDIATE');
   try {
@@ -64,10 +67,9 @@ export class SqlRepository implements Repository {
     params: (string | number | null)[] = [],
   ): Promise<T[]> {
     return (
-      await this.db.all<{ body: string }>(
-        `SELECT body FROM ${table} ${where}`,
-        ...params,
-      )
+      await this.db.all<{
+        body: string;
+      }>(`SELECT body FROM ${table} ${where}`, ...params)
     ).map((r) => JSON.parse(r.body) as T);
   }
   private write<T>(work: () => Promise<T>): Promise<T> {
@@ -123,16 +125,15 @@ export class SqlRepository implements Repository {
   }
   latestPhoto(recordId: string) {
     return this.queue.run(async () => {
-      const rows = await this.db.all<{ body: string }>(
-        latestPhotoQuery('?'),
-        recordId,
-      );
+      const rows = await this.db.all<{
+        body: string;
+      }>(latestPhotoQuery('?'), recordId);
       return rows[0] ? (JSON.parse(rows[0].body) as SeriesPhoto) : null;
     });
   }
   entries(recordId: string, search = '', offset = 0, limit = PAGE_SIZE) {
     return this.queue.run(async () => {
-      const pattern = `%${search.toLocaleLowerCase('de-DE').replace(/[\\%_]/g, '\\$&')}%`;
+      const pattern = `%${search.toLocaleLowerCase(localization().formatLocale).replace(/[\\%_]/g, '\\$&')}%`;
       const clause = "WHERE record_id=? AND search LIKE ? ESCAPE '\\'";
       const rows = await this.bodies<EpisodeEntry>(
         'entries',
@@ -141,13 +142,13 @@ export class SqlRepository implements Repository {
       );
       const total =
         (
-          await this.db.all<{ n: number }>(
-            `SELECT count(*) n FROM entries ${clause}`,
-            recordId,
-            pattern,
-          )
+          await this.db.all<{
+            n: number;
+          }>(`SELECT count(*) n FROM entries ${clause}`, recordId, pattern)
         )[0]?.n ?? 0;
-      const any = await this.db.all<{ found: number }>(
+      const any = await this.db.all<{
+        found: number;
+      }>(
         `SELECT EXISTS(
           SELECT 1 FROM entries e,json_each(e.body,'$.attachments') a
           WHERE e.record_id=? AND json_extract(a.value,'$.kind') IN ('photo','pdf')
@@ -172,10 +173,9 @@ export class SqlRepository implements Repository {
       const params = [request.recordId, request.entryId];
       const total =
         (
-          await this.db.all<{ n: number }>(
-            `SELECT count(*) n FROM reports ${clause}`,
-            ...params,
-          )
+          await this.db.all<{
+            n: number;
+          }>(`SELECT count(*) n FROM reports ${clause}`, ...params)
         )[0]?.n ?? 0;
       const lastOffset = Math.max(
         0,
@@ -231,25 +231,52 @@ export class SqlRepository implements Repository {
   private async putEntry(entry: EpisodeEntry) {
     const e = entrySchema.parse(entry);
     const existing = (
-      await this.db.all<{ record_id: string }>(
-        'SELECT record_id FROM entries WHERE id=?',
-        e.id,
-      )
+      await this.db.all<{
+        record_id: string;
+      }>('SELECT record_id FROM entries WHERE id=?', e.id)
     )[0];
     if (existing && existing.record_id !== e.recordId)
       throw new Error(
-        'Ein Eintrag kann nicht in eine andere Serie verschoben werden.',
+        t('Ein Eintrag kann nicht in eine andere Serie verschoben werden.'),
       );
     await this.db.run(
       'INSERT INTO entries VALUES (?,?,?,?,?) ON CONFLICT(id) DO UPDATE SET occurred_at=excluded.occurred_at,search=excluded.search,body=excluded.body',
       e.id,
       e.recordId,
       e.occurredAt,
-      `Staffel ${e.season} Folge ${e.episode} ${e.occurredAt} ${new Date(e.occurredAt).toLocaleDateString('de-DE')} ${new Date(e.occurredAt).toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' })} ${e.note}`.toLocaleLowerCase(
-        'de-DE',
-      ),
+      this.searchText(e),
       JSON.stringify(e),
     );
+  }
+  reindexSearch() {
+    return this.write(async () => {
+      const entries = await this.db.all<{ body: string }>(
+        'SELECT body FROM entries',
+      );
+      for (const row of entries) {
+        const entry = JSON.parse(row.body) as EpisodeEntry;
+        await this.db.run(
+          'UPDATE entries SET search=? WHERE id=?',
+          this.searchText(entry),
+          entry.id,
+        );
+      }
+    });
+  }
+  private searchText(e: EpisodeEntry) {
+    return [
+      positionText(e),
+      e.occurredAt,
+      new Date(e.occurredAt).toLocaleDateString(localization().formatLocale),
+      new Date(e.occurredAt).toLocaleDateString(localization().formatLocale, {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+      }),
+      e.note,
+    ]
+      .join(' ')
+      .toLocaleLowerCase(localization().formatLocale);
   }
   saveEntry(entry: EpisodeEntry, draftId: string) {
     return this.write(async () => {

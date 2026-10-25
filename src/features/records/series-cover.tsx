@@ -1,3 +1,5 @@
+import { t } from '../../core/i18n/runtime';
+import { useLocalization } from '../../core/i18n/react';
 import { useState } from 'react';
 import { Image, Pressable, StyleSheet, View } from 'react-native';
 import type { SeriesPhoto } from '../../core/domain/models';
@@ -5,7 +7,6 @@ import { useServices } from '../../core/composition';
 import { Body, useTheme } from '../../core/ui/components';
 import { Icon } from '../../core/ui/icon';
 import { PhotoViewer } from '../media/photo-viewer';
-
 export function SeriesCover({
   photo,
   title,
@@ -15,6 +16,7 @@ export function SeriesCover({
   title: string;
   expandable?: boolean;
 }) {
+  useLocalization();
   const { series } = useServices();
   const c = useTheme();
   const [failedUri, setFailedUri] = useState<string>();
@@ -36,7 +38,7 @@ export function SeriesCover({
       {failed ? (
         <>
           <Icon name="broken_image_outlined" color={c.muted} size={32} />
-          <Body muted>Bild nicht verfügbar</Body>
+          <Body muted>{t('Bild nicht verfügbar')}</Body>
         </>
       ) : (
         <Image
@@ -72,8 +74,8 @@ export function SeriesCover({
           accessibilityRole="button"
           accessibilityLabel={
             failed
-              ? `Bild von ${title} nicht verfügbar`
-              : `Bild von ${title} vergrößern`
+              ? t('Bild von {p0} nicht verfügbar', { p0: title })
+              : t('Bild von {p0} vergrößern', { p0: title })
           }
           disabled={failed}
           onPress={() => setViewing(true)}

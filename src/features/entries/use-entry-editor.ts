@@ -1,3 +1,5 @@
+import { t } from '../../core/i18n/runtime';
+import { useLocalization } from '../../core/i18n/react';
 import { useEffect, useRef, useState } from 'react';
 import { router } from 'expo-router';
 import { useServices } from '../../core/composition';
@@ -20,6 +22,7 @@ import {
   validateEntryForm,
 } from './entry-form-validation';
 export function useEntryEditor(recordId: string, entryId?: string) {
+  useLocalization();
   const { series, media, refresh } = useServices();
   const feedback = useFeedback();
   const [draft, setDraft] = useState<EntryDraft>(),
@@ -44,7 +47,7 @@ export function useEntryEditor(recordId: string, entryId?: string) {
         !record ||
         (entryId && (!savedEntry || savedEntry.recordId !== recordId))
       )
-        throw new Error('Serie oder Folgenstand nicht gefunden.');
+        throw new Error(t('Serie oder Folgenstand nicht gefunden.'));
       const lastEntry = data.entries
         .filter((e) => e.recordId === recordId)
         .sort(
@@ -88,7 +91,7 @@ export function useEntryEditor(recordId: string, entryId?: string) {
   const leave = useLeaveGuard({
     dirty,
     busy: task.busy,
-    title: entryId ? 'Änderungen verwerfen?' : 'Folgenstand verwerfen?',
+    title: entryId ? t('Änderungen verwerfen?') : t('Folgenstand verwerfen?'),
     discard: async () => {
       if (current.current) await series.discard(current.current);
       committed.current = true;
@@ -107,7 +110,9 @@ export function useEntryEditor(recordId: string, entryId?: string) {
       ...current.current,
       form: { ...current.current.form, [key]: value },
     }).catch((e) =>
-      setError(`Entwurf konnte nicht gesichert werden: ${errorText(e)}`),
+      setError(
+        t('Entwurf konnte nicht gesichert werden: {p0}', { p0: errorText(e) }),
+      ),
     );
   }
   function setAttachments(items: Attachment[]) {
@@ -235,7 +240,9 @@ export function useEntryEditor(recordId: string, entryId?: string) {
         });
         feedback.notify(
           result.warnings.join('\n') ||
-            (entryId ? 'Änderungen gespeichert.' : 'Folgenstand gespeichert.'),
+            (entryId
+              ? t('Änderungen gespeichert.')
+              : t('Folgenstand gespeichert.')),
         );
       });
     },

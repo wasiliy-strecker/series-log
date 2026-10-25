@@ -43,7 +43,7 @@ class SaveDocumentActivity : ComponentActivity() {
             } catch (_: Exception) {
                 // ACTION_CREATE_DOCUMENT supplies a newly created destination, never an app vault file.
                 try { DocumentsContract.deleteDocument(contentResolver, uri) } catch (_: Exception) { }
-                finish(token, false, "Das Backup konnte nicht am gewählten Ort gespeichert werden. Die vorbereitete Sicherung bleibt zum erneuten Speichern verfügbar.")
+                finish(token, false, NativeLanguage.text(this, R.string.sl_d25f1658b5c4))
             } finally { executor.shutdown(); runOnUiThread { finish() } }
         }
     }

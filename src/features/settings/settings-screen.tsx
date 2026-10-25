@@ -1,3 +1,11 @@
+import {
+  t,
+  languageNames,
+  languages,
+  setLocalization,
+} from '../../core/i18n/runtime';
+import { useLocalization } from '../../core/i18n/react';
+import { seriesNative } from '../../core/native/series-native';
 import { useEffect, useRef, useState } from 'react';
 import {
   Keyboard,
@@ -29,6 +37,7 @@ function PasswordDialog({
   confirm: boolean;
   close: (value: string | null) => void;
 }) {
+  useLocalization();
   const c = useTheme();
   const [password, setPassword] = useState(''),
     [repeat, setRepeat] = useState(''),
@@ -43,13 +52,13 @@ function PasswordDialog({
     ) {
       setError(
         confirm
-          ? 'Bitte ein Passwort mit 6 bis 1024 Zeichen eingeben.'
-          : 'Bitte ein gültiges Passwort eingeben.',
+          ? t('Bitte ein Passwort mit 6 bis 1024 Zeichen eingeben.')
+          : t('Bitte ein gültiges Passwort eingeben.'),
       );
       return;
     }
     if (confirm && password !== repeat) {
-      setError('Die Passwörter stimmen nicht überein.');
+      setError(t('Die Passwörter stimmen nicht überein.'));
       return;
     }
     close(password);
@@ -95,7 +104,9 @@ function PasswordDialog({
               color: c.ink,
             }}
           >
-            {confirm ? 'Backup-Passwort festlegen' : 'Backup-Passwort eingeben'}
+            {confirm
+              ? t('Backup-Passwort festlegen')
+              : t('Backup-Passwort eingeben')}
           </Text>
           <ScrollView
             style={{ flexGrow: 0, flexShrink: 1 }}
@@ -104,11 +115,13 @@ function PasswordDialog({
           >
             <Body>
               {confirm
-                ? 'Mindestens 6 Zeichen. Ohne dieses Passwort kann das Backup nicht wiederhergestellt werden.'
-                : 'Gib das Passwort dieser SerienLog-Sicherung ein.'}
+                ? t(
+                    'Mindestens 6 Zeichen. Ohne dieses Passwort kann das Backup nicht wiederhergestellt werden.',
+                  )
+                : t('Gib das Passwort dieser SerienLog-Sicherung ein.')}
             </Body>
             <Field
-              label="Passwort"
+              label={t('Passwort')}
               secureTextEntry={!show}
               autoCapitalize="none"
               autoCorrect={false}
@@ -126,7 +139,7 @@ function PasswordDialog({
             />
             {confirm && (
               <Field
-                label="Passwort wiederholen"
+                label={t('Passwort wiederholen')}
                 secureTextEntry={!show}
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -143,9 +156,9 @@ function PasswordDialog({
           <Notice error text={error} />
           <DialogActions
             actions={[
-              { label: 'Abbrechen', onPress: () => close(null) },
+              { label: t('Abbrechen'), onPress: () => close(null) },
               {
-                label: 'Weiter',
+                label: t('Weiter'),
                 filled: true,
                 onPress: submit,
               },
@@ -157,8 +170,12 @@ function PasswordDialog({
   );
 }
 export function SettingsScreen() {
+  const locale = useLocalization();
   const c = useTheme();
-  const [prompt, setPrompt] = useState<{ confirm: boolean; id: number }>();
+  const [prompt, setPrompt] = useState<{
+    confirm: boolean;
+    id: number;
+  }>();
   const resolve = useRef<((value: string | null) => void) | null>(null);
   useEffect(() => () => resolve.current?.(null), []);
   const vm = useSettings(
@@ -177,7 +194,26 @@ export function SettingsScreen() {
     <>
       <Page>
         <Notice error text={vm.error} />
-        <Heading>Datensicherung</Heading>
+        <Heading>{t('Sprache')}</Heading>
+        <Card>
+          <Body muted>
+            {t('Zahlen und Datumsangaben folgen der Region deines Geräts.')}
+          </Body>
+          {[null, ...languages].map((language) => (
+            <Button
+              key={language ?? 'system'}
+              secondary={locale.preference !== language}
+              title={language ? languageNames[language] : t('Systemsprache')}
+              disabled={vm.busy}
+              onPress={() =>
+                void vm.run(async () =>
+                  setLocalization(await seriesNative.setLanguage(language)),
+                )
+              }
+            />
+          ))}
+        </Card>
+        <Heading>{t('Datensicherung')}</Heading>
         <Card style={{ padding: 0, gap: 0 }}>
           <Pressable
             accessibilityRole="button"
@@ -194,10 +230,10 @@ export function SettingsScreen() {
             <Icon name="lock_outline" />
             <View style={{ flex: 1, gap: 4 }}>
               <Body style={{ fontSize: 16 }}>
-                Verschlüsseltes Backup erstellen
+                {t('Verschlüsseltes Backup erstellen')}
               </Body>
               <Body muted>
-                Serien, Folgenstände, Fotos und Serienprotokolle
+                {t('Serien, Folgenstände, Fotos und Serienprotokolle')}
               </Body>
             </View>
             <Icon name="chevron_right" />
@@ -217,60 +253,66 @@ export function SettingsScreen() {
           >
             <Icon name="settings_backup_restore_outlined" />
             <View style={{ flex: 1, gap: 4 }}>
-              <Body style={{ fontSize: 16 }}>Backup wiederherstellen</Body>
-              <Body muted>Vorhandene neuere Einträge bleiben erhalten</Body>
+              <Body style={{ fontSize: 16 }}>
+                {t('Backup wiederherstellen')}
+              </Body>
+              <Body muted>
+                {t('Vorhandene neuere Einträge bleiben erhalten')}
+              </Body>
             </View>
             <Icon name="chevron_right" />
           </Pressable>
         </Card>
         <View style={{ marginTop: 6 }}>
-          <Heading>Datenschutz</Heading>
+          <Heading>{t('Datenschutz')}</Heading>
         </View>
         <Card style={{ padding: 18, gap: 0 }}>
           <Body>
-            Fotos, Einträge und PDFs werden lokal auf deinem Gerät verarbeitet.
-            Die App überträgt deine Seriendaten nicht an einen Server.
+            {t(
+              'Fotos, Einträge und PDFs werden lokal auf deinem Gerät verarbeitet. Die App überträgt deine Seriendaten nicht an einen Server.',
+            )}
           </Body>
           <Body style={{ marginTop: 10 }}>
-            Deine Daten bleiben lokal auf deinem Gerät gespeichert, bis du sie
-            in der App löschst oder die App-Daten entfernst.
+            {t(
+              'Deine Daten bleiben lokal auf deinem Gerät gespeichert, bis du sie in der App löschst oder die App-Daten entfernst.',
+            )}
           </Body>
           <Body muted style={{ marginTop: 10 }}>
-            Entwickler und Datenschutzkontakt{'\n'}
+            {t('Entwickler und Datenschutzkontakt')}
+            {'\n'}
             Wasiliy Strecker · AppFabrik AI
           </Body>
           <Body muted style={{ marginTop: 10 }}>
-            Kamera und Galerie werden nur auf deinen Wunsch geöffnet. Fotos
-            werden auf maximal 1920 Pixel verkleinert, ohne Standortmetadaten
-            gespeichert und nicht automatisch hochgeladen. Benachrichtigungen
-            erinnern lokal ans Weiterschauen. Es gibt keine Werbung und keine
-            eigene Telemetrie.
+            {t(
+              'Kamera und Galerie werden nur auf deinen Wunsch geöffnet. Fotos werden auf maximal 1920 Pixel verkleinert, ohne Standortmetadaten gespeichert und nicht automatisch hochgeladen. Benachrichtigungen erinnern lokal ans Weiterschauen. Es gibt keine Werbung und keine eigene Telemetrie.',
+            )}
           </Body>
           <Body muted style={{ marginTop: 10 }}>
-            Beim Exportieren oder Teilen entscheidest du über Ziel und
-            Empfänger. Backups sind passwortgeschützt. Ohne Passwort können sie
-            nicht wiederhergestellt werden.
+            {t(
+              'Beim Exportieren oder Teilen entscheidest du über Ziel und Empfänger. Backups sind passwortgeschützt. Ohne Passwort können sie nicht wiederhergestellt werden.',
+            )}
           </Body>
           <View style={{ marginTop: 14 }}>
             <Button
               secondary
               icon="open_in_new"
-              title="Datenschutzerklärung öffnen"
+              title={t('Datenschutzerklärung öffnen')}
               disabled={vm.busy}
               onPress={() => void vm.openPrivacy()}
             />
           </View>
         </Card>
         <View style={{ marginTop: 6 }}>
-          <Heading>Über SerienLog</Heading>
+          <Heading>{t('Über SerienLog')}</Heading>
         </View>
         <Card style={{ padding: 0, gap: 0 }}>
           <View style={{ padding: 18, gap: 12 }}>
-            <Body strong>SerienLog 1.0.0</Body>
-            <Body muted>Kostenlos. Ohne Konto. Ohne Werbung.</Body>
+            <Body strong>{t('SerienLog 1.0.0')}</Body>
+            <Body muted>{t('Kostenlos. Ohne Konto. Ohne Werbung.')}</Body>
             <Body muted>
-              Eigenständige lokale Android-App. Backups bis 128 MB.
-              Formularentwürfe gehören nicht zum Backup.
+              {t(
+                'Eigenständige lokale Android-App. Backups bis 128 MB. Formularentwürfe gehören nicht zum Backup.',
+              )}
             </Body>
           </View>
         </Card>

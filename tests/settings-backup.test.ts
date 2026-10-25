@@ -8,6 +8,9 @@ import {
 } from 'react-test-renderer';
 import { SettingsScreen } from '../src/features/settings/settings-screen';
 import { fixture, record } from './support';
+vi.mock('../src/core/native/series-native', () => ({
+  seriesNative: { setLanguage: vi.fn() },
+}));
 
 const ports = vi.hoisted(() => ({
   dismissKeyboard: vi.fn(),

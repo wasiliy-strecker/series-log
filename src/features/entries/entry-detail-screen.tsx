@@ -1,3 +1,5 @@
+import { t, formatNumber } from '../../core/i18n/runtime';
+import { useLocalization } from '../../core/i18n/react';
 import { View, Text } from 'react-native';
 import { Stack, router, useLocalSearchParams } from 'expo-router';
 import {
@@ -14,7 +16,10 @@ import { Reports } from '../records/reports';
 import { PhotoGallery } from '../media/attachments';
 import { useEntryDetail } from './use-entry-detail';
 export function EntryDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  useLocalization();
+  const { id } = useLocalSearchParams<{
+    id: string;
+  }>();
   const vm = useEntryDetail(id),
     c = useTheme();
   const e = vm.entry;
@@ -22,17 +27,22 @@ export function EntryDetailScreen() {
     return (
       <Page ready={!vm.loading}>
         <Notice error text={vm.error} />
-        {vm.loading ? <Busy /> : <Body>Folgenstand nicht gefunden.</Body>}
+        {vm.loading ? (
+          <Busy />
+        ) : (
+          <Body>{t('Folgenstand nicht gefunden.')}</Body>
+        )}
       </Page>
     );
   const photos = e.attachments.filter((a) => a.kind === 'photo');
   return (
     <Page ready={!vm.loading}>
-      <Stack.Screen options={{ title: 'Folgenstand' }} />
+      <Stack.Screen options={{ title: t('Folgenstand') }} />
       {!!photos.length && (
         <View style={{ gap: 8 }}>
           <Body strong style={{ fontSize: 16 }}>
-            Aktuelle Fotos ({photos.length})
+            {t('Aktuelle Fotos (')}
+            {formatNumber(photos.length)})
           </Body>
           <PhotoGallery photos={photos} />
         </View>
@@ -54,7 +64,7 @@ export function EntryDetailScreen() {
         <Button
           secondary
           icon="edit_outlined"
-          title="Bearbeiten"
+          title={t('Bearbeiten')}
           onPress={() =>
             router.push({
               pathname: '/entry/edit',
@@ -66,18 +76,18 @@ export function EntryDetailScreen() {
           secondary
           danger
           icon="delete_outline"
-          title="Folgenstand löschen"
+          title={t('Folgenstand löschen')}
           disabled={vm.busy}
           onPress={() => void vm.remove()}
         />
       </View>
       <Notice error text={vm.error} />
       <Card>
-        <Body strong>Zum Folgenstand</Body>
+        <Body strong>{t('Zum Folgenstand')}</Body>
         <Body>{dateTime(e.occurredAt)}</Body>
         {!!e.note && <Body>{e.note}</Body>}
         <Body muted style={{ fontSize: 12 }}>
-          Zuletzt bearbeitet: {dateTime(e.updatedAt)}
+          {t('Zuletzt bearbeitet:')} {dateTime(e.updatedAt)}
         </Body>
       </Card>
       <Reports

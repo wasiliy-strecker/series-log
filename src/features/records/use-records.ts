@@ -1,3 +1,4 @@
+import { useLocalization } from '../../core/i18n/react';
 import { positionText } from '../../core/domain/episode-position';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { useFocusEffect, router } from 'expo-router';
@@ -19,6 +20,7 @@ import {
   type RecordSort,
 } from './presentation-model';
 export function useRecords() {
+  const locale = useLocalization();
   const { series, revision } = useServices();
   const [items, setItems] = useState<DashboardItem[]>([]),
     [drafts, setDrafts] = useState<EntryDraft[]>([]),
@@ -56,8 +58,8 @@ export function useRecords() {
     }, [series, revision, retry]),
   );
   const visibleItems = useMemo(
-    () => visibleRecords(items, search, sort),
-    [items, search, sort],
+    () => visibleRecords(items, search, sort, locale),
+    [items, search, sort, locale],
   );
   return {
     items: visibleItems,

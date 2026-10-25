@@ -1,3 +1,5 @@
+import { t, formatNumber } from '../../core/i18n/runtime';
+import { useLocalization } from '../../core/i18n/react';
 import { FlatList, View, Text, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
@@ -41,6 +43,7 @@ export function ReminderInfo({
   status?: ReminderStatus;
   onEdit(): void;
 }) {
+  useLocalization();
   const c = useTheme();
   const r = record.reminder;
   const s = status?.schedules.find((s) => s.recordId === record.id);
@@ -49,7 +52,7 @@ export function ReminderInfo({
     <View style={{ gap: 6 }}>
       {r && (
         <Body strong style={{ fontSize: 12 }}>
-          Erinnern: {reminderSummary(r)}
+          {t('Erinnern:')} {reminderSummary(r)}
         </Body>
       )}
       <ReminderScheduleStatus
@@ -71,10 +74,10 @@ export function ReminderInfo({
       >
         <Icon name="notifications_active_outlined" size={19} color={c.onSoft} />
         <Body strong style={{ fontSize: 12, color: c.onSoft, flex: 1 }}>
-          Letzte Erinnerung:{' '}
+          {t('Letzte Erinnerung:')}{' '}
           {s?.lastTriggeredAtMillis
-            ? `${dateTime(s.lastTriggeredAtMillis)} Uhr`
-            : 'noch keine'}
+            ? t('{p0} Uhr', { p0: dateTime(s.lastTriggeredAtMillis) })
+            : t('noch keine')}
         </Body>
       </View>
     </View>
@@ -83,8 +86,9 @@ export function ReminderInfo({
 type DashboardHeaderProps = Pick<
   ReturnType<typeof useRecords>,
   'search' | 'setSearch' | 'sort' | 'setSort' | 'error' | 'retry'
-> & { count: number };
-
+> & {
+  count: number;
+};
 // Keep the header type stable so typing never remounts the search input.
 function DashboardHeader({
   search,
@@ -95,21 +99,22 @@ function DashboardHeader({
   error,
   retry,
 }: DashboardHeaderProps) {
+  useLocalization();
   const feedback = useFeedback();
   return (
     <View style={{ gap: 12, paddingBottom: 12 }}>
       {!!error && (
         <>
           <Notice error text={error} />
-          <Button title="Erneut laden" onPress={retry} />
+          <Button title={t('Erneut laden')} onPress={retry} />
         </>
       )}
-      <Title subtitle="Dein nächster Serienabend beginnt hier.">
-        Deine Serien
+      <Title subtitle={t('Dein nächster Serienabend beginnt hier.')}>
+        {t('Deine Serien')}
       </Title>
       <View style={{ marginTop: 4 }}>
         <Field
-          label="Serien suchen"
+          label={t('Serien suchen')}
           leading="search"
           value={search}
           onChangeText={setSearch}
@@ -128,22 +133,23 @@ function DashboardHeader({
         }}
       >
         <Body muted>
-          {count} {search ? 'Treffer' : count === 1 ? 'Serie' : 'Serien'}
+          {formatNumber(count)}{' '}
+          {search ? t('Treffer') : count === 1 ? t('Serie') : t('Serien')}
         </Body>
         <Button
           secondary
           icon="sort"
           menu
-          title={sortLabels[sort]}
+          title={sortLabels()[sort]}
           onPress={(anchor) =>
             void feedback
               .choose({
-                title: 'Serien sortieren',
+                title: t('Serien sortieren'),
                 anchor,
-                options: (Object.keys(sortLabels) as RecordSort[]).map(
+                options: (Object.keys(sortLabels()) as RecordSort[]).map(
                   (value) => ({
                     value,
-                    label: sortLabels[value],
+                    label: sortLabels()[value],
                     icon: value === sort ? 'check' : undefined,
                   }),
                 ),
@@ -157,7 +163,6 @@ function DashboardHeader({
     </View>
   );
 }
-
 function DashboardCard({
   item,
   hasDraft,
@@ -167,6 +172,7 @@ function DashboardCard({
   hasDraft: boolean;
   status?: ReminderStatus;
 }) {
+  useLocalization();
   const { record, latest, lastEdited, photo } = item;
   const c = useTheme();
   return (
@@ -232,11 +238,11 @@ function DashboardCard({
             {entrySummary(latest)}
           </Text>
           <Body muted style={{ fontSize: 12, lineHeight: 16 }}>
-            Zuletzt bearbeitet: {dateTime(lastEdited)}
+            {t('Zuletzt bearbeitet:')} {dateTime(lastEdited)}
           </Body>
           {hasDraft && (
             <Body muted style={{ fontSize: 12 }}>
-              Gesicherter Formularentwurf
+              {t('Gesicherter Formularentwurf')}
             </Body>
           )}
           <ReminderInfo
@@ -255,13 +261,13 @@ function DashboardCard({
     </Card>
   );
 }
-
 function SeriesSeparator() {
+  useLocalization();
   return <View style={{ height: 12 }} />;
 }
 const dashboardKey = (item: DashboardItem) => item.record.id;
-
 export function RecordsScreen() {
+  useLocalization();
   const vm = useRecords(),
     c = useTheme(),
     safe = useSafeAreaInsets(),
@@ -272,14 +278,14 @@ export function RecordsScreen() {
     <Page
       ready={!vm.loading}
       scroll={!showList}
-      fab={<Fab title="Serie anlegen" onPress={create} />}
+      fab={<Fab title={t('Serie anlegen')} onPress={create} />}
     >
       {vm.loading ? (
-        <Busy label="Serien werden geladen …" />
+        <Busy label={t('Serien werden geladen …')} />
       ) : vm.error && vm.empty ? (
         <>
           <Notice error text={vm.error} />
-          <Button title="Erneut laden" onPress={vm.retry} />
+          <Button title={t('Erneut laden')} onPress={vm.retry} />
         </>
       ) : vm.empty ? (
         <View
@@ -292,11 +298,11 @@ export function RecordsScreen() {
           }}
         >
           <Icon name="live_tv" size={72} color={c.primary} />
-          <Title>Erste Serie anlegen</Title>
+          <Title>{t('Erste Serie anlegen')}</Title>
           <Body style={{ textAlign: 'center' }}>
-            Deine Serien. Dein Tempo. Halte fest, bei welcher Folge du bist,
-            ergänze Bilder und Gedanken und lass dich ans Weiterschauen
-            erinnern. Alles bleibt auf deinem Gerät.
+            {t(
+              'Deine Serien. Dein Tempo. Halte fest, bei welcher Folge du bist, ergänze Bilder und Gedanken und lass dich ans Weiterschauen erinnern. Alles bleibt auf deinem Gerät.',
+            )}
           </Body>
         </View>
       ) : (
@@ -329,7 +335,7 @@ export function RecordsScreen() {
           ListEmptyComponent={
             <Card>
               <Icon name="search" size={42} color={c.primary} />
-              <Body>Keine passenden Serien gefunden.</Body>
+              <Body>{t('Keine passenden Serien gefunden.')}</Body>
             </Card>
           }
           ItemSeparatorComponent={SeriesSeparator}
@@ -354,6 +360,7 @@ export function Pager({
   total: number;
   onChange(n: number): void;
 }) {
+  useLocalization();
   return total > PAGE_SIZE ? (
     <View
       style={{
@@ -365,17 +372,17 @@ export function Pager({
     >
       <IconButton
         icon="chevron_left"
-        label="Vorherige Seite"
+        label={t('Vorherige Seite')}
         disabled={offset === 0}
         onPress={() => onChange(Math.max(0, offset - PAGE_SIZE))}
       />
       <Body>
-        Seite {Math.floor(offset / PAGE_SIZE) + 1} von{' '}
-        {Math.ceil(total / PAGE_SIZE)}
+        {t('Seite')} {formatNumber(Math.floor(offset / PAGE_SIZE) + 1)}{' '}
+        {t('von')} {formatNumber(Math.ceil(total / PAGE_SIZE))}
       </Body>
       <IconButton
         icon="chevron_right"
-        label="Nächste Seite"
+        label={t('Nächste Seite')}
         disabled={offset + PAGE_SIZE >= total}
         onPress={() => onChange(offset + PAGE_SIZE)}
       />
@@ -383,7 +390,10 @@ export function Pager({
   ) : null;
 }
 export function RecordDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  useLocalization();
+  const { id } = useLocalSearchParams<{
+    id: string;
+  }>();
   const vm = useRecordDetail(id),
     c = useTheme(),
     feedback = useFeedback();
@@ -395,14 +405,18 @@ export function RecordDetailScreen() {
     return (
       <Page ready={!vm.loading}>
         <Notice error text={vm.error} />
-        {vm.loading ? <Busy /> : <Body>Serie nicht gefunden.</Body>}
+        {vm.loading ? <Busy /> : <Body>{t('Serie nicht gefunden.')}</Body>}
       </Page>
     );
   return (
     <Page
       ready={!vm.loading}
       fab={
-        <Fab title="Folgenstand erfassen" icon="play_arrow" onPress={capture} />
+        <Fab
+          title={t('Folgenstand erfassen')}
+          icon="play_arrow"
+          onPress={capture}
+        />
       }
     >
       <Stack.Screen options={{ title: r.name }} />
@@ -430,7 +444,7 @@ export function RecordDetailScreen() {
               letterSpacing: 0.15,
             }}
           >
-            {r.category || 'Serie'}
+            {r.category || t('Serie')}
           </Body>
           <Icon name="chevron_right" color={c.muted} />
         </View>
@@ -446,7 +460,9 @@ export function RecordDetailScreen() {
           {entrySummary(vm.entries[0] ?? null)}
         </Body>
         {!!vm.entries[0] && (
-          <Body>Zuletzt am {dateTime(vm.entries[0].occurredAt)}</Body>
+          <Body>
+            {t('Zuletzt am')} {dateTime(vm.entries[0].occurredAt)}
+          </Body>
         )}
         <View style={{ marginTop: 10 }}>
           {!!r.note && <Body>{r.note}</Body>}
@@ -457,21 +473,23 @@ export function RecordDetailScreen() {
         <Button
           secondary
           icon="edit_outlined"
-          title="Serie & Erinnerung bearbeiten"
+          title={t('Serie & Erinnerung bearbeiten')}
           onPress={edit}
         />
         <Button
           secondary
           danger
           icon="delete_outline"
-          title="Serie löschen"
+          title={t('Serie löschen')}
           disabled={vm.busy}
           onPress={() =>
             void feedback
               .confirm(
-                'Serie löschen?',
-                'Die Serie, ihre Folgenstände und gespeicherten Protokolle werden gelöscht. Exportierte Dateien bleiben erhalten.',
-                'Löschen',
+                t('Serie löschen?'),
+                t(
+                  'Die Serie, ihre Folgenstände und gespeicherten Protokolle werden gelöscht. Exportierte Dateien bleiben erhalten.',
+                ),
+                t('Löschen'),
                 true,
               )
               .then((ok) => {
@@ -489,12 +507,15 @@ export function RecordDetailScreen() {
         />
       )}
       <View style={{ marginTop: vm.total > 0 ? 6 : 18, gap: 8 }}>
-        <Heading>Serienverlauf</Heading>
+        <Heading>{t('Serienverlauf')}</Heading>
         {vm.total > 0 && (
           <Body style={{ fontFamily: 'RobotoMedium', letterSpacing: 0.1 }}>
             {vm.total === 1
-              ? '1 Folgenstand'
-              : `${vm.entries.length} von ${vm.total} Folgenständen`}
+              ? t('1 Folgenstand')
+              : t('{p0} von {p1} Folgenständen', {
+                  p0: vm.entries.length,
+                  p1: vm.total,
+                })}
           </Body>
         )}
         {!vm.total && (
@@ -504,8 +525,9 @@ export function RecordDetailScreen() {
           >
             <Icon name="play_arrow" size={44} color={c.primary} />
             <Body style={{ marginTop: 10, textAlign: 'center' }}>
-              Noch kein Folgenstand. Speichere deine aktuelle Staffel und Folge,
-              auf Wunsch mit einem Bild oder einer Notiz.
+              {t(
+                'Noch kein Folgenstand. Speichere deine aktuelle Staffel und Folge, auf Wunsch mit einem Bild oder einer Notiz.',
+              )}
             </Body>
             <View
               style={{
@@ -520,7 +542,7 @@ export function RecordDetailScreen() {
                 strong
                 style={{ color: c.primary, textAlign: 'center', flexShrink: 1 }}
               >
-                Ersten Folgenstand erfassen
+                {t('Ersten Folgenstand erfassen')}
               </Body>
               <Icon name="chevron_right" color={c.primary} />
             </View>
@@ -536,7 +558,7 @@ export function RecordDetailScreen() {
         <Button
           secondary
           icon="manage_search_outlined"
-          title="Alle Folgenstände anzeigen"
+          title={t('Alle Folgenstände anzeigen')}
           onPress={() =>
             router.push({ pathname: '/record/history', params: { id } })
           }
@@ -546,7 +568,10 @@ export function RecordDetailScreen() {
   );
 }
 export function RecordHistoryScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  useLocalization();
+  const { id } = useLocalSearchParams<{
+    id: string;
+  }>();
   const vm = useRecordDetail(id, true),
     c = useTheme();
   return (
@@ -573,7 +598,7 @@ export function RecordHistoryScreen() {
             {vm.record?.name ?? ''}
           </Body>
           <Field
-            label="Datum, Staffel, Folge oder Notiz suchen"
+            label={t('Datum, Staffel, Folge oder Notiz suchen')}
             leading="search"
             value={vm.search}
             onChangeText={vm.setSearch}
@@ -586,7 +611,7 @@ export function RecordHistoryScreen() {
         <Pager offset={vm.offset} total={vm.total} onChange={vm.setOffset} />
       }
     >
-      <Stack.Screen options={{ title: 'Serienverlauf' }} />
+      <Stack.Screen options={{ title: t('Serienverlauf') }} />
       <Notice error text={vm.error} />
       {vm.loading ? (
         <Busy />
@@ -594,12 +619,17 @@ export function RecordHistoryScreen() {
         <View style={{ gap: 8 }}>
           <Body style={{ fontFamily: 'RobotoMedium', letterSpacing: 0.1 }}>
             {vm.total === 0
-              ? 'Keine Folgenstände gefunden'
+              ? t('Keine Folgenstände gefunden')
               : vm.total === 1
                 ? vm.search.trim()
-                  ? '1 Treffer'
-                  : '1 Folgenstand'
-                : `${vm.offset + 1}–${Math.min(vm.offset + PAGE_SIZE, vm.total)} von ${vm.total} ${vm.search.trim() ? 'Treffern' : 'Folgenständen'}`}
+                  ? t('1 Treffer')
+                  : t('1 Folgenstand')
+                : t('{p0}–{p1} von {p2} {p3}', {
+                    p0: vm.offset + 1,
+                    p1: Math.min(vm.offset + PAGE_SIZE, vm.total),
+                    p2: vm.total,
+                    p3: vm.search.trim() ? t('Treffern') : t('Folgenständen'),
+                  })}
           </Body>
           <View style={{ gap: 10 }}>
             {vm.historyItems.map((item) => (

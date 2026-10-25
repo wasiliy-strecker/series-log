@@ -1,3 +1,5 @@
+import { t } from '../../core/i18n/runtime';
+import { useLocalization } from '../../core/i18n/react';
 import { View } from 'react-native';
 import { Body, Button, useTheme } from '../../core/ui/components';
 import { Icon } from '../../core/ui/icon';
@@ -9,7 +11,6 @@ import {
   reminderPresentation,
   reminderSettingsFailure,
 } from './reminder-model';
-
 export function ReminderScheduleStatus({
   reminder,
   status,
@@ -21,6 +22,7 @@ export function ReminderScheduleStatus({
   recordId: string;
   onEdit(): void;
 }) {
+  useLocalization();
   const c = useTheme(),
     { native } = useServices(),
     feedback = useFeedback();
@@ -78,8 +80,8 @@ export function ReminderScheduleStatus({
           icon="settings_outlined"
           title={
             display.action === 'edit'
-              ? 'Erinnerung bearbeiten'
-              : 'Einstellungen öffnen'
+              ? t('Erinnerung bearbeiten')
+              : t('Einstellungen öffnen')
           }
           onPress={() => void act()}
         />

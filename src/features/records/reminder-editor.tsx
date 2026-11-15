@@ -211,7 +211,8 @@ export function ReminderEditor(props: {
                 </View>
               </Card>
             ))}
-            {reminder.deliveryMode === 'punctualWithSound' &&
+            {Platform.OS === 'android' &&
+              reminder.deliveryMode === 'punctualWithSound' &&
               status?.exact === false && (
                 <Card style={{ backgroundColor: c.errorContainer }}>
                   <Body>
@@ -248,7 +249,9 @@ export function ReminderEditor(props: {
                 <Body>
                   {availability === 'appBlocked'
                     ? t(
-                        'Erlaube Benachrichtigungen für SerienLog in den Android-Einstellungen, damit Erinnerungen angezeigt werden können.',
+                        Platform.OS === 'ios'
+                          ? 'appleRemindersBlocked'
+                          : 'Erlaube Benachrichtigungen für SerienLog in den Android-Einstellungen, damit Erinnerungen angezeigt werden können.',
                       )
                     : t('Aktiviere die Benachrichtigungskategorie für „') +
                       reminderModes()[reminder.deliveryMode].title +

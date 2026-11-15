@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import { t } from '../../core/i18n/runtime';
 import { useLocalization } from '../../core/i18n/react';
 import { useEffect, useRef, useState } from 'react';
@@ -144,7 +145,11 @@ export function useReminderEditor({
       t(' „Pünktlich mit Ton“ bleibt ausgewählt.');
     try {
       const current = await refreshStatus();
-      if (mode === 'punctualWithSound' && current?.exact !== true) {
+      if (
+        Platform.OS === 'android' &&
+        mode === 'punctualWithSound' &&
+        current?.exact !== true
+      ) {
         if (
           !(await native.openReminderSettings('exact', null)) &&
           mounted.current
@@ -154,7 +159,7 @@ export function useReminderEditor({
     } catch {
       if (mounted.current)
         feedback.notify(
-          mode === 'punctualWithSound'
+          Platform.OS === 'android' && mode === 'punctualWithSound'
             ? settingsFailure
             : t('Der Erinnerungsstatus konnte nicht bestätigt werden.'),
         );

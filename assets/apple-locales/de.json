@@ -1,0 +1,7 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "SerienLog",
+    "NSCameraUsageDescription": "Füge deinem Folgenstand auf diesem Gerät ein Foto hinzu.",
+    "NSPhotoLibraryUsageDescription": "Wähle Fotos als Anhang zu deinem Folgenstand auf diesem Gerät."
+  }
+}

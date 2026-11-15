@@ -1,0 +1,7 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "Series Log",
+    "NSCameraUsageDescription": "Attach a photo to your viewing progress on this device.",
+    "NSPhotoLibraryUsageDescription": "Select photos to attach to your viewing progress on this device."
+  }
+}

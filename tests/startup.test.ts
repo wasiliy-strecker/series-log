@@ -16,6 +16,7 @@ const native = vi.hoisted(() => ({
   setOptions: vi.fn(),
 }));
 vi.mock('react-native', () => ({
+  Platform: { OS: 'android', Version: 35, isMacCatalyst: false },
   Image: 'Image',
   Pressable: 'Pressable',
   ScrollView: 'ScrollView',

@@ -1,5 +1,9 @@
 # SerienLog
 
+Die Mac-Portierung mit Mac Catalyst ist lokal vorbereitet. Der vollständige
+Mac-Build und Laufzeittest sind noch offen, weil dieser Mac aktuell Xcode 16.2
+verwendet. Anleitung und Prüfstand: [Mac-Version](docs/MACOS.md).
+
 SerienLog ist eine eigenständige lokale Android-App für deine Serienabende.
 React Native, TypeScript, Expo und SQLite stammen aus der Hausakte-Codebasis.
 Bildschirmaufbau und Bedienabläufe orientieren sich an LeseLog. Dunkle Flächen,

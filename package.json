@@ -20,7 +20,12 @@
     "install:preview": "bash scripts/install-preview.sh",
     "install:dev": "bash scripts/install-dev.sh",
     "check:permissions": "bash scripts/check-permissions.sh",
-    "check:localization": "python3 scripts/generate_localizations.py --check && node scripts/check_localization_calls.cjs"
+    "check:localization": "python3 scripts/generate_localizations.py --check && node scripts/check_localization_calls.cjs",
+    "prebuild:apple": "expo prebuild --platform ios --no-clean --no-install",
+    "check:apple": "bash scripts/check-apple.sh",
+    "build:mac": "bash scripts/build-mac.sh",
+    "check:mac-config": "node --test scripts/test-mac-config.cjs",
+    "bundle:apple": "expo export --platform ios --output-dir build/apple-export"
   },
   "dependencies": {
     "@gorhom/bottom-sheet": "5.2.14",
@@ -29,6 +34,7 @@
     "@pdf-lib/fontkit": "1.1.1",
     "expo": "~57.0.31",
     "expo-asset": "~57.0.20",
+    "expo-build-properties": "~57.0.22",
     "expo-constants": "~57.0.22",
     "expo-crypto": "~57.0.4",
     "expo-dev-client": "~57.0.20",

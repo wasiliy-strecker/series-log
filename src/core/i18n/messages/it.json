@@ -516,5 +516,21 @@
   "von": "di",
   "die App": "l’app",
   "die Serie": "la serie",
-  "Test: {p0} · {p1}": "Prova: {p0} · {p1}"
+  "Test: {p0} · {p1}": "Prova: {p0} · {p1}",
+  "appleReminderSoundTitle": "Con suono",
+  "appleReminderSoundDescription": "macOS mostra una notifica con il suono predefinito. La modalità silenziosa, Full immersion e le impostazioni possono disattivarlo.",
+  "appleReminderNormalDescription": "Notifica senza suono. La visualizzazione e la consegna dipendono dalle impostazioni macOS.",
+  "appleRemindersBlocked": "I promemoria sono bloccati. Consenti le notifiche di Diario delle serie nelle impostazioni di sistema.",
+  "appleTestReminderHint": "Apri il Centro Notifiche. La notifica di prova appare dopo pochi secondi e può essere rimossa lì.",
+  "appleTestReminderSent": "Notifica di prova inviata a macOS. ",
+  "appleReminderWindowHint": "Alcuni promemoria hanno un periodo limitato. Controlla la data finale e riapri l’app prima di allora per pianificare altre date.",
+  "appleReminderWindow": "Pianificato fino a {p0}. Riapri l’app prima di allora per pianificare altri promemoria.",
+  "appleReminderCapacity": "macOS non ha confermato tutti i promemoria. L’app usa al massimo 60 notifiche pianificate. Riduci i promemoria attivi e controllane lo stato.",
+  "appleReminderSettingsFailure": "Apri Impostazioni di Sistema → Notifiche → Diario delle serie per consentire le notifiche.",
+  "localAppDescription": "App locale indipendente. Backup fino a 128 MB. Le bozze dei moduli non sono incluse.",
+  "macChoosePhotos": "Scegli foto dai file",
+  "macPhotoGuidance": "Scegli una foto o uno screenshot dal Mac. Inserisci manualmente stagione ed episodio.",
+  "macPhotoSortHint": "Trascina una foto per riordinarla o usa Prima e Dopo nel menu.",
+  "appleNotificationEmpty": "Nessun avanzamento registrato",
+  "applePendingReminder": ". Il sistema non ha ancora confermato questa scadenza."
 }

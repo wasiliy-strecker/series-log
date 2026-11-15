@@ -1,4 +1,4 @@
-"""Check the six message catalogs and generate matching Android resources."""
+"""Check the six message catalogs and generate matching Android and Apple resources."""
 import argparse
 import hashlib
 import json
@@ -52,6 +52,9 @@ def outputs(data, android):
         '<?xml version="1.0" encoding="utf-8"?>\n<locale-config xmlns:android="http://schemas.android.com/apk/res/android">\n'
         + ''.join(f'    <locale android:name="{lang}" />\n' for lang in ('en', 'de', 'es', 'fr', 'it', 'pt-BR'))
         + '</locale-config>\n')
+    for lang, messages in data.items():
+        result[ROOT / "modules/series-native/ios/Resources" / f"{lang}.json"] = (
+            json.dumps(messages, ensure_ascii=False, indent=2) + "\n")
     return result
 
 
@@ -68,7 +71,7 @@ def main():
         else:
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(text)
-    print(f"Verified {len(data['en'])} messages in six languages and Android resources")
+    print(f"Verified {len(data['en'])} messages in six languages and Android/Apple resources")
 
 
 if __name__ == "__main__":

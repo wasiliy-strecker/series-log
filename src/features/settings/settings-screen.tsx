@@ -309,11 +309,7 @@ export function SettingsScreen() {
           <View style={{ padding: 18, gap: 12 }}>
             <Body strong>{t('SerienLog 1.0.0')}</Body>
             <Body muted>{t('Kostenlos. Ohne Konto. Ohne Werbung.')}</Body>
-            <Body muted>
-              {t(
-                'Eigenständige lokale Android-App. Backups bis 128 MB. Formularentwürfe gehören nicht zum Backup.',
-              )}
-            </Body>
+            <Body muted>{t('localAppDescription')}</Body>
           </View>
         </Card>
       </Page>

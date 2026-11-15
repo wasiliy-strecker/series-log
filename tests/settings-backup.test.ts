@@ -27,6 +27,7 @@ const ports = vi.hoisted(() => ({
 }));
 vi.mock('expo-router', () => ({ router: { push: vi.fn() } }));
 vi.mock('react-native', () => ({
+  Platform: { OS: 'android', Version: 35, isMacCatalyst: false },
   Keyboard: { dismiss: ports.dismissKeyboard },
   KeyboardAvoidingView: 'KeyboardAvoidingView',
   Modal: 'Modal',

@@ -17,6 +17,7 @@ const ports = vi.hoisted(() => ({
   nextFrame: 0,
 }));
 vi.mock('react-native', () => ({
+  Platform: { OS: 'android', Version: 35, isMacCatalyst: false },
   View: 'View',
   Text: 'Text',
   Pressable: 'Pressable',

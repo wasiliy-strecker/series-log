@@ -1,3 +1,4 @@
+import { isMac } from '../../core/native/platform';
 import { t } from '../../core/i18n/runtime';
 import { useLocalization } from '../../core/i18n/react';
 import { useRef } from 'react';
@@ -72,17 +73,19 @@ export function EntryEditorScreen() {
             disabled={vm.busy}
             onPress={() => void vm.chooseManual()}
           />
-          <Button
-            secondary
-            icon="photo_camera_outlined"
-            title={t('Foto aufnehmen')}
-            disabled={vm.busy}
-            onPress={() => void vm.pick('camera')}
-          />
+          {!isMac() && (
+            <Button
+              secondary
+              icon="photo_camera_outlined"
+              title={t('Foto aufnehmen')}
+              disabled={vm.busy}
+              onPress={() => void vm.pick('camera')}
+            />
+          )}
           <Button
             secondary
             icon="photo_library_outlined"
-            title={t('Bild aus Galerie')}
+            title={t(isMac() ? 'macChoosePhotos' : 'Bild aus Galerie')}
             disabled={vm.busy}
             onPress={() => void vm.pick('gallery')}
           />

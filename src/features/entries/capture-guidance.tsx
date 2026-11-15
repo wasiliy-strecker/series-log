@@ -1,9 +1,21 @@
+import { isMac } from '../../core/native/platform';
 import { t } from '../../core/i18n/runtime';
 import { useLocalization } from '../../core/i18n/react';
 import { View } from 'react-native';
 import { Body, Card } from '../../core/ui/components';
 export function CaptureGuidance({ latest }: { latest?: string }) {
   useLocalization();
+  if (isMac())
+    return (
+      <Card>
+        <Body>{t('macPhotoGuidance')}</Body>
+        {latest && (
+          <Body muted>
+            {t('Zuletzt:')} {latest}
+          </Body>
+        )}
+      </Card>
+    );
   return (
     <Card style={{ padding: 18, gap: 14 }}>
       <Body strong style={{ fontSize: 18, lineHeight: 26 }}>

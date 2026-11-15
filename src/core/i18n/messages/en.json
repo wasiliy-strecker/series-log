@@ -516,5 +516,21 @@
   "von": "of",
   "die App": "the app",
   "die Serie": "the series",
-  "Test: {p0} · {p1}": "Test: {p0} · {p1}"
+  "Test: {p0} · {p1}": "Test: {p0} · {p1}",
+  "appleReminderSoundTitle": "With sound",
+  "appleReminderSoundDescription": "macOS displays a notification with the default sound. Silent mode, Focus and system settings can suppress the sound.",
+  "appleReminderNormalDescription": "Notification without sound. Display and delivery depend on your macOS settings.",
+  "appleRemindersBlocked": "Reminders are blocked. Allow notifications for Series Log in system settings.",
+  "appleTestReminderHint": "Open Notification Center. The test notification appears after a few seconds and can be cleared there.",
+  "appleTestReminderSent": "Test notification handed to macOS. ",
+  "appleReminderWindowHint": "Some reminders have a limited scheduling window. Check the displayed end date and reopen the app before then to schedule further dates.",
+  "appleReminderWindow": "Scheduled through {p0}. Reopen the app before then to schedule further reminders.",
+  "appleReminderCapacity": "macOS could not confirm all reminders. The app uses at most 60 scheduled notifications. Reduce active reminders and check their status.",
+  "appleReminderSettingsFailure": "Open System Settings → Notifications → Series Log to allow notifications.",
+  "localAppDescription": "Independent local app. Backups up to 128 MB. Form drafts are not included in backups.",
+  "macChoosePhotos": "Choose photos from files",
+  "macPhotoGuidance": "Choose a photo or screenshot from your Mac. Enter the season and episode yourself.",
+  "macPhotoSortHint": "Drag a photo to reorder it, or use Earlier and Later in its menu.",
+  "appleNotificationEmpty": "No viewing progress yet",
+  "applePendingReminder": ". The system has not confirmed this occurrence yet."
 }

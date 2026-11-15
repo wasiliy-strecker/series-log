@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import { localization, t, type Localization } from '../../core/i18n/runtime';
 import type {
   EpisodeEntry,
@@ -96,7 +97,11 @@ export function reminderSummary(r: Reminder) {
   };
   return (
     labels[r.interval] +
-    (r.deliveryMode === 'punctualWithSound' ? t(' · pünktlich mit Ton') : '')
+    (r.deliveryMode === 'punctualWithSound'
+      ? Platform.OS === 'ios'
+        ? ' · ' + t('appleReminderSoundTitle')
+        : t(' · pünktlich mit Ton')
+      : '')
   );
 }
 export function capturePhase(draft: EntryDraft): 'choose' | 'form' {

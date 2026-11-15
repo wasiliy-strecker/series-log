@@ -1,0 +1,3 @@
+CFBundleDisplayName = "Diário de séries";
+NSCameraUsageDescription = "Anexe uma foto ao seu progresso de episódios neste dispositivo.";
+NSPhotoLibraryUsageDescription = "Selecione fotos para anexar ao seu progresso de episódios neste dispositivo.";

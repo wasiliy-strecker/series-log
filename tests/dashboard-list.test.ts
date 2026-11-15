@@ -14,6 +14,7 @@ type ListProps = {
   ListEmptyComponent: ReactNode;
 };
 vi.mock('react-native', () => ({
+  Platform: { OS: 'android', Version: 35, isMacCatalyst: false },
   View: 'View',
   Text: 'Text',
   useWindowDimensions: () => ({ fontScale: 1 }),

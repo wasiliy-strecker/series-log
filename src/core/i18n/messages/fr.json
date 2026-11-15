@@ -516,5 +516,21 @@
   "von": "sur",
   "die App": "l’application",
   "die Serie": "la série",
-  "Test: {p0} · {p1}": "Test : {p0} · {p1}"
+  "Test: {p0} · {p1}": "Test : {p0} · {p1}",
+  "appleReminderSoundTitle": "Avec son",
+  "appleReminderSoundDescription": "macOS affiche une notification avec le son par défaut. Le mode silencieux, Concentration et les réglages peuvent couper le son.",
+  "appleReminderNormalDescription": "Notification sans son. L’affichage et la remise dépendent des réglages macOS.",
+  "appleRemindersBlocked": "Les rappels sont bloqués. Autorisez les notifications de Journal de séries dans les réglages système.",
+  "appleTestReminderHint": "Ouvrez le centre de notifications. La notification de test apparaît après quelques secondes et peut y être effacée.",
+  "appleTestReminderSent": "Notification de test transmise à macOS. ",
+  "appleReminderWindowHint": "Certains rappels ont une période limitée. Vérifiez la date de fin et rouvrez l’app avant cette date pour planifier la suite.",
+  "appleReminderWindow": "Planifié jusqu’au {p0}. Rouvrez l’app avant cette date pour planifier d’autres rappels.",
+  "appleReminderCapacity": "macOS n’a pas confirmé tous les rappels. L’app utilise au maximum 60 notifications planifiées. Réduisez les rappels actifs et vérifiez leur état.",
+  "appleReminderSettingsFailure": "Ouvrez Réglages Système → Notifications → Journal de séries pour autoriser les notifications.",
+  "localAppDescription": "App locale indépendante. Sauvegardes jusqu’à 128 Mo. Les brouillons ne sont pas inclus.",
+  "macChoosePhotos": "Choisir des photos dans les fichiers",
+  "macPhotoGuidance": "Choisissez une photo ou une capture sur votre Mac. Saisissez vous-même la saison et l’épisode.",
+  "macPhotoSortHint": "Faites glisser une photo pour la déplacer ou utilisez Avant et Après dans son menu.",
+  "appleNotificationEmpty": "Aucun épisode enregistré",
+  "applePendingReminder": ". Le système n’a pas encore confirmé cette échéance."
 }

@@ -26,3 +26,11 @@ __pycache__/
 *.db-shm
 
 releases/
+
+ios/Pods/
+ios/build/
+ios/.xcode.env.local
+ios/**/xcuserdata/
+ios/**/*.xcuserstate
+modules/series-native/.build/
+modules/series-native/.swiftpm/

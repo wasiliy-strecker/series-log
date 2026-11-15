@@ -23,6 +23,7 @@ const ports = vi.hoisted(() => ({
   changed: vi.fn(),
 }));
 vi.mock('react-native', () => ({
+  Platform: { OS: 'android', Version: 35, isMacCatalyst: false },
   BackHandler: {
     addEventListener: (_event: string, callback: () => boolean) => {
       ports.back = callback;

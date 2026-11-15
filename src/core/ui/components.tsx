@@ -123,7 +123,8 @@ export function Page({
               keyboardShouldPersistTaps="handled"
               keyboardDismissMode="on-drag"
               contentContainerStyle={{
-                paddingHorizontal: 16,
+                paddingLeft: Math.max(16, safe.left),
+                paddingRight: Math.max(16, safe.right),
                 paddingTop: 8,
                 paddingBottom: fab
                   ? Math.max(112, 56 * fontScale + 48) + safe.bottom
@@ -159,7 +160,8 @@ export function Page({
           {!!bottom && (
             <View
               style={{
-                paddingHorizontal: 16,
+                paddingLeft: Math.max(16, safe.left),
+                paddingRight: Math.max(16, safe.right),
                 paddingTop: 8,
                 paddingBottom: safe.bottom + 16,
                 backgroundColor: c.background,

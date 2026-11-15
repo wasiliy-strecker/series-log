@@ -1,0 +1,7 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "Diario delle serie",
+    "NSCameraUsageDescription": "Allega una foto al tuo avanzamento degli episodi su questo dispositivo.",
+    "NSPhotoLibraryUsageDescription": "Seleziona foto da allegare al tuo avanzamento degli episodi su questo dispositivo."
+  }
+}

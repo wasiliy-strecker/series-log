@@ -1,4 +1,6 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { Platform } from 'react-native';
+import type { Attachment } from '../src/core/domain/models';
 import { ExpoVault } from '../src/core/files/expo-vault';
 import { ExpoMedia } from '../src/core/media/media-service';
 import { fixture, sourcePdf } from './support';
@@ -10,17 +12,20 @@ const io = vi.hoisted(() => ({
   share: vi.fn(),
   sharePdfs: vi.fn(),
   nextId: 0,
+  pickPhotos: vi.fn(),
 }));
 vi.mock('expo-crypto', () => ({
   randomUUID: () =>
     `00000000-0000-4000-8000-${String(++io.nextId).padStart(12, '0')}`,
 }));
 vi.mock('expo-file-system', () => {
-  const uri = (parts: (string | { uri: string })[]) =>
-    parts
+  const uri = (parts: (string | { uri: string })[]) => {
+    const joined = parts
       .map((p) => (typeof p === 'string' ? p : p.uri))
-      .join('/')
-      .replace(/([^:])\/+/g, '$1/');
+      .join('/');
+    const prefix = joined.match(/^[a-z]+:\/\//i)?.[0] ?? '';
+    return prefix + joined.slice(prefix.length).replace(/\/{2,}/g, '/');
+  };
   class File {
     uri: string;
     constructor(...parts: (string | { uri: string })[]) {
@@ -84,7 +89,7 @@ vi.mock('expo-image-manipulator', () => ({
 }));
 vi.mock('expo-sharing', () => ({ shareAsync: io.share }));
 vi.mock('../src/core/native/series-native', () => ({
-  seriesNative: { sharePdfs: io.sharePdfs },
+  seriesNative: { sharePdfs: io.sharePdfs, pickPhotos: io.pickPhotos },
 }));
 
 let f: Awaited<ReturnType<typeof fixture>>;
@@ -97,6 +102,7 @@ function deferred() {
 }
 beforeEach(async () => {
   vi.resetAllMocks();
+  Object.assign(Platform, { OS: 'android', Version: 35, isMacCatalyst: false });
   io.files.clear();
   io.move.mockResolvedValue(undefined);
   io.copy.mockResolvedValue(undefined);
@@ -178,4 +184,41 @@ it('waits for every PDF part before handing its URIs to Android', async () => {
   expect(uris).toHaveLength(2);
   expect(new Set(uris).size).toBe(2);
   for (const uri of uris) expect(io.files.get(uri)).toEqual(bytes);
+});
+
+it('imports Mac photos through the native file dialog and removes only temporary copies', async () => {
+  Object.assign(Platform, { OS: 'ios', isMacCatalyst: true });
+  const temporary = 'file:///cache/series-photo-temporary.jpg';
+  const original = 'file:///user/Pictures/original.jpg';
+  io.files.set(temporary, new Uint8Array([1]));
+  io.files.set(original, new Uint8Array([2]));
+  const asset = {
+    uri: temporary,
+    width: 100,
+    height: 100,
+    fileName: 'photo.jpg',
+  };
+  io.pickPhotos.mockResolvedValue([asset]);
+  const media = new ExpoMedia(f.series);
+  const attachment = { id: 'photo' } as Attachment;
+  const importing = vi
+    .spyOn(media, 'importPhoto')
+    .mockResolvedValue(attachment);
+  expect(await media.pick('gallery', true)).toEqual({
+    attachments: [attachment],
+    failures: [],
+  });
+  expect(io.pickPhotos).toHaveBeenCalledWith(true);
+  expect(importing).toHaveBeenCalledWith(asset);
+  expect(io.files.has(temporary)).toBe(false);
+  expect(io.files.get(original)).toEqual(new Uint8Array([2]));
+});
+
+it('leaves data untouched when the Mac file dialog is cancelled', async () => {
+  Object.assign(Platform, { OS: 'ios', isMacCatalyst: true });
+  io.pickPhotos.mockResolvedValue([]);
+  expect(await new ExpoMedia(f.series).pick('gallery', false)).toEqual({
+    attachments: [],
+    failures: [],
+  });
 });

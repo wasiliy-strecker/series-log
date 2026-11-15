@@ -1,3 +1,4 @@
+import { isMac } from '../../core/native/platform';
 import { t, formatNumber } from '../../core/i18n/runtime';
 import { useLocalization } from '../../core/i18n/react';
 import { useState } from 'react';
@@ -102,14 +103,18 @@ export function PhotoGallery({
         title: text.replace,
         optionStyle: 'cards',
         options: [
-          {
-            value: 'camera',
-            label: text.camera,
-            icon: 'photo_camera_outlined',
-          },
+          ...(!isMac()
+            ? [
+                {
+                  value: 'camera',
+                  label: text.camera,
+                  icon: 'photo_camera_outlined' as const,
+                },
+              ]
+            : []),
           {
             value: 'gallery',
-            label: text.gallery,
+            label: isMac() ? t('macChoosePhotos') : text.gallery,
             icon: 'photo_library_outlined',
           },
         ],
@@ -217,26 +222,34 @@ export function PhotoEditor({
       </Body>
       {photos.length > 1 && (
         <Body style={{ marginTop: 6 }}>
-          {t('Zum Sortieren ein Foto länger gedrückt halten und verschieben.')}
+          {t(
+            isMac()
+              ? 'macPhotoSortHint'
+              : 'Zum Sortieren ein Foto länger gedrückt halten und verschieben.',
+          )}
         </Body>
       )}
       <View style={{ marginTop: 10 }}>
         <PhotoGallery photos={photos} actions={actions} />
       </View>
       <View style={{ marginTop: 12, gap: 8 }}>
-        <Button
-          secondary
-          icon="add_a_photo_outlined"
-          title={
-            photos.length ? t('Weiteres Foto aufnehmen') : t('Foto aufnehmen')
-          }
-          disabled={actions.busy}
-          onPress={() => void actions.pick('camera')}
-        />
+        {!isMac() && (
+          <Button
+            secondary
+            icon="add_a_photo_outlined"
+            title={
+              photos.length ? t('Weiteres Foto aufnehmen') : t('Foto aufnehmen')
+            }
+            disabled={actions.busy}
+            onPress={() => void actions.pick('camera')}
+          />
+        )}
         <Button
           secondary
           icon="photo_library_outlined"
-          title={t('Fotos aus Galerie hinzufügen')}
+          title={t(
+            isMac() ? 'macChoosePhotos' : 'Fotos aus Galerie hinzufügen',
+          )}
           disabled={actions.busy}
           onPress={() => void actions.pick('gallery')}
         />

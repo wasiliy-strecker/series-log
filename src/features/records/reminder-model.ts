@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import { t } from '../../core/i18n/runtime';
 import type { Reminder } from '../../core/domain/models';
 import type {
@@ -27,21 +28,29 @@ export const reminderModes = () => ({
   normal: {
     title: t('Normale Erinnerung'),
     description: t(
-      'Kann leicht verzögert erscheinen. Die Systemeinstellung „Nicht stören“ wird berücksichtigt.',
+      Platform.OS === 'ios'
+        ? 'appleReminderNormalDescription'
+        : 'Kann leicht verzögert erscheinen. Die Systemeinstellung „Nicht stören“ wird berücksichtigt.',
     ),
     icon: 'notifications_outlined' as const,
   },
   punctualWithSound: {
-    title: t('Pünktlich mit Ton'),
+    title: t(
+      Platform.OS === 'ios' ? 'appleReminderSoundTitle' : 'Pünktlich mit Ton',
+    ),
     description: t(
-      'Wird möglichst genau zur gewählten Uhrzeit wie ein Alarm ausgelöst.',
+      Platform.OS === 'ios'
+        ? 'appleReminderSoundDescription'
+        : 'Wird möglichst genau zur gewählten Uhrzeit wie ein Alarm ausgelöst.',
     ),
     icon: 'alarm_outlined' as const,
   },
 });
 export const testReminderHint = () =>
   t(
-    'Ziehe die Benachrichtigungsleiste herunter. Die Test-Erinnerung verschwindet nach einer Minute.',
+    Platform.OS === 'ios'
+      ? 'appleTestReminderHint'
+      : 'Ziehe die Benachrichtigungsleiste herunter. Die Test-Erinnerung verschwindet nach einer Minute.',
   );
 export function defaultReminder(now = new Date()): Reminder {
   return {
@@ -108,7 +117,8 @@ export function needsReminderRepair(
     (!!reminder &&
       (schedule?.planningState !== 'scheduled' ||
         schedule.nextTriggerAtMillis === null ||
-        (reminder.deliveryMode === 'punctualWithSound' &&
+        (Platform.OS === 'android' &&
+          reminder.deliveryMode === 'punctualWithSound' &&
           schedule.isExact !== true)))
   );
 }
@@ -131,7 +141,9 @@ export function reminderSaveWarning(
   const availability = reminderAvailability(status, reminder.deliveryMode);
   if (availability === 'appBlocked' || availability === 'channelBlocked')
     return t(
-      'Daten gespeichert. Erinnerungen sind in Android blockiert. Öffne die Erinnerung und dann die Android-Einstellungen.',
+      Platform.OS === 'ios'
+        ? 'appleRemindersBlocked'
+        : 'Daten gespeichert. Erinnerungen sind in Android blockiert. Öffne die Erinnerung und dann die Android-Einstellungen.',
     );
   if (!status || availability === 'unknown')
     return t(
@@ -145,6 +157,7 @@ export function reminderSaveWarning(
       'Daten gespeichert. Die Erinnerung konnte nicht bestätigt werden. Öffne die Erinnerung und speichere erneut.',
     );
   if (
+    Platform.OS === 'android' &&
     reminder.deliveryMode === 'punctualWithSound' &&
     (!status.exact || schedule.isExact !== true)
   )
@@ -159,7 +172,11 @@ export function reminderTestMessage(
 ): string {
   if (result === 'posted')
     return (
-      t('Test-Erinnerung wurde an Android übergeben. ') +
+      t(
+        Platform.OS === 'ios'
+          ? 'appleTestReminderSent'
+          : 'Test-Erinnerung wurde an Android übergeben. ',
+      ) +
       testReminderHint() +
       (quiet === true
         ? t(
@@ -176,6 +193,7 @@ export function reminderTestMessage(
 export function reminderSettingsFailure(
   target: ReminderSettingsTarget,
 ): string {
+  if (Platform.OS === 'ios') return t('appleReminderSettingsFailure');
   if (target === 'exact')
     return t(
       'Die Android-Einstellung „Alarme & Erinnerungen“ konnte nicht geöffnet werden. Öffne sie manuell in den Einstellungen deines Smartphones.',
@@ -230,7 +248,11 @@ export function reminderPresentation(
       error: true,
       action: 'edit',
     };
-  if (reminder.deliveryMode === 'punctualWithSound' && status?.exact === false)
+  if (
+    Platform.OS === 'android' &&
+    reminder.deliveryMode === 'punctualWithSound' &&
+    status?.exact === false
+  )
     return {
       title: t('Pünktlichkeit nicht erlaubt'),
       description: t(
@@ -240,6 +262,7 @@ export function reminderPresentation(
       action: 'exact',
     };
   if (
+    Platform.OS === 'android' &&
     reminder.deliveryMode === 'punctualWithSound' &&
     status?.exact === true &&
     schedule?.isExact === false
@@ -265,7 +288,8 @@ export function reminderPresentation(
     schedule?.planningState !== 'scheduled' ||
     schedule.nextTriggerAtMillis === null ||
     availability !== 'available' ||
-    (reminder.deliveryMode === 'punctualWithSound' &&
+    (Platform.OS === 'android' &&
+      reminder.deliveryMode === 'punctualWithSound' &&
       (!status || schedule.isExact === null))
   )
     return {
@@ -282,7 +306,19 @@ export function reminderPresentation(
     description:
       dateTime(schedule.nextTriggerAtMillis) +
       t(' Uhr') +
-      (due ? t('. Android hat diesen Termin noch nicht verarbeitet.') : ''),
+      (due
+        ? t(
+            Platform.OS === 'ios'
+              ? 'applePendingReminder'
+              : '. Android hat diesen Termin noch nicht verarbeitet.',
+          )
+        : '') +
+      (schedule.scheduledThroughMillis
+        ? '\n' +
+          t('appleReminderWindow', {
+            p0: dateTime(schedule.scheduledThroughMillis),
+          })
+        : ''),
     error: false,
     action: null,
   };

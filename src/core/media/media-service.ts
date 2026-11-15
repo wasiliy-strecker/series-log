@@ -1,3 +1,5 @@
+import { Platform } from 'react-native';
+import { isMac } from '../native/platform';
 import { t } from '../i18n/runtime';
 import * as ImagePicker from 'expo-image-picker';
 import * as DocumentPicker from 'expo-document-picker';
@@ -94,6 +96,18 @@ export class ExpoMedia implements MediaPort {
     source: NonNullable<EntryDraft['external']>,
     multiple = true,
   ): Promise<PickResult> {
+    if (isMac()) {
+      const assets = await seriesNative.pickPhotos(multiple);
+      try {
+        return await this.photos({ canceled: false, assets });
+      } finally {
+        // These are our temporary native picker copies, never the user's originals.
+        for (const asset of assets) {
+          const file = new File(asset.uri);
+          if (file.exists) file.delete();
+        }
+      }
+    }
     if (source === 'camera') {
       if (!(await ImagePicker.requestCameraPermissionsAsync()).granted)
         throw new Error(
@@ -121,7 +135,9 @@ export class ExpoMedia implements MediaPort {
     throw new Error(t('Unbekannte Bildquelle.'));
   }
   async recoverPhotos() {
-    return this.photos(await ImagePicker.getPendingResultAsync());
+    return Platform.OS === 'android'
+      ? this.photos(await ImagePicker.getPendingResultAsync())
+      : { attachments: [], failures: [] };
   }
   async open(item: { file: string; sha256: string }) {
     await verifiedFile(this.series.vault, item);
@@ -240,7 +256,7 @@ export class ExpoMedia implements MediaPort {
     const result = await DocumentPicker.getDocumentAsync({
       // Android providers store the custom .slbackup extension as binary data.
       // Keep the extension check below because other binary files share this MIME.
-      type: 'application/octet-stream',
+      type: Platform.OS === 'ios' ? '*/*' : 'application/octet-stream',
       multiple: false,
       copyToCacheDirectory: true,
     });

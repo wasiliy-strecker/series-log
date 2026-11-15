@@ -516,5 +516,21 @@
   "von": "de",
   "die App": "o app",
   "die Serie": "a série",
-  "Test: {p0} · {p1}": "Teste: {p0} · {p1}"
+  "Test: {p0} · {p1}": "Teste: {p0} · {p1}",
+  "appleReminderSoundTitle": "Com som",
+  "appleReminderSoundDescription": "O macOS mostra uma notificação com o som padrão. O modo silencioso, Foco e os ajustes podem silenciar o som.",
+  "appleReminderNormalDescription": "Notificação sem som. A exibição e a entrega dependem dos ajustes do macOS.",
+  "appleRemindersBlocked": "Os lembretes estão bloqueados. Permita as notificações de Diário de séries nos ajustes do sistema.",
+  "appleTestReminderHint": "Abra a Central de Notificações. A notificação de teste aparece após alguns segundos e pode ser removida ali.",
+  "appleTestReminderSent": "Notificação de teste enviada ao macOS. ",
+  "appleReminderWindowHint": "Alguns lembretes têm um período limitado. Confira a data final e reabra o app antes para agendar mais datas.",
+  "appleReminderWindow": "Agendado até {p0}. Reabra o app antes para agendar mais lembretes.",
+  "appleReminderCapacity": "O macOS não confirmou todos os lembretes. O app usa no máximo 60 notificações agendadas. Reduza os lembretes ativos e confira o status.",
+  "appleReminderSettingsFailure": "Abra Ajustes do Sistema → Notificações → Diário de séries para permitir notificações.",
+  "localAppDescription": "App local independente. Backups de até 128 MB. Rascunhos de formulários não são incluídos.",
+  "macChoosePhotos": "Escolher fotos dos arquivos",
+  "macPhotoGuidance": "Escolha uma foto ou captura do Mac. Digite a temporada e o episódio manualmente.",
+  "macPhotoSortHint": "Arraste uma foto para ordenar ou use Antes e Depois no menu.",
+  "appleNotificationEmpty": "Nenhum progresso registrado",
+  "applePendingReminder": ". O sistema ainda não confirmou esta data."
 }

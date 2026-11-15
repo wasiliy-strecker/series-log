@@ -9,3 +9,7 @@ assets
 test-results
 
 releases/
+
+ios
+modules/series-native/.build
+modules/series-native/.swiftpm

@@ -17,6 +17,7 @@ export type ReminderTestRequest = {
 export type ReminderScheduleStatus = {
   recordId: string;
   nextTriggerAtMillis: number | null;
+  scheduledThroughMillis?: number | null;
   planningState: string;
   isExact: boolean | null;
   deliveryFailed: boolean;
@@ -35,6 +36,12 @@ export type PdfSession = {
   pages: { width: number; height: number }[];
 };
 export interface SeriesNative {
+  // Apple-only entry point, called only for a Mac Catalyst runtime.
+  pickPhotos(
+    multiple: boolean,
+  ): Promise<
+    { uri: string; width: number; height: number; fileName: string }[]
+  >;
   getLocalization(): Localization;
   setLanguage(language: LanguagePreference): Promise<Localization>;
   addListener(

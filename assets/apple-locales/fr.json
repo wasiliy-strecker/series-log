@@ -1,0 +1,7 @@
+{
+  "ios": {
+    "CFBundleDisplayName": "Journal de séries",
+    "NSCameraUsageDescription": "Joignez une photo à votre suivi des épisodes sur cet appareil.",
+    "NSPhotoLibraryUsageDescription": "Sélectionnez des photos à joindre à votre suivi des épisodes sur cet appareil."
+  }
+}

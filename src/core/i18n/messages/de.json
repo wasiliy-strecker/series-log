@@ -516,5 +516,21 @@
   "von": "von",
   "die App": "die App",
   "die Serie": "die Serie",
-  "Test: {p0} · {p1}": "Test: {p0} · {p1}"
+  "Test: {p0} · {p1}": "Test: {p0} · {p1}",
+  "appleReminderSoundTitle": "Mit Ton",
+  "appleReminderSoundDescription": "macOS zeigt eine Mitteilung mit dem Standardton. Stummmodus, Fokus und Systemeinstellungen können den Ton unterdrücken.",
+  "appleReminderNormalDescription": "Mitteilung ohne Ton. Anzeige und Zeitpunkt richten sich nach deinen macOS-Einstellungen.",
+  "appleRemindersBlocked": "Erinnerungen sind blockiert. Erlaube Mitteilungen für SerienLog in den Systemeinstellungen.",
+  "appleTestReminderHint": "Öffne die Mitteilungszentrale. Die Testmitteilung erscheint nach wenigen Sekunden und kann dort entfernt werden.",
+  "appleTestReminderSent": "Testmitteilung an macOS übergeben. ",
+  "appleReminderWindowHint": "Einige Erinnerungen haben einen begrenzten Planungshorizont. Prüfe das angezeigte Enddatum und öffne die App vorher erneut, um weitere Termine zu planen.",
+  "appleReminderWindow": "Geplant bis {p0}. Öffne die App vorher erneut, um weitere Erinnerungen zu planen.",
+  "appleReminderCapacity": "macOS konnte nicht alle Erinnerungen bestätigen. Die App verwendet höchstens 60 geplante Mitteilungen. Reduziere aktive Erinnerungen und prüfe ihren Status.",
+  "appleReminderSettingsFailure": "Öffne Systemeinstellungen → Mitteilungen → SerienLog, um Mitteilungen zu erlauben.",
+  "localAppDescription": "Eigenständige lokale App. Backups bis 128 MB. Formularentwürfe gehören nicht zum Backup.",
+  "macChoosePhotos": "Fotos aus Dateien wählen",
+  "macPhotoGuidance": "Wähle ein Bild oder einen Screenshot von deinem Mac. Staffel und Folge gibst du selbst ein.",
+  "macPhotoSortHint": "Ziehe ein Foto zum Sortieren. Alternativ stehen im Fotomenü „Früher“ und „Später“ bereit.",
+  "appleNotificationEmpty": "Noch kein Folgenstand",
+  "applePendingReminder": ". Das System hat diesen Termin noch nicht bestätigt."
 }
